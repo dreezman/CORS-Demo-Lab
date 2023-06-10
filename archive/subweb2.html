@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SubWeb2 Login Website with Parameter</title>
+</head>
+<body>
+    <form target="_blank">
+        <input type="text" name="cid" id="cid"/>
+        <input type="password" name="pwd" id="pwd" />
+        <input type="submit" value="open" />
+    </form>
+    <button onclick="accessWebsite()">login</button>
+
+    <script>
+        function accessWebsite() {
+            myu = document.getElementById('cid').value;
+            myp = document.getElementById('pwd').value;
+            param='username: '+ myu + ' pass: ' + myp            
+            localStorage.setItem("userpass", param);
+            sessionStorage.setItem("iframeName", param);
+        }
+    </script>
+</body>
+</html>

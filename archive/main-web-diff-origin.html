@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe Storage Demo</title>
+</head><h1>The iframe Storage Example</h1>
+
+<body>
+
+<iframe src="http://localhost:3000/subweb.html"  id="subweb1">
+</iframe>
+
+
+<iframe src="http://localhost:3001/subweb.html" id="subweb2">
+</iframe>
+<br>
+<button type="button" id="sendtochild" >Send Message to SubwebC/button>
+    <p id="response"></p>
+<script>
+
+        // -------------------- send message
+        function clickHandler () {
+            //console.log("i am postmessagin");
+            document.getElementById("subweb1").contentWindow.postMessage('Parent sending to iframe: ',
+            '*');
+            }
+        document.getElementById("sendtochild").addEventListener('click',clickHandler,false);
+
+
+        // -------------------- receive message
+        let count=1
+        var messageEventHandler = function(event){
+        // check that the origin is one we want.
+            if(
+                 event.data != undefined && (typeof event.data) == 'string'
+                ) 
+                {
+                console.log('parent receving:  '+ event.data)
+                document.getElementById("response").innerHTML = event.data  + count;
+                count += 1
+                }            
+            }           
+       window.addEventListener('message', messageEventHandler,false);
+
+
+</script>
+
+</body>
+</html>

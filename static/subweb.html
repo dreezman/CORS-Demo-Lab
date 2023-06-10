@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SubWeb1 Login Website with Parameter</title>
+</head>
+<body>
+
+    <form onsubmit="return accessWebsite()">
+        <input type="text" name="cid" id="cid"/>
+        <input type="password" name="pwd" id="pwd" />
+        <input type="submit" value="Login" />
+    </form>
+
+    <p id="response"></p>
+
+    <button type="button" id="button1" >Send Message to Parent/button>
+        <p id="response"></p>
+    <script>
+        function accessWebsite() {
+            myu = document.getElementById('cid').value;
+            myp = document.getElementById('pwd').value;
+            param='username: '+ myu + ' pass: ' + myp            
+            localStorage.setItem("userpass", param);
+            sessionStorage.setItem("iframeName", param);
+        }
+
+        // -------------------- send message
+        function clickHandler () {
+            console.log("SubWeb Posting Message");
+            window.parent.postMessage('Iframe sending to parent: ',
+            '*');//could be generic too like '*'
+            }
+        document.getElementById("button1").addEventListener('click',clickHandler,false);
+
+
+
+        let count = 1
+        // ------------  Receive Message
+        var messageEventHandler = function(event){
+           // check that the origin is one we want.
+            //if(event.origin == 'https://www.tutorialspoint.com') {
+            if(true) {                
+                //alert(event.data);
+                console.log('Iframe host '+ window.location.host + ' responding with:  '+ event.data);
+                document.getElementById("response").innerHTML = event.data  + count;
+                count += 1
+            }            
+            }           
+        window.addEventListener('message', messageEventHandler,false);
+
+
+    </script>
+</body>
+</html>
