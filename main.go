@@ -1,6 +1,35 @@
 package main
 
-// kill %1 %2 %3 ; sleep 3 ; go run main.go TLD 8081 & go run main.go sub1 3000 & go run main.go sub2 3001 &
+/*
+
+This program is a CORS security lab the allows users to explore both the client and server
+side of CORS. Users can manipulate both the Client JavaScript and Server GO HTTP header CORS
+attributes and view what the results are.
+
+This is done thru the use of a main program and two iframes, all in different origins via
+unique port numbers. The main program is a web server that forks to sub-processes all with
+different port numbers which makes the document.location.origin unique. Users can then switch
+between the 3 JS contexts (main, iframe1, iframe2) and view how CORS impacts accessing data
+from the different origins. Users can do this with both
+
+- getelementbyid to retireve data between origins
+- postmessage between iframes to retrieve data
+
+Usage:
+
+    go run main.go  HTML-Window-Name UniquePortNumber
+
+Example:
+
+// Unix
+kill $(jobs -p) ; sleep 3 ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
+
+// Windows
+get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
+
+
+*/
+
 import (
 	"encoding/json"
 	"log"
@@ -27,6 +56,9 @@ type Message struct {
 var Name string = ""
 var Port string = "80"
 
+// --------------------------------------------------------------------------------------
+//                              MAIN: is just a web server
+// --------------------------------------------------------------------------------------
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Need 2 args, Name and PortNumber")
@@ -46,6 +78,10 @@ func main() {
 
 }
 
+// --------------------------------------------------------------------------------------
+//                              Add CORS headers to HTTP responses
+// --------------------------------------------------------------------------------------
+
 func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 	if addOriginHeader {
 		//w.Header().Add("X-Frame-Options", "GOFORIT")
@@ -64,6 +100,11 @@ func addHeaders(fs http.Handler) http.HandlerFunc {
 	}
 
 }
+
+// --------------------------------------------------------------------------------------
+//      Add message handler to recieve postMessages from iframes and return data
+// --------------------------------------------------------------------------------------
+
 func jsonhandler(w http.ResponseWriter, r *http.Request) {
 	// Create a sample message
 	message := Message{Text: "ThisPasswordIsSecretFor:" + Name}
