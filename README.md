@@ -1,13 +1,13 @@
 # CORS Demo Lab
 
-One of the missing when watching YouTube videos explaining technology, is the hands on experience
+One of the elements missing when watching YouTube videos explaining technology, is the hands on experience
 to explore the "What Ifs" along with seeing both sides of the client-server interaction on a step-by-step
 basis. This is the only way to fully understand how a technology works.
 
 Single-Origin-Policy (SOP) and Cross-Origin-Requests (CORS) are easy to understand at a high
 level, but once one reads all the rules behind it, becomes very complex. There are a lot of
 "Rule XXX is always true EXCEPT in these cases". So in order to explore the intracies of 
-CORS "What-Ifs", I created a golang based CORS lab.
+CORS "What-Ifs", I created a Golang based CORS lab.
 
 This CORS security lab allows users to explore both the client and server
 side of CORS. Users can manipulate both the Client JavaScript and Server GO HTTP header CORS

@@ -2,32 +2,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Iframe CORS  Demo</title>
-</head><h3>The iframe CORS Example</h3>
+    <title> CORS  Demo Lab</title>
+</head><h2>CORS  Demo Lab</h2>
 
-<body>
-
+<body style="border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightgreen;">
 <!-- -------------------------------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------------------------------- -->
-<!--                       Set up 2 iFrames                                                       -->
-<!-- go run static-web.go TLD 8081 & go run static-web.go sub1 3000 & go run static-web.go sub2 3001 & -->
-<!-- -------------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------------- -->
-    <h3> iframe 1 </h3>
-<iframe style="border: 10 solid black; width:100%; height: 200px; overflow: auto;" id="iframe1">
-</iframe>
-
-
-
-<h3> iframe 2 </h3>
-<iframe style=" border: 10 solid black; width:100%; height: 200px; overflow: auto;"  id="iframe2">
-</iframe>
-<p id="response"></p>
-<br>
-
-<!-- -------------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------------- -->
-<!--                       Setup  Parent                                                    -->
+<!--                       Setup  Parent    Window                                                -->
 <!-- -------------------------------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------------------------------- -->
 
@@ -39,55 +20,74 @@
 <button type="button" id="sendtochild1" > Send Message to iframe 1  </button>
 <button type="button" id="sendtochild2" > Send Message to iframe 2  </button>
 <br>
+<p id="response"></p>
+<br>
+<hr>
+<!-- -------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------- -->
+<!--                       Set up 2 iFrames                                                       -->
+<!-- go run static-web.go TLD 8081 & go run static-web.go sub1 3000 & go run static-web.go sub2 3001 & -->
+<!-- -------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------- -->
+    <h3> iframe 1 </h3>
+<iframe style="border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightblue;" id="iframe1">
+</iframe>
+
+
+
+<h3> iframe 2 </h3>
+<iframe style=" border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightgoldenrodyellow;"  id="iframe2">
+</iframe>
+
+
 
 <script>
 
-        // ------------------------------------------------------------------------------------
-        // -------------------- Add event listeners to iframes to send msgs via button click to iframes
-        // ------------------------------------------------------------------------------------
-        function clickHandler (e) {
-            //console.log("i am postmessagin");
-            document.getElementById(e.currentTarget.myParam).contentWindow.postMessage('Parent sending to iframe: ',
-            '*'); //could be generic too like '*'
-            }
-        document.getElementById("sendtochild1").addEventListener('click',clickHandler,false);
-        document.getElementById("sendtochild1").myParam = "iframe1"
-        document.getElementById("sendtochild2").addEventListener('click',clickHandler,false);
-        document.getElementById("sendtochild2").myParam = "iframe2"
+    // ------------------------------------------------------------------------------------
+    // -------------------- Add event listeners to iframes to send msgs via button click to iframes
+    // ------------------------------------------------------------------------------------
+    function clickHandler (e) {
+        //console.log("i am postmessagin");
+        document.getElementById(e.currentTarget.myParam).contentWindow.postMessage('Parent sending to iframe: ',
+        '*'); //could be generic too like '*'
+        }
+    document.getElementById("sendtochild1").addEventListener('click',clickHandler,false);
+    document.getElementById("sendtochild1").myParam = "iframe1"
+    document.getElementById("sendtochild2").addEventListener('click',clickHandler,false);
+    document.getElementById("sendtochild2").myParam = "iframe2"
 
-        // ------------------------------------------------------------------------------------
-        // -------------------- Event listeners to receive message from iframes
-        // ------------------------------------------------------------------------------------
-        let count=1
-        var messageEventHandler = function(event){
-        // check that the origin is one we want.
-            if(
-                 event.data != undefined && (typeof event.data) == 'string'
-                ) 
-                {
-                console.log('parent window receving:  '+ event.data)
-                document.getElementById("response").innerHTML = event.data  + count;
-                count += 1
-                }            
-            }           
-       window.addEventListener('message', messageEventHandler,false);
+    // ------------------------------------------------------------------------------------
+    // -------------------- Event listeners to receive message from iframes
+    // ------------------------------------------------------------------------------------
+    let count=1
+    var messageEventHandler = function(event){
+    // check that the origin is one we want.
+        if(
+                event.data != undefined && (typeof event.data) == 'string'
+            ) 
+            {
+            console.log('parent window receving:  '+ event.data)
+            document.getElementById("response").innerHTML = event.data  + count;
+            count += 1
+            }            
+        }           
+    window.addEventListener('message', messageEventHandler,false);
 
 
 </script>
 
 </body>
-<script>
-      // ------------------------------------------------------------------------------------
-        // -------------------- Setup Iframes with parameters
+    <script>
         // ------------------------------------------------------------------------------------
-    const urlParams = new URL(window.location.toLocaleString()).searchParams;
-    let url1 = urlParams.get('iframeurl1'); // get the HTML page that we should load into the iFrame
-    let url2 = urlParams.get('iframeurl2'); // get the HTML page that we should load into the iFrame
-    let myIframe = document.getElementById("iframe1")
-    myIframe.src = url1
-    myIframe = document.getElementById("iframe2")
-    myIframe.src = url2
-
-</script>
+        // -------------------- Setup Iframes by loading their HTML pages into the iframes
+        // ------------------------------------------------------------------------------------
+        const urlParams = new URL(window.location.toLocaleString()).searchParams;
+        let url1 = urlParams.get('iframeurl1'); // get the HTML page that we should load into the iFrame
+        let url2 = urlParams.get('iframeurl2'); // get the HTML page that we should load into the iFrame
+        let myIframe = document.getElementById("iframe1")
+        myIframe.src = url1
+        myIframe = document.getElementById("iframe2")
+        myIframe.src = url2
+    </script>
 </html>
 
