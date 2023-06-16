@@ -45,11 +45,15 @@ get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe
 
 ## Usage
 
-Wait for program to start, takes 30 seconds, then browse to main web server it will load the iframes with the right HTML pages.
+Wait for program to start, takes 30 seconds, then browse to main web server it will load the HTML into all the 3 web servers from each
+or their respective origins.
 ```
-http://localhost:8081/?iframeurl=iframes.html
+http://localhost:8081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html
 ```
-press on the "Send Message" buttons to send messages postMessages between the 
+![Alt text](images/iframe-setup.jpg)
+
+
+Now press on the "Send Message" buttons to send messages postMessages between the 
 iframes and the parent, all in different origins. 
 
 Use Chrome Inspector or Firefox Debugger, to monitor the network traffic and inspect the header fields for the CORS headers. 
@@ -75,9 +79,20 @@ response=await fetch("http://localhost:3000/get-json"); await response.text()
 ```
 ![Alt text](images/fetch-queries.jpg) 
 
+Also try reading local storage to/from different origins to see if you can access local storage.
 
 
-()
+```
+# From Parent to Iframes
+window.frames[0].localStorage
+window.frames[1].localStorage
+# From Iframes to each other
+window.parent.frames[0].localStorage
+window.parent.frames[1].localStorage
+# From Iframes to parent
+window.parent.localStorage
+```
+
 
 Video coming soon...
 

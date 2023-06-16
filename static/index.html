@@ -81,11 +81,12 @@
         // -------------------- Setup Iframes with parameters
         // ------------------------------------------------------------------------------------
     const urlParams = new URL(window.location.toLocaleString()).searchParams;
-    let url = urlParams.get('iframeurl'); // get the HTML page that we should load into the iFrame
+    let url1 = urlParams.get('iframeurl1'); // get the HTML page that we should load into the iFrame
+    let url2 = urlParams.get('iframeurl2'); // get the HTML page that we should load into the iFrame
     let myIframe = document.getElementById("iframe1")
-    myIframe.src = url
+    myIframe.src = url1
     myIframe = document.getElementById("iframe2")
-    myIframe.src = url
+    myIframe.src = url2
 
 </script>
 </html>

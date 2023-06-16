@@ -5,6 +5,12 @@
 </head>
 <body>
 
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup login form to store passwords in local storage                                                   -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
     <form onsubmit="return accessWebsite()">
         <input type="text" name="cid" id="cid"/>
         <input type="password" name="pwd" id="pwd" />
@@ -13,8 +19,7 @@
 
     <p id="response"></p>
 
-    <button type="button" id="button1" >Send Message to Parent/button>
-        <p id="response"></p>
+
     <script>
         function accessWebsite() {
             myu = document.getElementById('cid').value;
@@ -23,17 +28,30 @@
             localStorage.setItem("userpass", param);
             sessionStorage.setItem("iframeName", param);
         }
+     </script>
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--            Setup Button to send message to parent via postMessage -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
 
-        // -------------------- send message
-        function clickHandler () {
-            console.log("iframeWeb Posting Message");
-            window.parent.postMessage('Iframe sending to parent: ',
-            '*');//could be generic too like '*'
-            }
+
+    <button type="button" id="button1" >Send Message to Parent<button>
+    <p id="response"></p>
+        <script>
+
+            function clickHandler () {
+                console.log("iframeWeb Posting Message");
+                window.parent.postMessage('Iframe sending to parent: ',
+                '*');//could be generic too like '*'
+                }
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    //        Setup message listener, to alert when receive message iframes or parent
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------    
+        
         document.getElementById("button1").addEventListener('click',clickHandler,false);
-
-
-
         let count = 1
         // ------------  Receive Message
         var messageEventHandler = function(event){
