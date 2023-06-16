@@ -1,6 +1,7 @@
 package main
 
 /*
+                               CORS Lab
 
 This program is a CORS security lab the allows users to explore both the client and server
 side of CORS. Users can manipulate both the Client JavaScript and Server GO HTTP header CORS
@@ -17,15 +18,23 @@ from the different origins. Users can do this with both
 
 Usage:
 
-    go run main.go  HTML-Window-Name UniquePortNumber
+    Start main process: go run main.go  HTML-Window-Name UniquePortNumber
 
 Example:
+
+Start 3 web servers with different port numbers. 1 main webserver and 2 others for the iframes
 
 // Unix
 kill $(jobs -p) ; sleep 3 ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
 
 // Windows
-get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
+get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframes 3000 & go run main.go iframes 3001 &
+
+
+once the main and 2 iframes are started, browse them. you have to pass the url that the frames will use to render their pages
+
+http://localhost:8081/?iframeurl=iframes.html
+
 
 
 */

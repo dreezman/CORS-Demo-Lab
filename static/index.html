@@ -80,14 +80,11 @@
       // ------------------------------------------------------------------------------------
         // -------------------- Setup Iframes with parameters
         // ------------------------------------------------------------------------------------
-    // http://localhost:8081/main-web-same-origin.html?url1=http://localhost:8081/subweb.html&url2=http://localhost:8081/subweb.html
-    // http://localhost:8081/main-web-same-origin.html?url1=http://localhost:3000/subweb.html&url2=http://localhost:3001/subweb.html
     const urlParams = new URL(window.location.toLocaleString()).searchParams;
-    let url = urlParams.get('url1');
+    let url = urlParams.get('iframeurl'); // get the HTML page that we should load into the iFrame
     let myIframe = document.getElementById("iframe1")
     myIframe.src = url
     myIframe = document.getElementById("iframe2")
-    url = urlParams.get('url2');
     myIframe.src = url
 
 </script>
