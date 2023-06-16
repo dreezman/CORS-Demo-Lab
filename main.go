@@ -35,7 +35,13 @@ once the main and 2 iframes are started, browse them. you have to pass the url t
 
 http://localhost:8081/?iframeurl=iframes.html
 
+press on the "Send Message" buttons to send messages postMessages between the
+iframes and the parent, all in different origins.
 
+Using Chrome Inspector or Firefox Debugger, to monitor the network traffic and
+inspect the header fields for the CORS headers.const
+
+You can then modify the
 
 */
 
@@ -51,12 +57,12 @@ import (
 //                              Modify HTTP Header
 // --------------------------------------------------------------------------------------
 
-const addOriginHeader = false                    // add Access-Control header to HTTP response
-var AllowOrigin string = "http://localhost:8081" // Choose a Access-Control origin header
+const addOriginHeader = true // add Access-Control header to HTTP response
+var AllowOrigin string = "*" // Choose a Access-Control origin header
+//var AllowOrigin string = "http://localhost:8081"
 //var AllowOrigin string = "http://localhost:3000"
 //var AllowOrigin string = "http://localhost:3001"
 //var AllowOrigin string = "http://localhost:222"
-//var AllowOrigin string = "*"
 
 type Message struct {
 	Text string `json:"text"`
