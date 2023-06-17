@@ -2,7 +2,7 @@
   - [Installation](#installation)
   - [Usage](#usage)
     - [Start Program](#start-program)
-    - [Cross-Domain Inspections](#cross-domain-inspections)
+    - [Cross-Origin Queries](#cross-origin-queries)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -99,9 +99,24 @@ var AllowOrigin string = "*" // Choose a Access-Control origin header
 ```
 <hr>
 
-### Cross-Domain Inspections
+Also test the login sequence with user: admin password: password and view the post and response. Note the response token is stored in the localStorage.
+![Alt text](images/login.jpg)
+![Alt text](images/token.jpg)
 
-You can also use the Inspector Console to manually do queries between the 3 origins to see if you can read the responses to the queries.
+
+
+
+
+### Cross-Origin Queries
+
+Now we will manually to cross-Origin queries by manually executing JavaScript commands.
+
+In the Inspector console, one can switch between JavaScript contexts to execute JavaScript commands in the local context.
+
+![Alt text](images/jscontexts.jpg)
+
+
+Use the Inspector Console to manually do queries between the 3 origins to see if you can read the responses to the queries.
 
 
 ```
@@ -110,6 +125,7 @@ response=await fetch("http://localhost:3000/get-json"); await response.text()
 ```
 ![Alt text](images/fetch-queries.jpg) 
 <hr>
+
 Also try reading local storage to/from different origins to see if you can access local storage.
 
 
