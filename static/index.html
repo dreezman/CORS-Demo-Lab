@@ -22,6 +22,57 @@
 <br>
 <p id="response"></p>
 <br>
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup login form to store passwords in local storage                                                   -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup login form to store passwords in local storage                                                   -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+
+    <p id="response"></p>
+
+    <h2>Login Form</h2>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br>
+      <input type="submit" value="Login">
+    </form>
+
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+      
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+      
+        try {
+          const response = await fetch(document.location.origin + '/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+      
+          const data = await response.json();
+          console.log(data);
+          window.localStorage.setItem('AccessToken',data.token)
+        } catch (error) {
+        console.error('An error occurred:', error.message);
+        }
+      });
+    </script>
+
 <hr>
 <!-- -------------------------------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------------------------------- -->
@@ -30,13 +81,13 @@
 <!-- -------------------------------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------------------------------- -->
     <h3> iframe 1 </h3>
-<iframe style="border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightblue;" id="iframe1">
+<iframe style="border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: lightblue;" id="iframe1">
 </iframe>
 
 
 
 <h3> iframe 2 </h3>
-<iframe style=" border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightgoldenrodyellow;"  id="iframe2">
+<iframe style=" border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: lightgoldenrodyellow;"  id="iframe2">
 </iframe>
 
 

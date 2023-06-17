@@ -82,7 +82,11 @@ func main() {
 	Name = os.Args[1]
 	Port = os.Args[2]
 	fs := http.FileServer(http.Dir("./static"))
+	// handle logins
+	http.HandleFunc("/login", loginHandler)
+	// handle default web requests
 	http.Handle("/", addHeaders(fs))
+	// test program: return secrets to client, see if they read it
 	http.HandleFunc("/get-json", jsonhandler)
 
 	log.Print(Name + " Listening on :" + Port + "...")
@@ -91,6 +95,81 @@ func main() {
 		log.Fatal(err)
 	}
 
+}
+
+// --------------------------------------------------------------------------------------
+//      Login Logic to handle passwords
+// --------------------------------------------------------------------------------------
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+type LoginResponse struct {
+	Message string `json:"message"`
+	Token   string `json:"token"`
+	Success bool   `json:"success"`
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var loginReq LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	// Perform authentication logic here
+
+	// Check if the username and password are valid
+	success := loginReq.Username == "admin" && loginReq.Password == "password"
+	message := ""
+	token := ""
+	if success {
+		message = "Login successful!"
+		token = "12345"
+	} else {
+		message = "Invalid username or password"
+	}
+
+	loginResp := LoginResponse{
+		Message: message,
+		Token:   token,
+		Success: success,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
+		http.Error(w, "Failed to encode JSON response", http.StatusInternalServerError)
+		return
+	}
+}
+
+// --------------------------------------------------------------------------------------
+//      Add HTTP Request Handler to recieve GET /get-json request to return data to client
+//      so see if client can read it cross-origin
+// --------------------------------------------------------------------------------------
+
+func jsonhandler(w http.ResponseWriter, r *http.Request) {
+	// Create a sample message
+	message := Message{Text: "ThisPasswordIsSecretFor:" + Name}
+
+	// Convert the message to JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Set the content type to application/json
+	w.Header().Set("Content-Type", "application/json")
+	WriteACHeader(w, AllowOrigin)
+
+	// Write the JSON data to the response body
+	w.Write(jsonData)
 }
 
 // --------------------------------------------------------------------------------------
@@ -114,27 +193,4 @@ func addHeaders(fs http.Handler) http.HandlerFunc {
 		fs.ServeHTTP(w, r)
 	}
 
-}
-
-// --------------------------------------------------------------------------------------
-//      Add message handler to recieve postMessages from iframes and return data
-// --------------------------------------------------------------------------------------
-
-func jsonhandler(w http.ResponseWriter, r *http.Request) {
-	// Create a sample message
-	message := Message{Text: "ThisPasswordIsSecretFor:" + Name}
-
-	// Convert the message to JSON
-	jsonData, err := json.Marshal(message)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// Set the content type to application/json
-	w.Header().Set("Content-Type", "application/json")
-	WriteACHeader(w, AllowOrigin)
-
-	// Write the JSON data to the response body
-	w.Write(jsonData)
 }

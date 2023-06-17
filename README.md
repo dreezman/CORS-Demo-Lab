@@ -1,3 +1,13 @@
+- [CORS Demo Lab](#cors-demo-lab)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Start Program](#start-program)
+    - [Cross-Domain Inspections](#cross-domain-inspections)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+
+
 # CORS Demo Lab
 
 One of the elements missing when watching YouTube videos explaining technology, is the hands on experience
@@ -40,16 +50,33 @@ from the different origins. Users can do this with both
 kill $(jobs -p) ; sleep 3 ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
 
 // Windows
-get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframes 3000 & go run main.go iframes 3001 &
+get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
 ```
 
 ## Usage
 
+We will be exploring:
+
+- cross-domain inspections internally inside browser
+- postMessage (inter-window messaging) vs fetch(HTTP requests)
+
+We will use the browser debugger/Inspector a lot to examine the code and traffic between the client and browser. 
+- Chrome:   Press F12 in Chrome or 
+- FireFox: 3-bars-MoreTools-WebDeveloperTools
+
+to begin inspection.
+<hr>
+
+### Start Program
+
 Wait for program to start, takes 30 seconds, then browse to main web server it will load the HTML into all the 3 web servers from each
-or their respective origins.
+or their respective origins. 
 ```
 http://localhost:8081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html
 ```
+
+You can see pages loaded in their respective origins.
+
 ![Alt text](images/iframe-setup.jpg)
 
 
@@ -59,16 +86,20 @@ iframes and the parent, all in different origins.
 Use Chrome Inspector or Firefox Debugger, to monitor the network traffic and inspect the header fields for the CORS headers. 
 ![Alt text](images/cors-headers.jpg)
 
-You can then modify the main.go program to change HTTP header fields and watch the errors occur in the console.
+The default is to allow all cross-origin requests via "Access-Control-Allow-Origin: *"
+
+You can then modify the [main.go](./main.go) program to change HTTP header fields and watch the CORS errors occur in the console.
 ```
-const addOriginHeader = false                    // add Access-Control header to HTTP response
-var AllowOrigin string = "http://localhost:8081" // Choose a Access-Control origin header
+const addOriginHeader = true // add Access-Control header to HTTP response
+var AllowOrigin string = "*" // Choose a Access-Control origin header
+//var AllowOrigin string = "http://localhost:8081"
 //var AllowOrigin string = "http://localhost:3000"
 //var AllowOrigin string = "http://localhost:3001"
 //var AllowOrigin string = "http://localhost:222"
-//var AllowOrigin string = "*"
 ```
+<hr>
 
+### Cross-Domain Inspections
 
 You can also use the Inspector Console to manually do queries between the 3 origins to see if you can read the responses to the queries.
 
@@ -78,7 +109,7 @@ response=await fetch("http://localhost:8081/get-json"); await response.text()
 response=await fetch("http://localhost:3000/get-json"); await response.text()
 ```
 ![Alt text](images/fetch-queries.jpg) 
-
+<hr>
 Also try reading local storage to/from different origins to see if you can access local storage.
 
 

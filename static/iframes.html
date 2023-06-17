@@ -11,48 +11,74 @@
     <!--                       Setup login form to store passwords in local storage                                                   -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
-    <form onsubmit="return accessWebsite()">
-        <input type="text" name="cid" id="cid"/>
-        <input type="password" name="pwd" id="pwd" />
-        <input type="submit" value="Login" />
-    </form>
 
-    <p id="response"></p>
+
+
+
+    <h2>Login Form</h2>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br>
+      <input type="submit" value="Login">
+    </form>
 
 
     <script>
-        function accessWebsite() {
-            myu = document.getElementById('cid').value;
-            myp = document.getElementById('pwd').value;
-            param='username: '+ myu + ' pass: ' + myp            
-            localStorage.setItem("userpass", param);
-            sessionStorage.setItem("iframeName", param);
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+      
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+      
+        try {
+          const response = await fetch(document.location.origin + '/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+      
+          const data = await response.json();
+          console.log(data);
+          window.localStorage.setItem('AccessToken',data.token)
+        } catch (error) {
+        console.error('An error occurred:', error.message);
         }
-     </script>
+      });
+    </script>
+
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!--            Setup Button to send message to parent via postMessage -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
 
+    <hr>
 
-    <button type="button" id="button1" >Send Message to Parent<button>
-    <p id="response"></p>
-        <script>
 
-            function clickHandler () {
-                console.log("iframeWeb Posting Message");
-                window.parent.postMessage('Iframe sending to parent: ',
-                '*');//could be generic too like '*'
-                }
-    // ----------------------------------------------------------------------------
-    // ----------------------------------------------------------------------------
-    //        Setup message listener, to alert when receive message iframes or parent
-    // ----------------------------------------------------------------------------
-    // ----------------------------------------------------------------------------    
-        
+    <button type="button" id="button1" > Send Message to Parent <button>
+
+    <script>
+
+        function clickHandler () {
+            console.log("iframeWeb Posting Message");
+            window.parent.postMessage('Iframe sending to parent: ',
+            '*');//could be generic too like '*'
+            }
         document.getElementById("button1").addEventListener('click',clickHandler,false);
-        let count = 1
+
+    </script>
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--     Setup message listener, to alert when receive message iframes or parent-->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <div Parent Response Counter: id="response"></div>
+    <script>
+    let count = 1
         // ------------  Receive Message
         var messageEventHandler = function(event){
            // check that the origin is one we want.
