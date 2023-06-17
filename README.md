@@ -14,10 +14,18 @@ One of the elements missing when watching YouTube videos explaining technology, 
 to explore the "What Ifs" along with seeing both sides of the client-server interaction on a step-by-step
 basis. This is the only way to fully understand how a technology works.
 
-Single-Origin-Policy (SOP) and Cross-Origin-Requests (CORS) are easy to understand at a high
+
+Same-Origin-Policy (SOP) and Cross-Origin-Requests (CORS) are easy to understand at a high
 level, but once one reads all the rules behind it, becomes very complex. There are a lot of
 "Rule XXX is always true EXCEPT in these cases". So in order to explore the intracies of 
 CORS "What-Ifs", I created a Golang based CORS lab.
+
+Lesson 1: Site vs Origin..
+Same Origin Policy states that JavaScript cannot access data across Origins. What is an Origin?
+An origin is very strict, the whole url domain from 'h' to portnumber will make a match. Subdomains are not in the same Origin.
+Site is more flexible, subdomains are in the same Site. These are used in cookie restrictions.
+
+![Alt text](images/origin-site.jpg)
 
 This CORS security lab allows users to explore both the client and server
 side of CORS. Users can manipulate both the Client JavaScript and Server GO HTTP header CORS
@@ -25,13 +33,21 @@ attributes and view what the results are.
 
 This is done thru the use of a main program and two iframes, all in different origins via
 unique port numbers. The main program is a web server that forks to sub-processes all with
-different port numbers which makes the document.location.origin unique. Users can then switch
-between the 3 JS contexts (main, iframe1, iframe2) and view how CORS impacts accessing data
-from the different origins. Users can do this with both
+different port numbers which makes the document.location.origin unique. 
 
-- getElementById() to retireve data between origins
-- postMessage between iframes to retrieve data
 ![Alt text](images/cors-lab.jpg)
+
+Users can then switch between the 3 JS contexts (main, iframe1, iframe2) and view how CORS impacts accessing data
+from the different origins. Users can do this with:
+
+- Forms - Post login and try to view response
+- getElementById() to retrieve data between origins and see response
+- postMessage between iframes to retrieve data
+- JS fetch - can one fetch/HTTP GET and view response between origins
+- localStorage - Can one access local storage between origins
+
+
+
 ## Installation
 
 —-------------
