@@ -59,11 +59,11 @@ import (
 // --------------------------------------------------------------------------------------
 
 const addOriginHeader = true // add Access-Control header to HTTP response
-//var AllowOrigin string = "*" // Choose a Access-Control origin header
+var AllowOrigin string = "*" // Choose a Access-Control origin header
 //var AllowOrigin string = "http://localhost:8081"
 //var AllowOrigin string = "http://localhost:3000"
 //var AllowOrigin string = "http://localhost:3001"
-var AllowOrigin string = "http://localhost:222"
+//var AllowOrigin string = "http://localhost:222"
 
 type Message struct {
 	Text string `json:"text"`

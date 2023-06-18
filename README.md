@@ -1,5 +1,7 @@
 - [CORS Demo Lab](#cors-demo-lab)
   - [Background](#background)
+    - [Lesson 1: Where does Origin Come From?](#lesson-1-where-does-origin-come-from)
+    - [Lesson 2: Site vs Origin..](#lesson-2-site-vs-origin)
   - [Lab Overview](#lab-overview)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -33,12 +35,19 @@ level, but once one reads all the rules behind it, becomes very complex . There 
 So in order to explore the intracies of CORS "What-Ifs", I created a Golang based CORS lab. Developers can use this lab to better understand the "What-Ifs"of CORS, and hopefully work within its limitations vs coding around them.
 
 
+### Lesson 1: Where does Origin Come From?
 
-Lesson 1: Site vs Origin..
+When a browser/render loads a page from a website, the browser tags that page with a Origin attribute in the DOM. This attribute is used to determine which windows/frames can see what data.
+
+![Alt text](images/iframe-setup.jpg)
+![Alt text](images/origin-host-info.jpg)
+
+
+### Lesson 2: Site vs Origin..
+
 Same Origin Policy states that JavaScript cannot access data across Origins. What is an Origin?
 An origin is very strict, the whole url domain from 'h' to portnumber will make a match. Subdomains are not in the same Origin.
 Site is more flexible, subdomains are in the same Site. These are used in cookie restrictions.
-
 ![Alt text](images/origin-site.jpg)
 
 
@@ -229,22 +238,22 @@ Why is it working/not working?
 #### PostMessage 
 
 ```
-From iframes do this
+// From iframes do this
 window.parent.frames[0].postMessage(localStorage.userpass,'*')
 window.parent.frames[1].postMessage(localStorage.userpass,'*')
 window.parent.postMessage(localStorage.userpass,'*')
 
-Look what post message does with
+// Look what post message does with
 http://localhost:3000
 http://localhost:8081
 http://localhost:3001
 
-In frame1 do this
+// In frame1 do this
 monitorEvents(window, 'message')
 
-In frame2 do this to frame1
+// In frame2 do this to frame1
 window.parent.frames[0].postMessage('hixxxxx','*')
-Look at data
+// Look at data
 ```
 
 #### X-Frame Options
