@@ -43,7 +43,8 @@
       
           const data = await response.json();
           console.log(data);
-          window.localStorage.setItem('AccessToken',data.token)
+          window.localStorage.setItem("AccessToken"+ document.location.port,data.token)
+          window.document.cookie="AccessToken"+ document.location.port + "=" + data.token
         } catch (error) {
         console.error('An error occurred:', error.message);
         }
@@ -76,7 +77,7 @@
     <!--     Setup message listener, to alert when receive message iframes or parent-->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
-    <div Parent Response Counter: id="response"></div>
+
     <script>
     let count = 1
         // ------------  Receive Message
@@ -94,5 +95,6 @@
 
 
     </script>
+        <div Parent Response Counter: id="response"></div>
 </body>
 </html>

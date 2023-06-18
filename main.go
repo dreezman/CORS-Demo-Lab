@@ -28,7 +28,7 @@ Start 3 web servers with different port numbers. 1 main webserver and 2 others f
 kill $(jobs -p) ; sleep 3 ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
 
 // Windows
-get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframes 3000 & go run main.go iframes 3001 &
+get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframes1 3000 & go run main.go iframes2 3001 &
 
 
 once the main and 2 iframes are started, browse them. you have to pass the url that the frames will use to render their pages
@@ -50,6 +50,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 //
@@ -58,11 +59,11 @@ import (
 // --------------------------------------------------------------------------------------
 
 const addOriginHeader = true // add Access-Control header to HTTP response
-var AllowOrigin string = "*" // Choose a Access-Control origin header
+//var AllowOrigin string = "*" // Choose a Access-Control origin header
 //var AllowOrigin string = "http://localhost:8081"
 //var AllowOrigin string = "http://localhost:3000"
 //var AllowOrigin string = "http://localhost:3001"
-//var AllowOrigin string = "http://localhost:222"
+var AllowOrigin string = "http://localhost:222"
 
 type Message struct {
 	Text string `json:"text"`
@@ -81,6 +82,8 @@ func main() {
 	}
 	Name = os.Args[1]
 	Port = os.Args[2]
+
+	// Setup all the paths to handle HTTP requests
 	fs := http.FileServer(http.Dir("./static"))
 	// handle logins
 	http.HandleFunc("/login", loginHandler)
@@ -89,12 +92,28 @@ func main() {
 	// test program: return secrets to client, see if they read it
 	http.HandleFunc("/get-json", jsonhandler)
 
-	log.Print(Name + " Listening on :" + Port + "...")
-	err := http.ListenAndServe(":"+Port, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// HTTP server
+	go func() {
+		log.Print(Name + " Listening on HTTP port:" + Port + "...")
+		err := http.ListenAndServe(":"+Port, nil)
+		if err != nil {
+			log.Fatal("Error starting HTTP server: ", err)
+		}
+	}()
 
+	// HTTPS server
+	go func() {
+		HttpsPort, err := strconv.Atoi(Port)
+		HttpsPort += 300
+		log.Print(Name + " Listening on HTTPS port:" + strconv.Itoa(HttpsPort) + "...")
+		certFile := "./certificate.crt"
+		keyFile := "./privatekey.key"
+		err = http.ListenAndServeTLS(":"+strconv.Itoa(HttpsPort), certFile, keyFile, nil)
+		if err != nil {
+			log.Fatal("Error starting HTTPS server: ", err)
+		}
+	}()
+	select {}
 }
 
 // --------------------------------------------------------------------------------------
@@ -142,6 +161,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	WriteACHeader(w, AllowOrigin)
 	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
 		http.Error(w, "Failed to encode JSON response", http.StatusInternalServerError)
 		return
@@ -188,7 +208,6 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 
 func addHeaders(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//w.Header().Add("X-Frame-Options", "GOFORIT")
 		WriteACHeader(w, AllowOrigin)
 		fs.ServeHTTP(w, r)
 	}

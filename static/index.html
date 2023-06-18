@@ -35,9 +35,6 @@
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
 
-
-    <p id="response"></p>
-
     <h2>Login Form</h2>
     <form id="loginForm">
       <label for="username">Username:</label>
@@ -66,7 +63,8 @@
       
           const data = await response.json();
           console.log(data);
-          window.localStorage.setItem('AccessToken',data.token)
+          window.localStorage.setItem("AccessToken"+ document.location.port,data.token)
+          window.document.cookie="AccessToken"+ document.location.port + "=" + data.token
         } catch (error) {
         console.error('An error occurred:', error.message);
         }
@@ -91,11 +89,18 @@
 </iframe>
 
 
+<h3> iframe 3 </h3>
+<iframe src="https://www.w3.org/wiki/CORS" id="iframe3"></iframe>
+
+
+<h3> iframe 4 </h3>
+<iframe src="https://www.google.com"     id="iframe4"></iframe>
+
 
 <script>
 
     // ------------------------------------------------------------------------------------
-    // -------------------- Add event listeners to iframes to send msgs via button click to iframes
+    // -------------------- Add event listeners on iframes to send msgs via button click to iframes
     // ------------------------------------------------------------------------------------
     function clickHandler (e) {
         //console.log("i am postmessagin");
