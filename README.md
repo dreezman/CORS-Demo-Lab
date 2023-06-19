@@ -75,37 +75,41 @@ from the different origins. Users can do this with:
 - JS fetch - can one fetch/HTTP GET and view response between origins
 
 
+fix
+formatting
+powershell
 
 
 ## Installation
 
 <hr>
- Create a golang HELLO WORLD project---------------
-- https://go.dev/doc/install
-- Download     https://go.dev/dl/
-- https://go.dev/doc/tutorial/getting-started
+ 
+ Create a golang HELLO WORLD project in order to install Golang
+
+1) https://go.dev/doc/tutorial/getting-started
+2) Here is download: https://go.dev/doc/install
+3) Make sure the Hello World is working in go
 
 <hr>
- Install CORS lab ---------------
-- cd ..
-- git clone https://github.com/dreezman/CORS-Demo-Lab.git
-- cd CORS-Demo-Lab
+ Install CORS lab 
+
+1) cd ..
+2) git clone https://github.com/dreezman/CORS-Demo-Lab.git
+3) cd CORS-Demo-Lab
 
 <hr>
-
-In order to avoid certificate prompts on the browser for localhost, import self-signed cert into trusted roots certs
-- Windows 11 start window: cert -> Manager Computer Certs
-- Linux -> Not sure
-- Import Cert
-![Alt text](images/importcert.jpg)
-
 
 ```
-// Unix
-kill $(jobs -p) ; sleep 3 ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
+############## Start Backend Web Servers ################
+#####    Unix
+./startlab.sh
+# to kill all background jobs
+killall main  
 
-// Windows
-get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
+#####   Windows PowerShell
+.\startlab.ps1
+# to kill all background jobs
+get-job| stop-job | remove-job 
 ```
 
 ## Usage
