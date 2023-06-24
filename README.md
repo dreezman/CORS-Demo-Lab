@@ -8,6 +8,7 @@
     - [Use Browser Debugger to inspect CORS traffic](#use-browser-debugger-to-inspect-cors-traffic)
     - [Start Program](#start-program)
     - [Cross-Origin Queries](#cross-origin-queries)
+      - [Cross Origin DOM access](#cross-origin-dom-access)
       - [LocalStorage](#localstorage)
       - [getElementByTagName()](#getelementbytagname)
       - [Cookies](#cookies)
@@ -28,7 +29,9 @@ One of the elements missing when watching YouTube videos explaining technology, 
 to explore the "What Ifs" along with seeing both sides of the client-server interaction on a step-by-step
 basis. This is the only way to fully understand how a technology works.
 
-[Same-Origin-Policy SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) states that in a browser, data from one origin cannot be accessed by a different origin. [Cross-Origin-Requests CORS](https://www.w3.org/TR/2020/SPSD-cors-20200602/) is a way of permitting cross origin access for HTTP requests (but not internal JS access?????????????check this????????????????????????). SOP and CORS are easy to understand at a high
+[Same-Origin-Policy SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) states that in a browser, data from one origin cannot be accessed by a different origin. [Cross-Origin-Requests CORS](https://www.w3.org/TR/2020/SPSD-cors-20200602/) is a way of permitting cross origin access for HTTP requests (vs but does NOT regulate internal JavaScript(JS) access, no impact, still follows SOP). CORS also controls how credentials are sent across orgin in order to ensure the evil target origin does not steal the good guys bank origin credentials.
+
+SOP and CORS are easy to understand at a high
 level, but once one reads all the rules behind it, becomes very complex . There are a lot of "Rule XXX is always true EXCEPT in these cases" (localStorage vs cookies, img vs GET response, JS internal data vs HTTP data, * vs nil, one one domain allowed per Allow-Origin). One can understand that as a developer working in a 2-week sprint, one would just throw up their hands and find the easiest way to bypass all these restrictions because it is too complex to try and understand them.
 
 
@@ -181,7 +184,25 @@ Bring up the console in all the tabs...
 
 Use the Inspector Console to manually do queries between the 3 origins to see if you can read the responses to the queries.
 
+#### Cross Origin DOM access
 
+Try reading the DOMs of other iframes and see what happens.
+
+Does "Allow-Origin: *" have any impact?<br>
+HINT: Do you see any HTML queries being executed?
+
+Why is it working not working?<br>
+HINT: Look at your Source and Target Origins (How to do this?), are they different?
+
+
+```
+//  Try to access across origin to get to DOM
+window.frames[0].document
+//  Try to access same origin to get to DOM
+window.frames[2].document
+window.frames[2].document.defaultView.localStorage
+window.frames[2].parent.localStorage
+```
 
 #### LocalStorage 
 

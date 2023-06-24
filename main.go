@@ -47,6 +47,8 @@ You can then modify the
 
 import (
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -59,11 +61,11 @@ import (
 // --------------------------------------------------------------------------------------
 
 const addOriginHeader = true // add Access-Control header to HTTP response
-var AllowOrigin string = "*" // Choose a Access-Control origin header
+//var AllowOrigin string = "*" // Choose a Access-Control origin header
 //var AllowOrigin string = "http://localhost:8081"
 //var AllowOrigin string = "http://localhost:3000"
 //var AllowOrigin string = "http://localhost:3001"
-//var AllowOrigin string = "http://localhost:222"
+var AllowOrigin string = "http://localhost:222"
 
 type Message struct {
 	Text string `json:"text"`
@@ -85,10 +87,14 @@ func main() {
 
 	// Setup all the paths to handle HTTP requests
 	fs := http.FileServer(http.Dir("./static"))
-	// handle logins
-	http.HandleFunc("/login", loginHandler)
-	// handle default web requests
+	// handle default web requests as front end server for html pages
 	http.Handle("/", addHeaders(fs))
+
+	// handle login forms from JS Fetch requests
+	http.HandleFunc("/login", loginHandler)
+	// handle login forms from classic Form Post Submit
+	http.HandleFunc("/classic-form-submit", classicFormSubmit)
+
 	// test program: return secrets to client, see if they read it
 	http.HandleFunc("/get-json", jsonhandler)
 
@@ -165,6 +171,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
 		http.Error(w, "Failed to encode JSON response", http.StatusInternalServerError)
 		return
+	}
+}
+
+func classicFormSubmit(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("method:", r.Method) //get request method
+	if r.Method == "GET" {
+		t, _ := template.ParseFiles("login.gtpl")
+		t.Execute(w, nil)
+	} else {
+		r.ParseForm()
+		// logic part of log in
+		fmt.Println("username:", r.Form["username"])
+		fmt.Println("password:", r.Form["password"])
 	}
 }
 

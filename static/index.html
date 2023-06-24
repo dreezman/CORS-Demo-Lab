@@ -6,22 +6,155 @@
 </head><h2>CORS  Demo Lab</h2>
 
 <body style="border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightgreen;">
-<!-- -------------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------------- -->
-<!--                       Setup  Parent    Window                                                -->
-<!-- -------------------------------------------------------------------------------------------- -->
-<!-- -------------------------------------------------------------------------------------------- -->
-
+  <script>  
+    // get origin parameters of two sub iframe web servers, will use later
+    const urlParams = new URL(window.location.toLocaleString()).searchParams;  
+    var iframeurl1 = urlParams.get('iframeurl1')
+    var iframeurl2 = urlParams.get('iframeurl2')
+    var iframe1origin= iframeurl1.replace(/(http.*:\d{1,4}.*)(\/.*)/,"$1");
+    var iframe2origin= iframeurl2.replace(/(http.*:\d{1,4}.*)(\/.*)/,"$1");
+  </script>
 <!-- -------------------------------------------------------------------------------------------- -->
 <!--                       Setup  Buttons to send msg to iframs                                   -->
 <!-- -------------------------------------------------------------------------------------------- -->
 
-<h3> Parent Window </h3>
-<button type="button" id="sendtochild1" > Send Message to iframe 1  </button>
-<button type="button" id="sendtochild2" > Send Message to iframe 2  </button>
+<h1> Parent Window </h1>
+Within the parent frame are several internal frames that it will use to test cross-origin and 
+same origin restrictions. The Parent window has multiple test for various CORS scenarios. 
+<ul>
+  <li> Internal JS postMessages to cross-origin itnernal frames </li>
+  <li> Various Form submissions</li>
+  <li> HTTP GET requests via Fetch and XHL</li>
+  <li> Cross origin DOM queries</li>
+<h2>JS Post Message Test </h2>
+<button type="button" id="sendtochild1" > Send Message to iframe 1 with JS postMessage </button><br>
+<button type="button" id="sendtochild2" > Send Message to iframe 2 with JS postMessage </button><br>
+<script>
+
+  // ------------------------------------------------------------------------------------
+  // -------------------- Add event listeners on iframes to send msgs via button click to iframes
+  // ------------------------------------------------------------------------------------
+  function clickHandler (e) {
+      console.log("i am postmessagin");
+      // find the right iframe in "myParam" to send postMessage to
+      document.getElementById(e.currentTarget.myParam).contentWindow.postMessage('Parent sending to iframe: ',
+      '*'); // notice, let browser choose origin forces forcing it!!!
+      }
+  document.getElementById("sendtochild1").addEventListener('click',clickHandler,false);
+  document.getElementById("sendtochild1").myParam = "iframe1"  //click handler variable to send message to iframe1
+  document.getElementById("sendtochild2").addEventListener('click',clickHandler,false);
+  document.getElementById("sendtochild2").myParam = "iframe2"  //click handler variable to send message to iframe1
+  </script>
+
+
+<!-- -------------------------------------------------------------------------------------------- -->
+<!--                       Response HTML element to fill in repsonse from Child iframe            -->
+<!-- -------------------------------------------------------------------------------------------- -->
 <br>
-<p id="response"></p>
+<div id="responseiframe">Post Message Response from either child iframe: </div>
+
+<script>
+  // ------------------------------------------------------------------------------------
+  // -------------------- Event listeners to receive message from iframes
+  // ------------------------------------------------------------------------------------
+  let count=1
+  var messageEventHandler = function(event){
+  // check that the origin is one we want.
+      if(
+              event.data != undefined && (typeof event.data) == 'string'
+          ) 
+          {
+          console.log('parent window receving:  '+ event.data)
+          document.getElementById("responseiframe").innerHTML = "Post Message Response from either child iframe:  "+ event.data  + count;
+          count += 1
+          }            
+      }           
+  window.addEventListener('message', messageEventHandler,false);
+
+
+</script>
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                        Setup  Buttons to send HTTP request to backend for secret data        -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <hr>
+    <h2>HTML Requests Testing </h2>
 <br>
+<button type="button" id="getsecretfromsameorigin" >  Get Secret from Same Origin with HTTP Request:   </button>: <div id="sopsecretresponse"></div>
+<button type="button" id="getsecretfromcrossorigin" > Get Secret from Cross Origin with HTTP Request:  </button>: <div id="corsecretresponse"></div><br>
+<div id="secretresponse"></div>
+<br>
+<script>
+
+    document.getElementById("getsecretfromsameorigin").addEventListener('click',secretsclickHandler,false);
+    document.getElementById("getsecretfromsameorigin").myParam = document.location.origin
+    document.getElementById("getsecretfromcrossorigin").addEventListener('click',secretsclickHandler,false);
+    document.getElementById("getsecretfromcrossorigin").myParam = iframe1origin
+
+    let  secretcount=1;
+   async function secretsclickHandler (e) {
+    try {
+        const response = await fetch(e.currentTarget.myParam + '/get-json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+    
+        const data = await response.json();
+        console.log(data);
+        document.getElementById("sopsecretresponse").innerHTML = "Get Secret from Same Origin:  "+ data.text + ':' +secretcount;
+        secretcount +=1
+
+      } catch (error) {
+      console.error('An error occurred:', error.message);
+      }
+      }
+
+
+
+  </script>
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup login forms to store passwords in local storage                                                   -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup Classic Form Submit to                                           -->
+    <!--      login form to store passwords in local storage                                          -->
+   <!-- --------------------------------------------------------------------------------------------  -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <hr>
+    <h2>Form Submition Testing</h2>
+    <h3>Classic Same Origin Form Post Submit - Provide Email Info</h3>
+    <form id="sameoriginclassicloginForm" action="/classic-form-submit" method="post">
+      <label for="fname">Email Address:</label>
+      <input type="text" id="fname" name="fname">
+      <input type="submit" value="Submit">      
+      <br><br><br>
+    </form>
+
+
+    <h3>Classic Cross Origin Form Post Submit - Provide Email Info</h3>
+    <form id="crossoriginclassicloginForm" action="REPLACE" method="post">
+      <label for="fname2">Email Address:</label>
+      <input type="text" id="fname2" name="fname2">
+      <input type="submit" value="Submit">      
+      <br><br><br>
+    </form>
+
+    <script>
+      // when submit cross origin form, send it to iframe1 webserver
+      let crossOriginUrl= iframe1origin + "/classic-form-submit";
+          form_parent = document.getElementById('crossoriginclassicloginForm'),
+          form_parent.action=crossOriginUrl
+    </script>
 
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
@@ -29,19 +162,14 @@
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
 
-    <!-- -------------------------------------------------------------------------------------------- -->
-    <!-- -------------------------------------------------------------------------------------------- -->
-    <!--                       Setup login form to store passwords in local storage                                                   -->
-    <!-- -------------------------------------------------------------------------------------------- -->
-    <!-- -------------------------------------------------------------------------------------------- -->
-
-    <h2>Login Form</h2>
+   <h3> JS Fetch based Login Form </h3>
     <form id="loginForm">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required><br>
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required><br>
-      <input type="submit" value="Login">
+      <input type="sopsubmit" value="Same Origin Login">
+      <input type="corssubmit" value="Cross Origin Login">
     </form>
 
 
@@ -78,72 +206,58 @@
 <!-- go run static-web.go TLD 8081 & go run static-web.go sub1 3000 & go run static-web.go sub2 3001 & -->
 <!-- -------------------------------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------------------------------- -->
-    <h3> iframe 1 </h3>
+<h3> Non-Origin Iframe 1: </h3> <div id="iframe1urlparm"></div><br>
 <iframe style="border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: lightblue;" id="iframe1">
 </iframe>
-
-
-
-<h3> iframe 2 </h3>
-<iframe style=" border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: lightgoldenrodyellow;"  id="iframe2">
-</iframe>
-
-
-<h3> iframe 3 </h3>
-<iframe src="https://www.w3.org/wiki/CORS" id="iframe3"></iframe>
-
-
-<h3> iframe 4 </h3>
-<iframe src="https://www.google.com"     id="iframe4"></iframe>
-
-
 <script>
-
-    // ------------------------------------------------------------------------------------
-    // -------------------- Add event listeners on iframes to send msgs via button click to iframes
-    // ------------------------------------------------------------------------------------
-    function clickHandler (e) {
-        //console.log("i am postmessagin");
-        document.getElementById(e.currentTarget.myParam).contentWindow.postMessage('Parent sending to iframe: ',
-        '*'); //could be generic too like '*'
-        }
-    document.getElementById("sendtochild1").addEventListener('click',clickHandler,false);
-    document.getElementById("sendtochild1").myParam = "iframe1"
-    document.getElementById("sendtochild2").addEventListener('click',clickHandler,false);
-    document.getElementById("sendtochild2").myParam = "iframe2"
-
-    // ------------------------------------------------------------------------------------
-    // -------------------- Event listeners to receive message from iframes
-    // ------------------------------------------------------------------------------------
-    let count=1
-    var messageEventHandler = function(event){
-    // check that the origin is one we want.
-        if(
-                event.data != undefined && (typeof event.data) == 'string'
-            ) 
-            {
-            console.log('parent window receving:  '+ event.data)
-            document.getElementById("response").innerHTML = event.data  + count;
-            count += 1
-            }            
-        }           
-    window.addEventListener('message', messageEventHandler,false);
-
-
+  document.getElementById('iframe1').src=iframeurl1; // load the HTML for this frame
+  document.getElementById('iframe1urlparm').innerHTML = "Origin:" + document.getElementById('iframe1').src
 </script>
 
+
+
+
+<h3> Non-Origin Iframe 2: </h3> <div id="iframe2urlparm"></div>
+<iframe style=" border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: lightgoldenrodyellow;"  id="iframe2">
+</iframe>
+<script>
+  document.getElementById('iframe2').src=iframeurl2;// load the HTML for this frame
+  document.getElementById('iframe2urlparm').innerHTML = "Origin:" + document.getElementById('iframe2').src
+</script>
+
+
+
+<h3> Same-Origin Iframe : </h3> <div id="sameoriginframeurl"></div>
+<iframe style=" border: 10 solid black; width:100%; height: 250px; overflow: auto; background-color: rgb(201, 172, 207);"  id="sameoriginframe">
+</iframe>
+<script>
+  document.getElementById('sameoriginframe').src=window.location.origin + "/iframes.html"; // load frame from same origin
+  document.getElementById('sameoriginframeurl').innerHTML = "Origin:" + document.getElementById('sameoriginframe').src
+</script>
+
+
+<h3> Simple Non Origin Frame:  </h3><div id="simplenonoriginframeurl"></div>
+<iframe src="https://www.w3.org/wiki/CORS" id="simplenonoriginframe"></iframe>
+<script>
+  document.getElementById('simplenonoriginframeurl').innerHTML = "Origin:" + document.getElementById('simplenonoriginframe').src
+</script>
+
+
+<h3> Complex Non Origin Frame </h3> <div id="complexnonoriginframeurl"></div>
+<iframe src="https://www.google.com"     id="complexnonoriginframe"></iframe>
+<script>
+  document.getElementById('complexnonoriginframeurl').innerHTML = "Origin:" + document.getElementById('complexnonoriginframe').src
+</script>
+
+
+
+
 </body>
-    <script>
-        // ------------------------------------------------------------------------------------
-        // -------------------- Setup Iframes by loading their HTML pages into the iframes
-        // ------------------------------------------------------------------------------------
-        const urlParams = new URL(window.location.toLocaleString()).searchParams;
-        let url1 = urlParams.get('iframeurl1'); // get the HTML page that we should load into the iFrame
-        let url2 = urlParams.get('iframeurl2'); // get the HTML page that we should load into the iFrame
-        let myIframe = document.getElementById("iframe1")
-        myIframe.src = url1
-        myIframe = document.getElementById("iframe2")
-        myIframe.src = url2
-    </script>
+<!-- -------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------- -->
+<!--                       Setup  Parent    Window                                                -->
+<!-- -------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------- -->
+
 </html>
 
