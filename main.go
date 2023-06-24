@@ -48,7 +48,6 @@ You can then modify the
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -177,9 +176,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 func classicFormSubmit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("login.gtpl")
-		t.Execute(w, nil)
+		WriteACHeader(w, AllowOrigin)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Must use a POST, preferabally HTTPS"))
 	} else {
+		WriteACHeader(w, AllowOrigin)
 		r.ParseForm()
 		// logic part of log in
 		fmt.Println("username:", r.Form["username"])
