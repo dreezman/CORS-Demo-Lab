@@ -29,10 +29,12 @@ One of the elements missing when watching YouTube videos explaining technology, 
 to explore the "What Ifs" along with seeing both sides of the client-server interaction on a step-by-step
 basis. This is the only way to fully understand how a technology works.
 
-[Same-Origin-Policy SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) states that in a browser, data from one origin cannot be accessed by a different origin. [Cross-Origin-Requests CORS](https://www.w3.org/TR/2020/SPSD-cors-20200602/) is a way of permitting cross origin access for HTTP requests (vs but does NOT regulate internal JavaScript(JS) access, no impact, still follows SOP). CORS also controls how credentials are sent across orgin in order to ensure the evil target origin does not steal the good guys bank origin credentials.
+[Same-Origin-Policy SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) states that in a browser, the document or script from one origin cannot data (e.g. cookies, storage, DOM) in a different different origin. 
+
+[Cross-Origin-Requests CORS](https://www.w3.org/TR/2020/SPSD-cors-20200602/) is a way of permitting cross origin access for HTTP requests (vs but does NOT regulate internal JavaScript(JS) access, no impact, still follows SOP). CORS also controls how credentials are sent across orgin in order to ensure the evil target origin does not steal the good guys bank origin credentials.
 
 SOP and CORS are easy to understand at a high
-level, but once one reads all the rules behind it, becomes very complex . There are a lot of "Rule XXX is always true EXCEPT in these cases" (localStorage vs cookies, img vs GET response, JS internal data vs HTTP data, * vs nil, one one domain allowed per Allow-Origin). One can understand that as a developer working in a 2-week sprint, one would just throw up their hands and find the easiest way to bypass all these restrictions because it is too complex to try and understand them.
+level, but once one reads all the rules behind it, becomes very complex . There are a lot of "Rule XXX is always true EXCEPT in these cases" (localStorage vs cookies, img vs GET response, JS internal data vs HTTP data, * vs nil, one one domain allowed per Allow-Origin in some browsers, Forms not subject to CORS). One can understand that as a developer working in a 2-week sprint, one would just throw up their hands and find the easiest way to bypass all these restrictions because it is too complex to try and understand them.
 
 
 So in order to explore the intracies of CORS "What-Ifs", I created a Golang based CORS lab. Developers can use this lab to better understand the "What-Ifs"of CORS, and hopefully work within its limitations vs coding around them.
@@ -42,8 +44,10 @@ So in order to explore the intracies of CORS "What-Ifs", I created a Golang base
 
 When a browser/render loads a page from a website, the browser tags that page with a Origin attribute in the DOM. This attribute is used to determine which windows/frames can see what data.
 
+![Alt text](images/origindef.jpg) 
 ![Alt text](images/iframe-setup.jpg)
 ![Alt text](images/origin-host-info.jpg)
+
 
 
 ### Lesson 2: Site vs Origin..
@@ -53,6 +57,11 @@ An origin is very strict, the whole url domain from 'h' to portnumber will make 
 Site is more flexible, subdomains are in the same Site. These are used in cookie restrictions.
 ![Alt text](images/origin-site.jpg)
 
+
+So for SOP, scripts in evil.com inside a web page cannot access the cookies of good.com.  
+CORS is a method of allowing that interaction to happen with limitations.
+
+![Alt text](images/origindef.jpg) 
 
 ## Lab Overview
 
@@ -79,8 +88,8 @@ from the different origins. Users can do this with:
 
 
 fix
-formatting
-powershell
+
+
 
 
 ## Installation
@@ -110,6 +119,7 @@ powershell
 killall main  
 
 #####   Windows PowerShell
+set-executionpolicy unrestricted -scope process
 .\startlab.ps1
 # to kill all background jobs
 get-job| stop-job | remove-job 
@@ -260,7 +270,26 @@ Why is it working/not working?
 
 
 #### Forms 
+
+Forms are a bit special with CORS. There are two types of forms according to CORS.
+
+- Simple Classic Forms: The browser POSTs some data but no JS exists to process the response
+- JS Forms: The form is processed by JS for both the POST and the response
+
+![Alt text](image.png)
+
+Try submitting these with both allow-origin:* and allow-origin: [some-random-port] and see what happens. Why do the classics always work but the JS sometimes fail?
+
 #### PostMessage 
+
+Postmessage is an internal JS messaging protocol that does NOT use HTTP requests. See what happens when you send postMessages to other frames.
+
+- Send postMessages from parent to child frames
+- Send postMessages from child to parent frames
+
+![Alt text](images/postmessageparentotchild.jpg)
+
+Now modify the allow-origin: [somerandomport] and see what happens.
 
 ```
 // From iframes do this

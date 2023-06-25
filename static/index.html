@@ -196,7 +196,7 @@ same origin restrictions. The Parent window has multiple test for various CORS s
         }
       
         try {
-          const response = await fetch(target + '/login', {
+          const response = await fetch(target, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
