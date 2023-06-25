@@ -8,14 +8,13 @@
     - [Use Browser Debugger to inspect CORS traffic](#use-browser-debugger-to-inspect-cors-traffic)
     - [Start Program](#start-program)
     - [Cross-Origin Queries](#cross-origin-queries)
-      - [Cross Origin DOM access](#cross-origin-dom-access)
-      - [LocalStorage](#localstorage)
-      - [getElementByTagName()](#getelementbytagname)
-      - [Cookies](#cookies)
+      - [JS fetch](#js-fetch)
       - [Forms](#forms)
       - [PostMessage](#postmessage)
+      - [Cross Origin DOM access](#cross-origin-dom-access)
+      - [LocalStorage](#localstorage)
+      - [Cookies](#cookies)
       - [X-Frame Options](#x-frame-options)
-      - [JS fetch](#js-fetch)
   - [Change History](#change-history)
   - [Contributing](#contributing)
   - [License](#license)
@@ -188,85 +187,35 @@ In the Inspector console, one can switch between JavaScript contexts to execute 
 
 ![Alt text](images/jscontexts.jpg)
 
+For reference;
+
+The parent window has 5 sub-frames, each can be indexed to view their DOMs...if you know how to work withing the bounds of SOP. 
+
+- window.iframe[0] = iframe1 = http://localhost:3000
+- window.iframe[1] = iframe2 = http://localhost:3001
+- window.iframe[2] = parent = http://localhost:8081
+- window.iframe[3] = w3.org = https://www.w3.org
+- window.iframe[4] = google = https://www.google.com
+
 Bring up the console in all the tabs...
 ![Alt text](images/get-console.jpg)
 
 
 Use the Inspector Console to manually do queries between the 3 origins to see if you can read the responses to the queries.
 
-#### Cross Origin DOM access
+#### JS fetch 
 
-Try reading the DOMs of other iframes and see what happens.
+Try these and see if they work with both
 
-Does "Allow-Origin: *" have any impact?<br>
-HINT: Do you see any HTML queries being executed?
-
-Why is it working not working?<br>
-HINT: Look at your Source and Target Origins (How to do this?), are they different?
+- var AllowOrigin string = "http://localhost:222"
+- var AllowOrigin string = *
 
 
-```
-//  Try to access across origin to get to DOM
-window.frames[0].document
-//  Try to access same origin to get to DOM
-window.frames[2].document
-window.frames[2].document.defaultView.localStorage
-window.frames[2].parent.localStorage
-```
+![Alt text](images/postmessage.jpg)
 
-#### LocalStorage 
-
-Try reading local storage to/from different origins to see if you can access local storage.
-
-```
-// From Parent to Iframes
-window.frames[0].localStorage
-window.frames[1].localStorage
-// From Iframes to each other
-window.parent.frames[0].localStorage
-window.parent.frames[1].localStorage
-// From Iframes to parent
-window.parent.localStorage
-```
 
 Why is it working/not working?
 
-#### getElementByTagName() 
-
-```
-// Try from parent
-window.frames[0]
-window.frames[0].document
-// Try from current origin
-document.getElementsByTagName('script')
-// Try from non-parent
-window.parent.frames[0]
-window.parent.document.getElementsByTagName('p') 
-```
-Why is it working/not working?
-
-#### Cookies 
-
---- First make sure you login with user:admin and password: password <br>
---- This will load the cookies and localStorage with an AccessToken
-```
-// From Parent
-document.cookie
-// From Subframe
-document.cookie
-// Go to Inspector Application tab
-Set Access token to None and Secure Flag
-```
-![Alt text](images/samesitecesstoken.jpg)
-
-```
-// Repeat: From Parent
-document.cookie
-// From Subframe
-document.cookie
-```
-
-Why is it working/not working?
 
 
 #### Forms 
@@ -278,7 +227,15 @@ Forms are a bit special with CORS. There are two types of forms according to COR
 
 ![Alt text](image.png)
 
-Try submitting these with both allow-origin:* and allow-origin: [some-random-port] and see what happens. Why do the classics always work but the JS sometimes fail?
+Try submitting these with both 
+
+- var AllowOrigin string = "http://localhost:222"
+- var AllowOrigin string = *
+
+and see what happens. Why do the classics always work but the JS sometimes fail?
+Why is JS not able to read the response from a cross origin request?
+
+![Alt text](images/whynoread.jpg)
 
 #### PostMessage 
 
@@ -302,13 +259,74 @@ http://localhost:3000
 http://localhost:8081
 http://localhost:3001
 
-// In frame1 do this
-monitorEvents(window, 'message')
 
-// In frame2 do this to frame1
-window.parent.frames[0].postMessage('hixxxxx','*')
-// Look at data
 ```
+
+#### Cross Origin DOM access
+
+Try reading the DOMs of other iframes and see what happens.
+
+Does "Allow-Origin: *" have any impact?<br>
+HINT: Do you see any HTML queries being executed?
+
+Why is it working not working?<br>
+HINT: Look at your Source and Target Origins (How to do this?), are they different?
+
+
+```
+//  From Parent: Try to access across origin to get to DOM
+window.frames[0].document
+//  From Parent:Try to access same origin to get to DOM
+window.frames[2].document
+window.frames[2].document.defaultView.localStorage
+window.frames[2].parent.localStorage
+// Try from current origin - Get all the internal JS
+document.getElementsByTagName('script')
+```
+
+#### LocalStorage 
+
+Try reading local storage to/from different origins to see if you can access local storage.
+
+```
+// From Parent to Iframes
+window.frames[0].localStorage
+window.frames[1].localStorage
+// From Iframes to each other
+window.parent.frames[0].localStorage
+window.parent.frames[1].localStorage
+// From Iframes to parent
+window.parent.localStorage
+```
+
+Why is it working/not working?
+
+
+#### Cookies 
+
+TBD - Work In Progress
+
+--- First make sure you login with user:admin and password: password <br>
+--- This will load the cookies and localStorage with an AccessToken
+```
+// From Parent
+document.cookie
+// From Subframe
+document.cookie
+// Go to Inspector Application tab
+Set Access token to None and Secure Flag
+```
+![Alt text](images/samesitecesstoken.jpg)
+
+```
+// Repeat: From Parent
+document.cookie
+// From Subframe
+document.cookie
+```
+
+Why is it working/not working?
+
 
 #### X-Frame Options
 
@@ -326,35 +344,6 @@ Look up the term [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/
 9. Look for X-Frame-Options
 10. What do you think that means? Why is page showing?
 
-#### JS fetch 
-
-
-```
---- Run Queries from Parent
-response=await fetch("http://localhost:8081/get-json"); await response.text()
-response=await fetch("http://localhost:3000/get-json"); await response.text()
-```
-![Alt text](images/fetch-queries.jpg) 
-
-Now modify the AllowOrigin in the [main.go](./main.go)to some foriegn domain and save file
-```
-//var AllowOrigin string = "*" // Choose a Access-Control origin header
-//var AllowOrigin string = "http://localhost:8081"
-//var AllowOrigin string = "http://localhost:3000"
-//var AllowOrigin string = "http://localhost:3001"
-var AllowOrigin string = "http://localhost:222"
-```
-Stop and Start go modules from command line
-```
-get-job| stop-job | remove-job ; go run main.go TLD 8081 & go run main.go iframe1 3000 & go run main.go iframe2 3001 &
-```
-```
---- Re-Run Queries from Parent
-response=await fetch("http://localhost:8081/get-json"); await response.text()
-response=await fetch("http://localhost:3000/get-json"); await response.text()
-```
-
-Why is it working/not working?
 
 <hr>
 
