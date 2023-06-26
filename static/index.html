@@ -19,19 +19,19 @@
 <!-- -------------------------------------------------------------------------------------------- -->
 <hr>
 <h2>CORs Settings Menu</h2>
-<form action="/cors-toggle" method="GET" target="_blank">
+<form action="/cors-toggle" method="GET">
     <input type="radio" id="corsoff" name="corssettings" value="TurnCorsOff">
     <label for="corsoff">Turn CORs Headers Off</label><br>
     <input type="radio" id="corwildon" name="corssettings" value="TurnCorsWildOn">
     <label for="corswildon">Turn CORs Wildcard ON</label><br>
     <input type="radio" id="randon" name="corssettings" value="TurnCorsRandomOrigOn">
     <label for="corsrandon">Turn CORs Random Origin ON</label><br>
-    <input type="radio"name="corsparenon" value="TurnCorsParenOrigOn">
-    <label for="corsparenon">Turn CORs Random Origin ON</label><br>
-    <input type="submit" value="Submit">
+    <input type="radio" id="corsparent" name="corssettings" value="TurnCorsParenOrigOn">
+    <label for="corsparent">Turn CORs Parent Port ON</label><br>
+    <input type="submit" value="Submit">   
   </form>
 
-
+<hr>
 
 <h1> Parent Window </h1>
 Within the parent frame are several internal frames that it will use to test cross-origin and 

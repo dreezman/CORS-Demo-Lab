@@ -26,7 +26,9 @@ var Name string = ""
 var Port string = "80"
 
 // --------------------------------------------------------------------------------------
-//                              MAIN: is just a web server handling requests
+//
+//	MAIN: is just a web server handling requests
+//
 // --------------------------------------------------------------------------------------
 func main() {
 	if len(os.Args) < 2 {
@@ -77,7 +79,9 @@ func main() {
 }
 
 // --------------------------------------------------------------------------------------
-//                              Add CORS headers to HTTP responses
+//
+//	Add CORS headers to HTTP responses
+//
 // --------------------------------------------------------------------------------------
 var addOriginHeader = true   // add Access-Control header to HTTP response
 var AllowOrigin string = "*" // Choose a Access-Control origin header
@@ -122,7 +126,7 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		AllowOrigin = "*"
 		addOriginHeader = true
 	}
-
+	http.Error(w, "Return to Main Page", http.StatusNoContent)
 }
 
 // --------------------------------------------------------------------------------------
@@ -214,8 +218,10 @@ func classicFormSubmit(w http.ResponseWriter, r *http.Request) {
 }
 
 // --------------------------------------------------------------------------------------
-//      Add HTTP Request Handler to recieve GET /get-json request to return data to client
-//      so see if client can read it cross-origin
+//
+//	Add HTTP Request Handler to recieve GET /get-json request to return data to client
+//	so see if client can read it cross-origin
+//
 // --------------------------------------------------------------------------------------
 type Message struct {
 	Text string `json:"text"`
