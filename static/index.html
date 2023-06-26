@@ -17,6 +17,21 @@
 <!-- -------------------------------------------------------------------------------------------- -->
 <!--                       Setup  Buttons to send msg to iframs                                   -->
 <!-- -------------------------------------------------------------------------------------------- -->
+<hr>
+<h2>CORs Settings Menu</h2>
+<form action="/cors-toggle" method="GET" target="_blank">
+    <input type="radio" id="corsoff" name="corssettings" value="TurnCorsOff">
+    <label for="corsoff">Turn CORs Headers Off</label><br>
+    <input type="radio" id="corwildon" name="corssettings" value="TurnCorsWildOn">
+    <label for="corswildon">Turn CORs Wildcard ON</label><br>
+    <input type="radio" id="randon" name="corssettings" value="TurnCorsRandomOrigOn">
+    <label for="corsrandon">Turn CORs Random Origin ON</label><br>
+    <input type="radio"name="corsparenon" value="TurnCorsParenOrigOn">
+    <label for="corsparenon">Turn CORs Random Origin ON</label><br>
+    <input type="submit" value="Submit">
+  </form>
+
+
 
 <h1> Parent Window </h1>
 Within the parent frame are several internal frames that it will use to test cross-origin and 
@@ -171,7 +186,8 @@ same origin restrictions. The Parent window has multiple test for various CORS s
       <input type="text" id="username" name="username" value="admin" required><br>
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" value="password" required><br>
-      <input type="submit" value="Same Origin Login" id="sopsubmit">
+      <input type="submit" value="non-SSL Same Origin Login" id="sopsubmit">
+      <input type="submit" value="SSL Cross Origin Login" id="sslsubmit">
       <input type="submit" value="Cross Origin Login" id="corssubmit">
     </form>
 
@@ -191,10 +207,14 @@ same origin restrictions. The Parent window has multiple test for various CORS s
         const whichbutton = event.submitter.id
         if (whichbutton=='sopsubmit') {
           target=document.location.origin +'/login'
+        }
+        else if (whichbutton=='sslsubmit')  { // send to HTTPS port which is 300 higher
+          target='https://' + document.location.hostname + ':' + (Number(document.location.port)+300).toString() +'/login'
         } else { // cross origin target, iframe1 web server
           target=iframe1origin +'/login'
         }
-      
+
+        // actual reqeust
         try {
           const response = await fetch(target, {
             method: 'POST',
@@ -207,7 +227,7 @@ same origin restrictions. The Parent window has multiple test for various CORS s
           const data = await response.json();
           console.log(data);
           window.localStorage.setItem("AccessToken"+ document.location.port,data.token)
-          window.document.cookie="AccessToken"+ document.location.port + "=" + data.token
+          window.document.cookie=data.token
         } catch (error) {
         console.error('An error occurred:', error.message);
         }

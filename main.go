@@ -15,44 +15,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 )
-
-//
-// --------------------------------------------------------------------------------------
-//                              Modify HTTP Header
-// --------------------------------------------------------------------------------------
-
-const addOriginHeader = true // add Access-Control header to HTTP response
-//var AllowOrigin string = "*" // Choose a Access-Control origin header
-//var AllowOrigin string = "http://localhost:8081"
-//var AllowOrigin string = "http://localhost:3000"
-//var AllowOrigin string = "http://localhost:3001"
-var AllowOrigin string = "http://localhost:222"
-
-// --------------------------------------------------------------------------------------
-//                              Add CORS headers to HTTP responses
-// --------------------------------------------------------------------------------------
-
-func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
-	if addOriginHeader {
-		//w.Header().Add("X-Frame-Options", "GOFORIT")
-		w.Header().Set("Cache-Control", "no-store")
-		w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	}
-}
-
-func addHeaders(fs http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		WriteACHeader(w, AllowOrigin)
-		fs.ServeHTTP(w, r)
-	}
-
-}
 
 var Name string = ""
 var Port string = "80"
@@ -72,6 +40,9 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	// handle default web requests as front end server for html pages
 	http.Handle("/", addHeaders(fs))
+
+	// handle toggle CORS headers
+	http.HandleFunc("/cors-toggle", corsToggle)
 
 	// handle login forms from JS Fetch requests
 	http.HandleFunc("/login", loginHandler)
@@ -106,6 +77,55 @@ func main() {
 }
 
 // --------------------------------------------------------------------------------------
+//                              Add CORS headers to HTTP responses
+// --------------------------------------------------------------------------------------
+var addOriginHeader = true   // add Access-Control header to HTTP response
+var AllowOrigin string = "*" // Choose a Access-Control origin header
+func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
+	if addOriginHeader {
+		//w.Header().Add("X-Frame-Options", "GOFORIT")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Expose-Headers", "*")
+	}
+}
+
+func addHeaders(fs http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		WriteACHeader(w, AllowOrigin)
+		fs.ServeHTTP(w, r)
+	}
+
+}
+
+// Let browser set the CORS header setting
+func corsToggle(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	addOriginHeader = true
+	param1 := r.URL.Query().Get("corssettings")
+	switch param1 {
+	case "TurnCorsOff":
+		addOriginHeader = false
+	case "TurnCorsWildOn":
+		AllowOrigin = "*"
+	case "TurnCorsRandomOrigOn":
+		AllowOrigin = "https://xyz.com:123"
+	case "TurnCorsParenOrigOn":
+		AllowOrigin = "http://localhost:8081"
+	default:
+		AllowOrigin = "*"
+		addOriginHeader = true
+	}
+
+}
+
+// --------------------------------------------------------------------------------------
 //      Login Logic to handle passwords
 // --------------------------------------------------------------------------------------
 
@@ -120,6 +140,13 @@ type LoginResponse struct {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == http.MethodOptions {
+		WriteACHeader(w, AllowOrigin)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -137,9 +164,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	success := loginReq.Username == "admin" && loginReq.Password == "password"
 	message := ""
 	token := ""
+	// Add access token, append port number of the origin
+	u, _ := url.Parse(r.Header["Origin"][0])
+	_, port, _ := net.SplitHostPort(u.Host)
+	var cookie http.Cookie
 	if success {
 		message = "Login successful!"
 		token = "12345"
+		if r.TLS == nil {
+			cookieorigin := "AccessToken_" + string(port)
+			cookie = http.Cookie{Name: cookieorigin, Value: "12345", Domain: "localhost", Secure: false, SameSite: http.SameSiteLaxMode}
+		} else {
+			intport, _ := strconv.Atoi(port) // tls port on cookie is 300 higher always
+			intport += 300
+			cookieorigin := "AccessToken_" + strconv.Itoa(intport)
+			cookie = http.Cookie{Name: cookieorigin, Value: "12345", Domain: "localhost", Secure: true, SameSite: http.SameSiteNoneMode}
+		}
+		http.SetCookie(w, &cookie)
 	} else {
 		message = "Invalid username or password"
 	}
@@ -149,7 +190,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		Token:   token,
 		Success: success,
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	WriteACHeader(w, AllowOrigin)
 	if err := json.NewEncoder(w).Encode(loginResp); err != nil {
