@@ -233,9 +233,9 @@ Forms are a bit special with CORS. There are two types of forms according to COR
 - Simple Classic Forms: The browser POSTs some data but no JS exists to process the response
 - JS Forms: The form is processed by JS for both the POST and the response
 
-![Alt text](image.png)
+![Alt text](images/differentlogins.jpg)
 
-Try submitting these with both 
+Try all the different logins and watch the network traffic and see how the CORS headers are exchanged. Try submitting these with both 
 
 - var AllowOrigin string = "http://localhost:222"
 - var AllowOrigin string = *
