@@ -121,7 +121,7 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 	case "TurnCorsRandomOrigOn":
 		AllowOrigin = "https://xyz.com:123"
 	case "TurnCorsParenOrigOn":
-		AllowOrigin = "http://localhost:8081"
+		AllowOrigin = "http://localhost:9081"
 	default:
 		AllowOrigin = "*"
 		addOriginHeader = true
