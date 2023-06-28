@@ -7,12 +7,26 @@
 
 <body style="border: 10 solid black; width:100%; height: 200px; overflow: auto; background-color: lightgreen;">
   <script>  
-    // get origin parameters of two sub iframe web servers, will use later
+    // passed in origin information for iframe1 and iframe2 on parameters. 
+    // parse out into individual out into protocol,domain,port
+    // http://localhost:9081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html
     const urlParams = new URL(window.location.toLocaleString()).searchParams;  
-    var iframeurl1 = urlParams.get('iframeurl1')
-    var iframeurl2 = urlParams.get('iframeurl2')
-    var iframe1origin= iframeurl1.replace(/(http.*:\d{1,4}.*)(\/.*)/,"$1");
-    var iframe2origin= iframeurl2.replace(/(http.*:\d{1,4}.*)(\/.*)/,"$1");
+    const iframeurl1 = urlParams.get('iframeurl1')
+    var   protocol = iframeurl1.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$1")
+    var   domain = iframeurl1.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$2")
+    var   port = iframeurl1.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$3")
+    const  iframe1location = {protocol:protocol,domain:domain,port:port}
+    const iframe1origin = iframe1location.protocol + "://" + iframe1location.domain + ":" + iframe1location.port
+
+    const iframeurl2 = urlParams.get('iframeurl2')
+          protocol = iframeurl2.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$1")  
+          domain = iframeurl2.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$2")
+          port = iframeurl2.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/,"$3")
+    const iframe2location = {protocol:protocol,domain:domain,port:port}
+    const iframe2origin = iframe2location.protocol + "://" + iframe2location.domain +  ":" + iframe2location.port
+
+
+
   </script>
 <!-- -------------------------------------------------------------------------------------------- -->
 <!--                       Setup  Buttons to send msg to iframs                                   -->
@@ -28,7 +42,7 @@
     <label for="corsrandon">Turn CORs Random Origin ON</label><br>
     <input type="radio" id="corsparent" name="corssettings" value="TurnCorsParenOrigOn">
     <label for="corsparent">Turn CORs Parent Port ON</label><br>
-    <input type="submit" value="Submit">   
+    <input type="submit" value="Submit to Parent">   
   </form>
 
 <hr>
@@ -143,8 +157,8 @@ same origin restrictions. The Parent window has multiple test for various CORS s
 
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
-    <!--                       Setup Classic Form Submit to                                           -->
-    <!--      login form to store passwords in local storage                                          -->
+    <!--                       Setup Various Classic Form Submits                                    -->
+    <!--                                                                                             -->
    <!-- --------------------------------------------------------------------------------------------  -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <hr>
@@ -176,7 +190,7 @@ same origin restrictions. The Parent window has multiple test for various CORS s
 
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
-    <!--                       Setup login form to store passwords in local storage                                                   -->
+    <!--                       Setup login form for SSL and CrossOrigin Logins                        -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
 
@@ -226,8 +240,8 @@ same origin restrictions. The Parent window has multiple test for various CORS s
       
           const data = await response.json();
           console.log(data);
-          window.localStorage.setItem("AccessToken"+ document.location.port,data.token)
-          window.document.cookie=data.token
+          window.localStorage.setItem("JSCreatedToken_"+ document.location.port,data.token)
+          window.document.cookie="JSCreatedToken_"+ document.location.port + "=" + data.token
         } catch (error) {
         console.error('An error occurred:', error.message);
         }

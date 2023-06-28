@@ -126,6 +126,7 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		AllowOrigin = "*"
 		addOriginHeader = true
 	}
+	WriteACHeader(w, AllowOrigin)
 	http.Error(w, "Return to Main Page", http.StatusNoContent)
 }
 
@@ -167,28 +168,32 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if the username and password are valid
 	success := loginReq.Username == "admin" && loginReq.Password == "password"
 	message := ""
-	token := ""
+	tokenname := "AccessToken_" // will append a port number
+	tokenval := "12345678990"
+	cookieorigin := ""
 	// Add access token, append port number of the origin
 	u, _ := url.Parse(r.Header["Origin"][0])
 	_, port, _ := net.SplitHostPort(u.Host)
 	var cookie http.Cookie
 	if success {
-		message = "Login successful!"
-		token = "12345"
+
 		if r.TLS == nil {
-			cookieorigin := "AccessToken_" + string(port)
-			cookie = http.Cookie{Name: cookieorigin, Value: "12345", Domain: "localhost", Secure: false, SameSite: http.SameSiteLaxMode}
+			cookieorigin = tokenname + string(port)
+			domain := "localhost"
+			cookie = http.Cookie{Name: cookieorigin, Value: tokenval, Domain: domain, Secure: false, SameSite: http.SameSiteLaxMode}
 		} else {
 			intport, _ := strconv.Atoi(port) // tls port on cookie is 300 higher always
 			intport += 300
-			cookieorigin := "AccessToken_" + strconv.Itoa(intport)
-			cookie = http.Cookie{Name: cookieorigin, Value: "12345", Domain: "localhost", Secure: true, SameSite: http.SameSiteNoneMode}
+			cookieorigin = tokenname + strconv.Itoa(intport)
+			domain := "localhost"
+			cookie = http.Cookie{Name: cookieorigin, Value: tokenval, Domain: domain, Secure: true, SameSite: http.SameSiteNoneMode}
 		}
 		http.SetCookie(w, &cookie)
 	} else {
 		message = "Invalid username or password"
 	}
-
+	message = "Login successful!"
+	token := cookieorigin + ":" + tokenval
 	loginResp := LoginResponse{
 		Message: message,
 		Token:   token,
