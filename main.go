@@ -111,6 +111,7 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	// get port number I am listening on
 	addOriginHeader = true
 	param1 := r.URL.Query().Get("corssettings")
 	switch param1 {
@@ -118,10 +119,10 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		addOriginHeader = false
 	case "TurnCorsWildOn":
 		AllowOrigin = "*"
-	case "TurnCorsRandomOrigOn":
+	case "TurnCorsRandomOrigOn": // random port and https
 		AllowOrigin = "https://xyz.com:123"
-	case "TurnCorsParenOrigOn":
-		AllowOrigin = "http://localhost:9081"
+	case "TurnCorsSelfOrigOn":
+		AllowOrigin = "http://" + r.Host
 	default:
 		AllowOrigin = "*"
 		addOriginHeader = true
