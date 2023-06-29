@@ -215,6 +215,7 @@ func classicFormSubmit(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Must use a POST, preferabally HTTPS"))
 	} else {
+		w.WriteHeader(http.StatusNoContent)
 		WriteACHeader(w, AllowOrigin)
 		r.ParseForm()
 		// logic part of log in
