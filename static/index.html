@@ -51,13 +51,14 @@
     <h1>CORS Demo Lab</h1>
 
     <div class="row">
-      <div class="column left" style="background-color: #30b652">
+      <div class="column left" style="background-color: lightgreen">
         <script>
           // passed in origin information for iframe1 and iframe2 on parameters.
           // parse out into individual out into protocol,domain,port
           // http://localhost:9081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html
           const urlParams = new URL(window.location.toLocaleString())
             .searchParams;
+          // Specify Origin of IFRAME1
           const iframeurl1 = urlParams.get("iframeurl1");
           var protocol = iframeurl1.replace(
             /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
@@ -76,6 +77,7 @@
             domain: domain,
             port: port,
           };
+
           const iframe1origin =
             iframe1location.protocol +
             "://" +
@@ -83,6 +85,7 @@
             ":" +
             iframe1location.port;
 
+          // Specify Origin of IFRAME2
           const iframeurl2 = urlParams.get("iframeurl2");
           protocol = iframeurl2.replace(
             /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
@@ -105,6 +108,34 @@
         <!-- -------------------------------------------------------------------------------------------- -->
         <!--                       Be able to dynamically change CORs headers on web servers              -->
         <!-- -------------------------------------------------------------------------------------------- -->
+        <h1>Parent Window</h1>
+        <h3 id="ParOrigin"></h3>
+        <script>
+          document.getElementById("ParOrigin").innerHTML =
+            "Origin:" + document.location.origin;
+        </script>
+        <br />
+        Within the parent frame are several internal frames that it will use to
+        test cross-origin and same origin restrictions. The Parent window has
+        multiple test for various CORS scenarios.
+        <ul>
+          <li>How cookies are set and used by site not origin</li>
+          <li>
+            Determine if Internal JS postMessages to cross-origin internal
+            frames is impacted by CORS
+          </li>
+          <li>
+            Watch how HTTP GET requests via Fetch and XHL are impacted by CORS
+          </li>
+          <li>
+            Determine if various Form submissions, both Classical and JS based,
+            are impacted by CORS
+          </li>
+          <li>
+            Watch how manual JS Queries on Cross origin DOMs are impacted by
+            CORS
+          </li>
+        </ul>
         <hr />
         <h2>CORs Settings Menu</h2>
         Set CORs Headers on Parent and two iFrames
@@ -180,17 +211,13 @@
         </script>
 
         <hr />
-
-        <h1>Parent Window</h1>
-        Within the parent frame are several internal frames that it will use to
-        test cross-origin and same origin restrictions. The Parent window has
-        multiple test for various CORS scenarios.
-        <ul>
-          <li>Internal JS postMessages to cross-origin itnernal frames</li>
-          <li>Various Form submissions</li>
-          <li>HTTP GET requests via Fetch and XHL</li>
-          <li>Cross origin DOM queries</li>
-        </ul>
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!--                       Send Internal Post Messages between Parent and Iframes                 -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
         <h2>JS Post Message Test</h2>
         <button type="button" id="sendtochild1">
           Send Message to iframe 1 with JS postMessage</button
@@ -254,11 +281,11 @@
         <h2>HTML Requests Testing</h2>
         <br />
         <button type="button" id="getsecretfromsameorigin">
-          Get Secret from Same Origin with HTTP Request:</button
+          Get Secret from Same Origin(Parent) with HTTP Request:</button
         >:
         <div id="sopsecretresponse"></div>
         <button type="button" id="getsecretfromcrossorigin">
-          Get Secret from Cross Origin with HTTP Request:</button
+          Get Secret from Cross Origin(Iframe1) with HTTP Request:</button
         >:
         <div id="corsecretresponse"></div>
         <br />
