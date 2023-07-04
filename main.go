@@ -20,10 +20,14 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
-var Name string = ""
-var Port string = "80"
+var WebServerName string = ""
+var WebServerHTTPPort string = "80"
+
+
+
 
 // --------------------------------------------------------------------------------------
 //
@@ -32,11 +36,11 @@ var Port string = "80"
 // --------------------------------------------------------------------------------------
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Need 2 args, Name and PortNumber")
+		log.Fatal("Need 2 args, WebServerName and PortNumber")
 
 	}
-	Name = os.Args[1]
-	Port = os.Args[2]
+	WebServerName = os.Args[1]
+	WebServerHTTPPort = os.Args[2]
 
 	// Setup all the paths to handle HTTP requests
 	fs := http.FileServer(http.Dir("./static"))
@@ -54,10 +58,13 @@ func main() {
 	// test program: return secrets to client, see if they read it
 	http.HandleFunc("/get-json", jsonhandler)
 
+	// set cookies in response
+	http.HandleFunc("/get-cookies", cookiehandler)
+
 	// HTTP server
 	go func() {
-		log.Print(Name + " Listening on HTTP port:" + Port + "...")
-		err := http.ListenAndServe(":"+Port, nil)
+		log.Print(WebServerName + " Listening on HTTP port:" +WebServerHTTPPort+ "...")
+		err := http.ListenAndServe(":"+WebServerHTTPPort, nil)
 		if err != nil {
 			log.Fatal("Error starting HTTP server: ", err)
 		}
@@ -65,10 +72,10 @@ func main() {
 
 	// HTTPS server
 	go func() {
-		HttpsPort, err := strconv.Atoi(Port)
+		HttpsPort, err := strconv.Atoi(WebServerHTTPPort)
 		HttpsPort += 300
-		log.Print(Name + " Listening on HTTPS port:" + strconv.Itoa(HttpsPort) + "...")
-		certFile := "./certificate.crt"
+		log.Print(WebServerName + " Listening on HTTPS port:" + strconv.Itoa(HttpsPort) + "...")
+		certFile := "./publiccert.crt"
 		keyFile := "./privatekey.key"
 		err = http.ListenAndServeTLS(":"+strconv.Itoa(HttpsPort), certFile, keyFile, nil)
 		if err != nil {
@@ -132,7 +139,8 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 }
 
 // --------------------------------------------------------------------------------------
-//      Login Logic to handle passwords
+//      Login Logic 
+//      Pretend to login and then return access token in cookie
 // --------------------------------------------------------------------------------------
 
 type LoginRequest struct {
@@ -169,35 +177,26 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if the username and password are valid
 	success := loginReq.Username == "admin" && loginReq.Password == "password"
 	message := ""
-	tokenname := "AccessToken_" // will append a port number
-	tokenval := "12345678990"
-	cookieorigin := ""
-	// Add access token, append port number of the origin
-	u, _ := url.Parse(r.Header["Origin"][0])
-	_, port, _ := net.SplitHostPort(u.Host)
-	var cookie http.Cookie
+	tokenval := "blank"
 	if success {
-
-		if r.TLS == nil {
-			cookieorigin = tokenname + string(port)
-			domain := "localhost"
-			cookie = http.Cookie{Name: cookieorigin, Value: tokenval, Domain: domain, Secure: false, SameSite: http.SameSiteLaxMode}
-		} else {
-			intport, _ := strconv.Atoi(port) // tls port on cookie is 300 higher always
-			intport += 300
-			cookieorigin = tokenname + strconv.Itoa(intport)
-			domain := "localhost"
-			cookie = http.Cookie{Name: cookieorigin, Value: tokenval, Domain: domain, Secure: true, SameSite: http.SameSiteNoneMode}
-		}
+		// when successful login, create access token in cookie
+		tokenname := "AccessToken" // return fake access token
+		tokenval = "12345678990"
+		// get origin domain to put into cookie
+		Origin, _ := url.Parse(r.Header["Origin"][0]) // Origin= http://localhost:9081
+		Domain, _, _ := net.SplitHostPort(Origin.Host) // Split Origin
+		// create cookie to return access token
+		var cookie http.Cookie
+		cookie = http.Cookie{Name: tokenname, Value: tokenval, Domain: Domain, Secure: false, SameSite: http.SameSiteLaxMode}	
 		http.SetCookie(w, &cookie)
+		message = "Login successful!, returning cookie with access token in lax, non-Secure mode"
 	} else {
-		message = "Invalid username or password"
+		message = "Invalid username or password, no access token or cookie"
 	}
-	message = "Login successful!"
-	token := cookieorigin + ":" + tokenval
+
 	loginResp := LoginResponse{
 		Message: message,
-		Token:   token,
+		Token:   tokenval,
 		Success: success,
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -223,20 +222,85 @@ func classicFormSubmit(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("password:", r.Form["password"])
 	}
 }
+///////////////////////////////////////////////////////////////////////////
+// Cookie Handler
+// Add various cookies to response to see if client can read them
+///////////////////////////////////////////////////////////////////////////
+func MakeVariousCookies(r *http.Request, w http.ResponseWriter){
+// Origin and Target should be http://somehostname:portnumber
+	var Scheme, Origin, Target string = "","",""
+	// What scheme was this called with??
+	if (r.TLS == nil) {
+		Scheme = "http"
+	} else {
+		Scheme = "https"
+	}
+	var Domain string
+	// find where the request comes from and what host it is targeting
+	 OriginVal,ok := r.Header["Origin"]   // r.Header["Origin"][0]= localhost:9081 
+	if (!ok) 	{
+		Origin = "NoOriginSpecified" // Oh OH, no origin in Header...
+	} else {
+		Origin = OriginVal[0]
+	}
+	// Create Target of my Web server how it was called
+	Target = Scheme + "://" + r.Host // r.Host= localhost:9381 
+	MyHostArray := strings.Split(r.Host,":")
+	Domain = MyHostArray[0]
+	// Create various Cookies
+	var cookie http.Cookie
+	cookievalue := "Origin From: " + Origin + " To: " + Target
+	cookie = http.Cookie{Name: "CookieNotSecureLax", Value: cookievalue, Domain: Domain, Secure: false, SameSite: http.SameSiteLaxMode}		
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieSecureLax", Value: cookievalue, Domain: Domain, Secure: true, SameSite: http.SameSiteLaxMode}		
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieNotSecureNone", Value: cookievalue, Domain: Domain, Secure: false, SameSite: http.SameSiteNoneMode}	
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieSecureNone", Value: cookievalue, Domain: Domain, Secure: true, SameSite: http.SameSiteNoneMode}	
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieNotSecureLax_HTTPOnly", Value: cookievalue, Domain: Domain, Secure: false, HttpOnly: true, SameSite : http.SameSiteLaxMode}	
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieNotSecureLax_NOHTTPOnly", Value: cookievalue, Domain: Domain, Secure: false, HttpOnly: false, SameSite : http.SameSiteLaxMode}	
+	http.SetCookie(w, &cookie)
+	cookie = http.Cookie{Name: "CookieNotSecureLax_WeirdDomain", Value: cookievalue, Domain: "WeirdDomain.com", Secure: false, HttpOnly: false, SameSite : http.SameSiteLaxMode}	
+	http.SetCookie(w, &cookie)
+	return
+}
 
+
+type Message struct {
+	Text string `json:"text"`
+}
+
+func cookiehandler(w http.ResponseWriter, r *http.Request) {
+	// create all sorts of cookies
+	MakeVariousCookies(r,w)
+	// write the allow-origin header
+	WriteACHeader(w, AllowOrigin)
+	// Set the content type to application/json
+	w.Header().Set("Content-Type", "application/json")
+	// Create an info message
+	message := Message{Text: "Set various cookie values"}
+	// Convert the message to JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	// Write the JSON data to the response body
+	w.Write(jsonData)
+}
 // --------------------------------------------------------------------------------------
 //
 //	Add HTTP Request Handler to recieve GET /get-json request to return data to client
 //	so see if client can read it cross-origin
 //
 // --------------------------------------------------------------------------------------
-type Message struct {
-	Text string `json:"text"`
-}
+
 
 func jsonhandler(w http.ResponseWriter, r *http.Request) {
 	// Create a sample message
-	message := Message{Text: "ThisPasswordIsSecretFor:" + Name}
+	message := Message{Text: "ThisPasswordIsSecretFor:" + WebServerName}
 
 	// Convert the message to JSON
 	jsonData, err := json.Marshal(message)

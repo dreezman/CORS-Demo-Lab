@@ -37,8 +37,10 @@
 TBD-
 
 - cookies
+- check local storage too
 - read only response
 - send credentials
+- force origin in post
 
 ## 1. <a name='Background'></a>Background
 

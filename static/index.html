@@ -213,12 +213,83 @@
         <hr />
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
+        <!--                        Setup Cookie  Buttons - Get various cookies sent back in response     -->
+        <!--             Test both Same origin and Cross Origin                                           -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <hr />
+        <h2>Cooking Testing</h2>
+        This test will ask for the Parent web server and if Iframe1 web server
+        to return several different cookies. Clear the cookies in your browser
+        and compare the network traffic to what you see being returned into
+        cookie storage.
+        <br />
+        <br />
+
+        <button type="button" id="getvariouscookiessameorigin">
+          Have Same Origin HTTP server response with various cookies
+        </button>
+        <div id="sameorigincookieresponse"></div>
+        <button type="button" id="getvariouscookiescrossorigin">
+          Have Cross Origin HTTP server response with various cookies</button
+        >:
+        <div id="crossorigincookieresponse"></div>
+        <script>
+          let cookiecount = 1;
+          // Put listeners for the click on the button
+          document
+            .getElementById("getvariouscookiessameorigin")
+            .addEventListener("click", cookieclickHandler, false);
+          document.getElementById("getvariouscookiessameorigin").myParam =
+            document.location.origin;
+          // put listener on cross origin
+          document
+            .getElementById("getvariouscookiescrossorigin")
+            .addEventListener("click", cookieclickHandler, false);
+          document.getElementById("getvariouscookiescrossorigin").myParam =
+            iframe1origin;
+          // execute when cookie button is clicked
+          async function cookieclickHandler(e) {
+            try {
+              const response = await fetch(
+                e.srcElement.myParam + "/get-cookies",
+                {
+                  method: "GET",
+                }
+              );
+
+              const data = await response.json();
+              console.log(data);
+              buttonname = e.srcElement.id;
+              document.getElementById(buttonname).innerHTML =
+                "Get Cookie from Origin:  " +
+                response.url +
+                " " +
+                data.text +
+                ":" +
+                cookiecount;
+              cookiecount += 1;
+            } catch (error) {
+              console.error(
+                "An error occurred retrieving cookie:",
+                error.message
+              );
+            }
+          }
+        </script>
+        <hr />
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <!--                       Send Internal Post Messages between Parent and Iframes                 -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <h2>JS Post Message Test</h2>
+        This test will send an internal JS post message IPC request to both the
+        Parent web server and the sub-iframe1 webserver
+        <br />
+        <br />
         <button type="button" id="sendtochild1">
           Send Message to iframe 1 with JS postMessage</button
         ><br />
@@ -271,6 +342,7 @@
           };
           window.addEventListener("message", messageEventHandler, false);
         </script>
+        <br />
 
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
@@ -279,6 +351,10 @@
         <!-- -------------------------------------------------------------------------------------------- -->
         <hr />
         <h2>HTML Requests Testing</h2>
+        This test will send POST requests to the Parent and SubIframe1 web
+        server to retrieve secret data. See if you can read secret data from the
+        various JS environments.
+        <br />
         <br />
         <button type="button" id="getsecretfromsameorigin">
           Get Secret from Same Origin(Parent) with HTTP Request:</button
@@ -310,10 +386,6 @@
                 e.currentTarget.myParam + "/get-json",
                 {
                   method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ username, password }),
                 }
               );
 
@@ -345,6 +417,17 @@
         <!-- -------------------------------------------------------------------------------------------- -->
         <hr />
         <h2>Form Submition Testing</h2>
+
+        This test will create two different kinds of forms.
+        <ul>
+          <li>Classic just submit and do not see response</li>
+          <li>
+            A form with a JS listner on it to send a GET request to backend
+          </li>
+        </ul>
+        Lets see if they all work the same way with CORS as we do SOP and CORs
+        requests
+        <br /><br />
         <h3>Classic Same Origin Form Post Submit - Provide Email Info</h3>
         <form
           id="sameoriginclassicloginForm"
@@ -411,11 +494,20 @@
           /><br />
           <input
             type="submit"
-            value="non-SSL Same Origin Login"
+            value="non-SSL Parent frame Login"
             id="sopsubmit"
           />
-          <input type="submit" value="SSL Cross Origin Login" id="sslsubmit" />
-          <input type="submit" value="Cross Origin Login" id="corssubmit" />
+          <input
+            type="submit"
+            value="SSL Parent frame   Login"
+            id="sopsslsubmit"
+          />
+          <input type="submit" value="non-SSL iframe1 Login" id="corssubmit" />
+          <input
+            type="submit"
+            value="SSL iframe1 Login"
+            id="crossorigsslsubmit"
+          />
         </form>
 
         <script>
@@ -433,13 +525,21 @@
             const whichbutton = event.submitter.id;
             if (whichbutton == "sopsubmit") {
               target = document.location.origin + "/login";
-            } else if (whichbutton == "sslsubmit") {
-              // send to HTTPS port which is 300 higher
+            } else if (whichbutton == "sopsslsubmit") {
+              // send to HTTPS port of same origin, not cross origin
               target =
                 "https://" +
                 document.location.hostname +
                 ":" +
                 (Number(document.location.port) + 300).toString() +
+                "/login";
+            } else if (whichbutton == "crossorigsslsubmit") {
+              // send to HTTPS port which is 300 higher
+              target =
+                "https://" +
+                iframe1location.domain +
+                ":" +
+                (Number(iframe1location.port) + 300).toString() +
                 "/login";
             } else {
               // cross origin target, iframe1 web server
