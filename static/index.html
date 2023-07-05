@@ -138,49 +138,34 @@
         </ul>
         <hr />
         <h2>CORs Settings Menu</h2>
-        Set CORs Headers on Parent and two iFrames
-        <ul>
-          <li>Off</li>
-          <li>*</li>
-          <li>Random Number</li>
-          <li>Specific Host Port</li>
-          <li>Default: Allow-Origin:*</li>
-        </ul>
+        Set CORs Headers values on Parent and two iFrames
 
         <form action="/cors-toggle" method="GET">
-           
-          <input
-            type="radio"
-            id="corsoff"
-            name="corssettings"
-            value="TurnCorsOff"
-          />
-            <label for="corsoff">Turn CORs Headers Off</label><br />
-           
-          <input
-            type="radio"
-            id="corwildon"
-            name="corssettings"
-            value="TurnCorsWildOn"
-          />
-            <label for="corswildon">Turn CORs Wildcard ON</label><br />
-           
-          <input
-            type="radio"
-            id="randon"
-            name="corssettings"
-            value="TurnCorsRandomOrigOn"
-          />
-            <label for="corsrandon">Turn CORs Random Origin ON</label><br />
-           
-          <input
-            type="radio"
-            id="corsself"
-            name="corssettings"
-            value="TurnCorsSelfOrigOn"
-          />
-            <label for="corsself">Turn CORs on for specific host:port</label
-          ><br />
+             Access-Control-Allow-Credentials<br />
+          (Send credentials on HTTP Requests):
+          <select id="creds" name="creds">
+            <option value="NotUsed">Not Used</option>
+            <option value="Omit">Omit-Never Send</option>
+            <option value="Same">SameOrigin - Only send to Same Origin</option>
+            <option value="Include">
+              Include - Send Credentials Cross Origin
+            </option>
+          </select>
+          <br />Access-Control-Allow-Origin<br />
+          (Allow CORs HTTP Requests to specific origins):
+          <select id="AllowOrigin" name="AllowOrigin">
+            <option value="TurnCorsOff">Not Used</option>
+            <option value="TurnCorsWildOn">
+              Allow All Cross Origin requests
+            </option>
+            <option value="TurnCorsRandomOrigOn">
+              Allow CORs Requests to weird domain
+            </option>
+            <option value="TurnCorsSelfOrigOn">
+              Allow requests only to Same Origin
+            </option>
+          </select>
+          <br />
           <input type="submit" value="Update Parent CORs headers" /> <br />
           <button
             type="submit"
