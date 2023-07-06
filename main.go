@@ -91,7 +91,8 @@ func main() {
 //
 // --------------------------------------------------------------------------------------
 var addOriginHeader = true   // add Access-Control header to HTTP response
-var AllowOrigin string = "*" // Choose a Access-Control origin header
+var addCredsHeader = false   // add Access-Control header to send credentials
+var AllowOrigin string = "*" // Choose a Access-Control origin header, default is allow cross origin all
 func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 	if addOriginHeader {
 		//w.Header().Add("X-Frame-Options", "GOFORIT")
@@ -100,6 +101,9 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Header().Set("Access-Control-Expose-Headers", "*")
+	}
+	if addCredsHeader {
+		w.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(addCredsHeader))
 	}
 }
 
@@ -118,9 +122,9 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	// get port number I am listening on
+	// What should the AllowOrigin be set to, default is Allow CORS
 	addOriginHeader = true
-	param1 := r.URL.Query().Get("corssettings")
+	param1 := r.URL.Query().Get("AllowOrigin")
 	switch param1 {
 	case "TurnCorsOff":
 		addOriginHeader = false
@@ -134,6 +138,19 @@ func corsToggle(w http.ResponseWriter, r *http.Request) {
 		AllowOrigin = "*"
 		addOriginHeader = true
 	}
+	// What should the Send Credentials be set to, default is do not send
+	addCredsHeader = false
+	param1 = r.URL.Query().Get("creds")
+	switch param1 {
+	case "Off":
+		addCredsHeader = false
+	case "On":
+		addCredsHeader = true
+	default:
+		addOriginHeader = false
+	}
+
+
 	WriteACHeader(w, AllowOrigin)
 	http.Error(w, "Return to Main Page", http.StatusNoContent)
 }
