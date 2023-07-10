@@ -100,7 +100,7 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 		w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Expose-Headers", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Headers: X-PINGOTHER, Content-Type,Cache-Control, Content-Length,Content-Type,Expires,Last-Modified")
 	}
 	if addCredsHeader {
 		w.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(addCredsHeader))

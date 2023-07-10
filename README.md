@@ -182,6 +182,26 @@ Also test the login sequence with user: admin password: password and view the po
 ![Alt text](images/login.jpg)
 ![Alt text](images/token.jpg)
 
+### Send Credentials
+
+-- list of headers
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#requests_with_credentials
+
+- Request:
+
+  - send to same site
+    - Set to omit - force browser to never send
+    - Set to include
+    - Set same origin
+    - Not Set - Not sure what browser will do
+
+- server
+  - send with allow origin \* - will not work why
+  - send with allow origin off
+  - send with allow origin specific target
+  -
+
 ### 4.3. <a name='Cross-OriginQueries'></a>Cross-Origin Queries
 
 Now we will manually to cross-Origin queries by manually executing JavaScript commands.
