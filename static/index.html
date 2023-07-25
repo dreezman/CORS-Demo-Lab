@@ -505,7 +505,7 @@
           // -------------------- Add event listeners on iframes to send msgs via button click to iframes
           // ------------------------------------------------------------------------------------
           function clickHandler(e) {
-            console.log("i am postmessagin");
+            console.log("Parent is posting a message");
             // find the right iframe in "myParam" to send postMessage to
             document
               .getElementById(e.currentTarget.myParam)
@@ -533,6 +533,7 @@
               document.getElementById("responseiframe").innerHTML =
                 "Post Message Response from either child iframe:  " +
                 event.data +
+                " count: " +
                 count;
               count += 1;
             }
