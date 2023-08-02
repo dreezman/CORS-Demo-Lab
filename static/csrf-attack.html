@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My webpage!</title>
+  </head>
+  <body>
+    <h3>JS Fetch based Login Form</h3>
+    <form id="SSLloginform" method="POST" target="_blank">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        value="admin"
+        required
+      /><br />
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        value="password"
+        required
+      /><br />
+      <button id="SSLloginbutton">SSL Login</button>
+    </form>
+    <script>
+      // send login to parent on HTTPS
+      var SSLloginURL =
+        "https://" +
+        document.location.hostname +
+        ":" +
+        (document.location.port + 300).toString() +
+        "/login";
+      var parentframe = document.getElementById("SSLloginbutton");
+      parentframe.formAction = SSLloginURL;
+    </script>
+
+    <h2>CSRF</h2>
+    Now, lets steal the login cookie
+
+    <a href="csrf-attack-form.html" target="_blank"> Load csrf form!! </a>
+  </body>
+</html>

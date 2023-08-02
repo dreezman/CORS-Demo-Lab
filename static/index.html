@@ -185,15 +185,26 @@
         <script>
           // update CORS origin head update buttons so that we can send
           // corsssettings message to the right iframe origin
-          crossOriginUrl = iframe1origin + "/cors-toggle";
-          (iframe = document.getElementById("iframe1corsupdate")),
-            (iframe.formAction = crossOriginUrl);
+          var crossOriginUrl = iframe1origin + "/cors-toggle";
+          let iframe = document.getElementById("iframe1corsupdate");
+          iframe.formAction = crossOriginUrl;
           crossOriginUrl = iframe2origin + "/cors-toggle";
-          (iframe = document.getElementById("iframe2corsupdate")),
-            (iframe.formAction = crossOriginUrl);
+          iframe = document.getElementById("iframe2corsupdate");
+          iframe.formAction = crossOriginUrl;
         </script>
-
         <hr />
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!--      CSRF-   Execute CSRF and watch how the cookies get stolen -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <h2>CSRF</h2>
+        Let's steal a cookie without the parent knowing about it!!!
+
+        <a href="csrf-attack.html" target="_blank">
+          Execute a CSRF, for you FREE!!
+        </a>
+
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <!--      Cookie Testing-   Setup Cookie  Buttons - Get various cookies sent back in response     -->

