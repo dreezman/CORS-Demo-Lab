@@ -106,7 +106,7 @@
             iframe2location.port;
         </script>
         <!-- -------------------------------------------------------------------------------------------- -->
-        <!--                       Be able to dynamically change CORs headers on web servers              -->
+        <!--                  Parent Window Settings Page - Set some CORS parameters we will use on tests -->
         <!-- -------------------------------------------------------------------------------------------- -->
         <h1>Parent Window</h1>
         <h3 id="ParOrigin"></h3>
@@ -527,7 +527,7 @@
           // -------------------- Add event listeners on iframes to send msgs via button click to iframes
           // ------------------------------------------------------------------------------------
           function clickHandler(e) {
-            console.log("i am postmessagin");
+            console.log("Parent is posting a message");
             // find the right iframe in "myParam" to send postMessage to
             document
               .getElementById(e.currentTarget.myParam)
@@ -555,6 +555,7 @@
               document.getElementById("responseiframe").innerHTML =
                 "Post Message Response from either child iframe:  " +
                 event.data +
+                " count: " +
                 count;
               count += 1;
             }
