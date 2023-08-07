@@ -22,7 +22,14 @@
         value="password"
         required
       /><br />
-      <button id="SSLloginbutton">SSL Login</button>
+      <button
+        type="submit"
+        form="SSLloginform"
+        value="Submit"
+        id="SSLloginbutton"
+      >
+        SSL Login
+      </button>
     </form>
     <script>
       // send login to parent on HTTPS
@@ -30,7 +37,7 @@
         "https://" +
         document.location.hostname +
         ":" +
-        (document.location.port + 300).toString() +
+        (parseInt(document.location.port, 10) + 300).toString() +
         "/login";
       var parentframe = document.getElementById("SSLloginbutton");
       parentframe.formAction = SSLloginURL;
