@@ -22,7 +22,9 @@
         value="password"
         required
       /><br />
-      <button id="SSLloginbutton">SSL Login</button>
+      <button type="submit" id="SSLloginbutton" form="SSLloginform">
+        SSL Login
+      </button>
     </form>
     <script>
       // send login to parent on HTTPS
@@ -39,6 +41,6 @@
     <h2>CSRF</h2>
     Now, lets steal the login cookie
 
-    <a href="csrf-attack-form.html" target="_blank"> Load csrf form!! </a>
+    <a href="csrf-attack-form.html"> Load csrf form!! </a>
   </body>
 </html>
