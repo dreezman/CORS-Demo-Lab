@@ -36,6 +36,7 @@ func main() {
 	common.WebServerName = os.Args[1]
 	common.WebServerHTTPPort = os.Args[2]
 
+
 	// Setup all the paths to handle HTTP requests
 	fs := http.FileServer(http.Dir("./static"))
 	// handle default web requests as front end server for html pages
@@ -48,7 +49,8 @@ func main() {
 	http.HandleFunc("/login", login.LoginHandler)
 	// handle login forms from classic Form Post Submit
 	http.HandleFunc("/classic-form-submit", login.ClassicFormSubmit)
-
+	// fake setting new password
+	http.HandleFunc("/change-password",csrf.FakeSetPassword)
 	// test program: return secrets to client, see if they read it
 	http.HandleFunc("/get-json", cors.Jsonhandler)
 
@@ -65,6 +67,13 @@ func main() {
 	}()
 
 	// HTTPS server
+		// import to certmgr->trusted certs
+		// openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
+		//  -nodes -keyout privatekey.key -out publiccert.crt -subj "/CN=localhost" \
+		//  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+		// firefox: add exception
+		//  https://unix.stackexchange.com/questions/644176/how-to-permanently-add-self-signed-certificate-in-firefox		
+
 	go func() {
 		HttpsPort, err := strconv.Atoi(common.WebServerHTTPPort)
 		HttpsPort += 300

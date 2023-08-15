@@ -1,0 +1,17 @@
+{
+  "Parent": {
+    "domainName": "localhost",
+    "httpPort": 9081,
+    "httpsPort": "9381"
+  },
+  "Iframe1": {
+    "domainName": "localhost",
+    "httpPort": 3000,
+    "httpsPort": "3300"
+  },
+  "Iframe2": {
+    "domainName": "localhost",
+    "httpPort": 3000,
+    "httpsPort": "3300"
+  }
+}

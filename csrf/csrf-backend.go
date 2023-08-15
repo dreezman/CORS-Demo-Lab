@@ -2,6 +2,7 @@ package csrf
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -65,6 +66,34 @@ func Cookiehandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// Create an info message
 	message := common.Message{Text: "Set various cookie values"}
+	// Convert the message to JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	// Write the JSON data to the response body
+	w.Write(jsonData)
+}
+
+
+func FakeSetPassword(w http.ResponseWriter, r *http.Request) {
+
+	// fake setting password
+	// get password from form POST json data
+	if err := r.ParseForm(); err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			return
+	}
+	fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
+	// get new password
+	newpassword := r.FormValue("new-password")
+	// write the allow-origin header
+	common.WriteACHeader(w, common.AllowOrigin)
+	// Set the content type to application/json
+	w.Header().Set("Content-Type", "application/json")
+	// Create an info message
+	message := common.Message{Text: "Setting your password to:" + newpassword}
 	// Convert the message to JSON
 	jsonData, err := json.Marshal(message)
 	if err != nil {

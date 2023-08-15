@@ -50,7 +50,9 @@
   </head>
   <body>
     <h1>CORS Demo Lab</h1>
-
+    <script>
+      const config = require("./config.json");
+    </script>
     <div class="row">
       <div class="column left" style="background-color: lightgreen">
         <script>
@@ -202,7 +204,7 @@
         <h2>CSRF</h2>
         Let's steal a cookie without the parent knowing about it!!!
 
-        <a href="csrf-attack.html"> Execute a CSRF, for you FREE!! </a>
+        <a href="csrf/csrf-attack.html"> Execute a CSRF, for you FREE!! </a>
 
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->
@@ -297,9 +299,9 @@
 
         <br />
         <p>Click to steal a cookie</p>
-        <a href="http://localhost:9081/cookie-victim.html">
+        <a href="csrf/csrf-attack.html">
           <img
-            src="http://localhost:9081/cookiemonster.jpg"
+            src="http://localhost:9081/csrf/cookiemonster.jpg"
             alt="Cookie Monster"
             width="400"
             height="200"
@@ -691,7 +693,7 @@
         <script>
           // when submit cross origin form, send it to iframe1 webserver
           // replace the action element
-          let crossOriginUrl = iframe1origin + "/classic-form-submit";
+          crossOriginUrl = iframe1origin + "/classic-form-submit";
           (form_parent = document.getElementById(
             "crossoriginclassicloginForm"
           )),

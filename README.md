@@ -116,7 +116,10 @@ from the different origins. Users can do this with:
 1. cd ..
 2. git clone https://github.com/dreezman/CORS-Demo-Lab.git
 3. cd CORS-Demo-Lab
-
+4. Install certs into Chrome and Firefox
+   ![Alt text](images/chrome-certs.jpg)
+   ![Alt text](images/firefoxcerts.jpg)
+5. start the lab up
 <hr>
 
 ```
