@@ -137,6 +137,14 @@ set-executionpolicy unrestricted -scope process
 get-job| stop-job | remove-job
 ```
 
+<hr>
+6. Update Chrome and Firefox to latest updates
+7. Make sure lab works, click on these
+
+[Make sure HTTP works](http://localhost:9081/)<br>
+[Make sure HTTPS works](https://localhost:9381/)<br>
+[Make sure frames load](http://localhost:9081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html)<br>
+
 ## 4. <a name='Usage'></a>Usage
 
 ### 4.1. <a name='UseBrowserDebuggertoinspectCORStraffic'></a>Use Browser Debugger to inspect CORS traffic

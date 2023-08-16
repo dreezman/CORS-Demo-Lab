@@ -118,27 +118,39 @@
             "Origin:" + document.location.origin;
         </script>
         <br />
-        Within the parent frame are several internal frames that it will use to
-        test cross-origin and same origin restrictions. The Parent window has
-        multiple test for various CORS scenarios.
-        <ul>
-          <li>How cookies are set and used by site not origin</li>
-          <li>
-            Determine if Internal JS postMessages to cross-origin internal
-            frames is impacted by CORS
-          </li>
-          <li>
-            Watch how HTTP GET requests via Fetch and XHL are impacted by CORS
-          </li>
-          <li>
-            Determine if various Form submissions, both Classical and JS based,
-            are impacted by CORS
-          </li>
-          <li>
-            Watch how manual JS Queries on Cross origin DOMs are impacted by
-            CORS
-          </li>
-        </ul>
+        Within this parent frame are several internal frames on the right that
+        it will use to test cross-origin and same origin restrictions. Each one
+        comes from a different origin and web server.
+        <br />
+        <br />
+        This lab will use these frames to run various Cross Origin and Site
+        Requests and try to violate those policies.
+
+        <br />
+        <hr />
+        <h2>Cooking with Cookies</h2>
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!--      Cookies and SSP - Playing with cookies and CSRF attacks -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        Normally HTTP responses tell the browser to load cookies into the
+        browser. It would be too easy if there were just 1 way to do this!!!<br />
+
+        <a href="csrf/bakingcookies.html">back</a>
+        <p>Click to starting eat some cookies</p>
+        <a href="csrf/bakingcookies.html">
+          <img
+            src="csrf/cookiemonster.jpg"
+            alt="Cookie Monster"
+            width="400"
+            height="200"
+        /></a>
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!--      FIX THIS____ JS vs FORM loading cookeis. java cannot read response!!                                           -->
+        <!-- -------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------- -->
         <hr />
         <h2>CORs Settings Menu</h2>
         Set CORs Headers values on responses that the web servers send back to
@@ -195,35 +207,11 @@
           iframe = document.getElementById("iframe2corsupdate");
           iframe.formAction = crossOriginUrl;
         </script>
-        <hr />
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      CSRF-   Execute CSRF and watch how the cookies get stolen -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <h2>CSRF</h2>
-        Let's steal a cookie without the parent knowing about it!!!
+        <h2>Cooking with Cookies</h2>
+        Normally HTTP responses tell the browser to load cookies into the
+        browser. It would be too easy if there were just 1 way to do this!!!<br />
 
-        <a href="csrf/csrf-attack.html"> Execute a CSRF, for you FREE!! </a>
-
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      Cookie Testing-   Setup Cookie  Buttons - Get various cookies sent back in response     -->
-        <!--             Test both Same origin and Cross Origin                                           -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-        <h2>Cooking Testing</h2>
-        This test will ask for the Parent & Iframe1 web server to return several
-        different cookies. Watch the cookies in your browser and compare the
-        network traffic to what you see being returned into cookie storage.<br />
-        <a
-          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests"
-          title="Simple Requests"
-          >Restrictions on Fetches and Simple Requests
-        </a>
-        <br />
-        <br />
+        1) Same ORIGIN - 2) Cross ORIGIN -
 
         <br /><br />
         <button type="button" id="getvariouscookiessameorigin">
@@ -286,27 +274,6 @@
           }
         </script>
         <hr />
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--         Steal Cookies                                         -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-
-        <h2>Stealing Cookies</h2>
-        OK, you are probably pretty bored and hungry by now. Here is an easy way
-        to steal some cookies!<br />
-
-        <br />
-        <p>Click to steal a cookie</p>
-        <a href="csrf/csrf-attack.html">
-          <img
-            src="http://localhost:9081/csrf/cookiemonster.jpg"
-            alt="Cookie Monster"
-            width="400"
-            height="200"
-        /></a>
-
         <hr />
         <!-- -------------------------------------------------------------------------------------------- -->
         <!-- -------------------------------------------------------------------------------------------- -->

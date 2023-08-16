@@ -12,12 +12,12 @@
     <img src="cookiestorage.jpg" alt="Cookie Jar" width="800" height="200" />
     <ul>
       <li>
-        Domain - Which site (ignore protocol,port,subdomains) should I send this
-        to. If cookie domain is bank.com, then only send to http://bank.com
+        Domain - Which site (ignore port,subdomains) should I send this to. If
+        cookie domain is bank.com, then only send to http://bank.com
       </li>
       <li>
         Path - / sends cookies regardless of URL path. /somename only sends if
-        /somename is in URL path
+        /somename is in URL path or subdirectory
       </li>
       <li>
         HTTP Only - Only on Form HTTP submit requests, not Javascript HTTP
@@ -53,7 +53,8 @@
     </ul>
 
     <p>
-      First, let's look into the Cookie Jar and see what cookies we have.<br />
+      First, let's look into the Cookie Jar and see what cookies we have. Look
+      at the error console and see if some did not load.<br />
       <img src="cookiejar.jpg" alt="Cookie Jar" width="60" height="80" />
     </p>
     ----------------------<br />
@@ -62,6 +63,7 @@
     ----------------------<br />
     ----------------------<br />
     <h2>CSRF</h2>
+
     Now, lets steal the login cookie
 
     <a href="http://localhost:3000/csrf/csrf-attack-form.html">
