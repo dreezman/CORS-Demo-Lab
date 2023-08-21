@@ -62,25 +62,21 @@
     <div id="cookieTemplate"></div>
     ----------------------<br />
     ----------------------<br />
+    <script>
+      document.cookie.split(";").forEach(function (c) {
+        document.getElementById("cookieTemplate").innerHTML += c + "<br>";
+      });
+    </script>
+
     <h2>CSRF</h2>
 
     Now, lets steal the login cookie
 
-    <a href="http://localhost:3000/csrf/csrf-attack-form.html">
+    <a href="http://localhost:3000/csrf/csrf-attack-form.html" id="attacklink">
       Load csrf form from an EVIL website !!
     </a>
     <script>
-      document.cookie =
-        "cookieName1=Attributes: secure&SameSite=None.; Path=/; secure; SameSite=None";
-      document.cookie =
-        "cookieName2=Attributes: SameSite=None.;  Path=/; SameSite=None";
-      document.cookie =
-        "cookieName3=Attributes: sameSite=Lax.;  Path=/; SameSite=Lax";
-      document.cookie =
-        "cookieName4=Attributes: SameSite=Strict.; Path=/;  SameSite=Strict";
-      document.cookie.split(";").forEach(function (c) {
-        document.getElementById("cookieTemplate").innerHTML += c + "<br>";
-      });
+      document.getElementById("attacklink").href = newURL;
     </script>
   </body>
 </html>

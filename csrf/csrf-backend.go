@@ -32,24 +32,24 @@ func MakeVariousCookies(r *http.Request, w http.ResponseWriter){
 	}
 	// Create Target of my Web server how it was called
 	Target = Scheme + "://" + r.Host // r.Host= localhost:9381 
-	MyHostArray := strings.Split(r.Host,":")
+	MyHostArray := strings.Split(r.Host,":") // find the domainname before the "":"
 	Domain = MyHostArray[0]
 	// Create various Cookies
 	var cookie http.Cookie
-	cookievalue := "Origin From: " + Origin + " To: " + Target
-	cookie = http.Cookie{Name: "CookieNotSecureLax", Value: cookievalue, Domain: Domain, Secure: false, SameSite: http.SameSiteLaxMode}		
+	cookieOriginTarget := "Origin From: " + Origin + " To: " + Target
+	cookie = http.Cookie{Name: "Cookie1", Value: cookieOriginTarget + "||Secure=False||SameSite=Lax||Domain="+Domain+"|| ", Domain: Domain, Secure: false, SameSite: http.SameSiteLaxMode}		
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieSecureLax", Value: cookievalue, Domain: Domain, Secure: true, SameSite: http.SameSiteLaxMode}		
+	cookie = http.Cookie{Name: "Cookie2", Value: cookieOriginTarget + "||Secure=True||SameSite=Lax||Domain="+Domain+"|| ", Domain: Domain, Secure: true, SameSite: http.SameSiteLaxMode}		
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieNotSecureNone", Value: cookievalue, Domain: Domain, Secure: false, SameSite: http.SameSiteNoneMode}	
+	cookie = http.Cookie{Name: "Cookie3", Value: cookieOriginTarget + "||Secure=false||SameSite=None||Domain="+Domain+"|| ", Domain: Domain, Secure: false, SameSite: http.SameSiteNoneMode}	
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieSecureNone", Value: cookievalue, Domain: Domain, Secure: true, SameSite: http.SameSiteNoneMode}	
+	cookie = http.Cookie{Name: "Cookie4", Value: cookieOriginTarget + "||Secure=true||SameSite=None||Domain="+Domain+"|| ", Domain: Domain, Secure: true, SameSite: http.SameSiteNoneMode}	
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieNotSecureLax_HTTPOnly", Value: cookievalue, Domain: Domain, Secure: false, HttpOnly: true, SameSite : http.SameSiteLaxMode}	
+	cookie = http.Cookie{Name: "Cookie5", Value: cookieOriginTarget + "||Secure=False||HttpOnly: true||SameSite=Lax||Domain="+Domain+"|| ", Domain: Domain, Secure: false, HttpOnly: true, SameSite : http.SameSiteLaxMode}	
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieNotSecureLax_NOHTTPOnly", Value: cookievalue, Domain: Domain, Secure: false, HttpOnly: false, SameSite : http.SameSiteLaxMode}	
+	cookie = http.Cookie{Name: "Cookie6", Value: cookieOriginTarget + "||Secure=False||SameSite=Strict||Domain="+Domain+"|| ", Domain: Domain, Secure: false, SameSite : http.SameSiteStrictMode}	
 	http.SetCookie(w, &cookie)
-	cookie = http.Cookie{Name: "CookieNotSecureLax_WeirdDomain", Value: cookievalue, Domain: "WeirdDomain.com", Secure: false, HttpOnly: false, SameSite : http.SameSiteLaxMode}	
+	cookie = http.Cookie{Name: "Cookie7", Value: cookieOriginTarget + "||Secure=False||SameSite=Lax||Domain=WeirdDomain.com|| ", Domain: "WeirdDomain.com", Secure: false, HttpOnly: false, SameSite : http.SameSiteLaxMode}	
 	http.SetCookie(w, &cookie)
 	return
 }

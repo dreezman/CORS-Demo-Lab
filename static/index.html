@@ -49,68 +49,20 @@
     </style>
   </head>
   <body>
-    <h1>CORS Demo Lab</h1>
+    <!----------------------------------------------------------------------------------------
+      Load Config information about iframes and their URLs and ports
+    ------------------->
+    <script src="getConfig.js"></script>
     <script>
-      const config = require("./config.json");
+      getConfig("config.json"); // data is stored in localstorage under "config"
+      const jsonConfig = JSON.parse(localStorage.getItem("config"));
     </script>
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                  Parent Window Settings Page - Set some CORS parameters we will use on tests -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <h1>CORS Demo Lab</h1>
     <div class="row">
       <div class="column left" style="background-color: lightgreen">
-        <script>
-          // passed in origin information for iframe1 and iframe2 on parameters.
-          // parse out into individual out into protocol,domain,port
-          // http://localhost:9081/?iframeurl1=http://localhost:3000/iframes.html&iframeurl2=http://localhost:3001/iframes.html
-          const urlParams = new URL(window.location.toLocaleString())
-            .searchParams;
-          // Specify Origin of IFRAME1
-          const iframeurl1 = urlParams.get("iframeurl1");
-          var protocol = iframeurl1.replace(
-            /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
-            "$1"
-          );
-          var domain = iframeurl1.replace(
-            /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
-            "$2"
-          );
-          var port = iframeurl1.replace(
-            /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
-            "$3"
-          );
-          const iframe1location = {
-            protocol: protocol,
-            domain: domain,
-            port: port,
-          };
-
-          const iframe1origin =
-            iframe1location.protocol +
-            "://" +
-            iframe1location.domain +
-            ":" +
-            iframe1location.port;
-
-          // Specify Origin of IFRAME2
-          const iframeurl2 = urlParams.get("iframeurl2");
-          protocol = iframeurl2.replace(
-            /(http.*):\/\/(\S+):(\d{0,4})\/.*/,
-            "$1"
-          );
-          domain = iframeurl2.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/, "$2");
-          port = iframeurl2.replace(/(http.*):\/\/(\S+):(\d{0,4})\/.*/, "$3");
-          const iframe2location = {
-            protocol: protocol,
-            domain: domain,
-            port: port,
-          };
-          const iframe2origin =
-            iframe2location.protocol +
-            "://" +
-            iframe2location.domain +
-            ":" +
-            iframe2location.port;
-        </script>
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--                  Parent Window Settings Page - Set some CORS parameters we will use on tests -->
-        <!-- -------------------------------------------------------------------------------------------- -->
         <h1>Parent Window</h1>
         <h3 id="ParOrigin"></h3>
         <script>
@@ -200,10 +152,10 @@
         <script>
           // update CORS origin head update buttons so that we can send
           // corsssettings message to the right iframe origin
-          var crossOriginUrl = iframe1origin + "/cors-toggle";
+          var crossOriginUrl = jsonConfig.Iframe1.fullHTTPURL + "/cors-toggle";
           let iframe = document.getElementById("iframe1corsupdate");
           iframe.formAction = crossOriginUrl;
-          crossOriginUrl = iframe2origin + "/cors-toggle";
+          crossOriginUrl = jsonConfig.Iframe2.fullHTTPURL + "/cors-toggle";
           iframe = document.getElementById("iframe2corsupdate");
           iframe.formAction = crossOriginUrl;
         </script>
@@ -235,7 +187,7 @@
             .getElementById("getvariouscookiescrossorigin")
             .addEventListener("click", cookieclickHandler, false);
           document.getElementById("getvariouscookiescrossorigin").myParam =
-            iframe1origin;
+            jsonConfig.Iframe1.fullHTTPURL;
           // execute when cookie button is clicked
           async function cookieclickHandler(e) {
             try {
@@ -437,7 +389,7 @@
             .getElementById("getvariouscookiescrossorigin2")
             .addEventListener("click", cookieclickHandler, false);
           document.getElementById("getvariouscookiescrossorigin2").myParam =
-            iframe1origin;
+            jsonConfig.Iframe1.fullHTTPURL;
           // execute when cookie button is clicked
           async function cookieclickHandler(e) {
             try {
@@ -576,7 +528,7 @@
             .getElementById("getsecretfromcrossorigin")
             .addEventListener("click", secretsclickHandler, false);
           document.getElementById("getsecretfromcrossorigin").myParam =
-            iframe1origin;
+            jsonConfig.Iframe1.fullHTTPURL;
 
           let secretcount = 1;
           async function secretsclickHandler(e) {
@@ -660,7 +612,8 @@
         <script>
           // when submit cross origin form, send it to iframe1 webserver
           // replace the action element
-          crossOriginUrl = iframe1origin + "/classic-form-submit";
+          crossOriginUrl =
+            jsonConfig.Iframe1.fullHTTPURL + "/classic-form-submit";
           (form_parent = document.getElementById(
             "crossoriginclassicloginForm"
           )),
@@ -742,7 +695,7 @@
                 "/login";
             } else {
               // cross origin target, iframe1 web server
-              target = iframe1origin + "/login";
+              target = jsonConfig.Iframe1.fullHTTPURL + "/login";
             }
 
             // actual reqeust
@@ -771,9 +724,19 @@
 
         <hr />
       </div>
+      <!------------------------------------------------------------------------------------------------------
+        ------------------------------------------------------------------------------------------------------
+        ------------------------------------------------------------------------------------------------------
+        
+        iframe setup -- create all the iframes of the parent
+
+        ------------------------------------------------------------------------------------------------------  
+        ------------------------------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------------------------------->
       <div class="column right" style="background-color: #bbb">
         <div class="row">
           <div class="column">
+            <!-- Iframe 1 -->
             <h3>Non-Origin Iframe 1:</h3>
             <div id="iframe1urlparm"></div>
             <br />
@@ -783,12 +746,13 @@
             >
             </iframe>
             <script>
-              document.getElementById("iframe1").src = iframeurl1; // load the HTML for this frame
+              document.getElementById("iframe1").src =
+                jsonConfig.Iframe1.fullHTTPURL + "/iframes.html"; // load the HTML for this frame
               document.getElementById("iframe1urlparm").innerHTML =
                 "Origin:" + document.getElementById("iframe1").src;
             </script>
           </div>
-
+          <!-- Iframe 2 -->
           <div class="column">
             <h3>Non-Origin Iframe 2:</h3>
             <div id="iframe2urlparm"></div>
@@ -801,11 +765,13 @@
             >
             </iframe>
             <script>
-              document.getElementById("iframe2").src = iframeurl2; // load the HTML for this frame
+              document.getElementById("iframe2").src =
+                jsonConfig.Iframe2.fullHTTPURL + "/iframes.html"; // load the HTML for this frame; // load the HTML for this frame
               document.getElementById("iframe2urlparm").innerHTML =
                 "Origin:" + document.getElementById("iframe2").src;
             </script>
           </div>
+          <!-- Iframe 3 -->
           <div class="column">
             <h3>Same-Origin Iframe :</h3>
             <div id="sameoriginframeurl"></div>
@@ -819,7 +785,7 @@
             </iframe>
             <script>
               document.getElementById("sameoriginframe").src =
-                window.location.origin + "/iframes.html"; // load frame from same origin
+                jsonConfig.Iframe3.fullHTTPURL + "/iframes.html"; // load the HTML for this frame;
               document.getElementById("sameoriginframeurl").innerHTML =
                 "Origin:" + document.getElementById("sameoriginframe").src;
             </script>
