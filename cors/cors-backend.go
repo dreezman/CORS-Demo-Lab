@@ -63,7 +63,7 @@ func CorsToggle(w http.ResponseWriter, r *http.Request) {
 
 func Jsonhandler(w http.ResponseWriter, r *http.Request) {
 	// Create a sample message
-	message := common.Message{Text: "ThisPasswordIsSecretFor:" + common.WebServerName}
+	message := common.Message{Text: "ThisPasswordIsSecretFor:" }
 
 	// Convert the message to JSON
 	jsonData, err := json.Marshal(message)

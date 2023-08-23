@@ -12,10 +12,12 @@ See README.md for details
 */
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/dreezman/browser-security/common"
 	"github.com/dreezman/browser-security/cors"
@@ -29,14 +31,22 @@ import (
 //
 // --------------------------------------------------------------------------------------
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Need 2 args, common.WebServerName and PortNumber")
+	if len(os.Args) < 1 {
+		log.Fatal("Missing 1 arg: path to iframe config file ")
 
 	}
-	common.WebServerName = os.Args[1]
-	common.WebServerHTTPPort = os.Args[2]
 
-
+	// read iframe config file
+	jsonFile, err := os.Open(os.Args[0])
+    if (err != nil || jsonFile == nil ){
+       fmt.Println(err)
+	}
+	byteValue, _ := io.ReadAll(jsonFile)  /// stuck here reading in map	
+	err = json.Unmarshal([]byte(byteValue), &common.FrameConfigData)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
 	// Setup all the paths to handle HTTP requests
 	fs := http.FileServer(http.Dir("./static"))
 	// handle default web requests as front end server for html pages
@@ -57,34 +67,34 @@ func main() {
 	// set cookies in response
 	http.HandleFunc("/get-cookies", csrf.Cookiehandler)
 
-	// HTTP server
-	go func() {
-		log.Print(common.WebServerName + " Listening on HTTP port:" + common.WebServerHTTPPort+ "...")
-		err := http.ListenAndServe(":"+ common.WebServerHTTPPort, nil)
-		if err != nil {
-			log.Fatal("Error starting HTTP server: ", err)
-		}
-	}()
 
-	// HTTPS server
-		// import to certmgr->trusted certs
-		// openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
-		//  -nodes -keyout privatekey.key -out publiccert.crt -subj "/CN=localhost" \
-		//  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
-		// firefox: add exception
-		//  https://unix.stackexchange.com/questions/644176/how-to-permanently-add-self-signed-certificate-in-firefox		
+	for frameName, frameData := range common.FrameConfigData {
+		// HTTP server
+		go func() {
+			log.Print(frameName + " Listening on HTTP port:" + frameData.HttpPort + "...")
+			err := http.ListenAndServe(":" + frameData.HttpPort, nil)
+			if err != nil {
+				log.Fatal("Error starting HTTP server: ", err)
+			}
+		}()
 
-	go func() {
-		HttpsPort, err := strconv.Atoi(common.WebServerHTTPPort)
-		HttpsPort += 300
-		log.Print(common.WebServerName + " Listening on HTTPS port:" + strconv.Itoa(HttpsPort) + "...")
-		certFile := "./publiccert.crt"
-		keyFile := "./privatekey.key"
-		err = http.ListenAndServeTLS(":"+strconv.Itoa(HttpsPort), certFile, keyFile, nil)
-		if err != nil {
-			log.Fatal("Error starting HTTPS server: ", err)
-		}
-	}()
+		// HTTPS server
+			// import to certmgr->trusted certs
+			// openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
+			//  -nodes -keyout privatekey.key -out publiccert.crt -subj "/CN=localhost" \
+			//  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+			// firefox: add exception
+			//  https://unix.stackexchange.com/questions/644176/how-to-permanently-add-self-signed-certificate-in-firefox		
+
+		go func() {
+			log.Print(frameName + " Listening on HTTPS port:" + frameData.HttpsPort + "...")
+			certFile := "./publiccert.crt"
+			keyFile := "./privatekey.key"
+			err = http.ListenAndServeTLS(":"+frameData.HttpsPort, certFile, keyFile, nil)
+			if err != nil {
+				log.Fatal("Error starting HTTPS server: ", err)
+			}
+	}()}
 	select {}
 }
 

@@ -10,9 +10,17 @@ var AddOriginHeader = true   // add Access-Control header to HTTP response
 var AddCredsHeader = false   // add Access-Control header to send credentials
 var AllowOrigin string = "*" // Choose a Access-Control origin header, default is allow cross origin all
 // Common variables Webserver info
-var WebServerName string = ""
-var WebServerHTTPPort string = "80"
-var WebServerHTTPSPort_Increment = 300 // web server https port is http port + 300
+// User struct which contains a name
+// a type and a list of social links
+type Frame struct {
+    Domainname   string `json:"domainname"`
+    HttpPort   string `json:"httpPort"`
+    HttpsPort    string    `json:"httpsPort"`
+	FullHTTPURL    string    `json:"fullHTTPURL"`
+    FullHTTPSURL    string    `json:"fullHTTPSURL"`
+    Description    string    `json:"Description"`	
+}
+var FrameConfigData map[string]Frame
 
 func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 	if AddOriginHeader {
