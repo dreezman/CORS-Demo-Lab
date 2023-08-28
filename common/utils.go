@@ -13,14 +13,19 @@ var AllowOrigin string = "*" // Choose a Access-Control origin header, default i
 // User struct which contains a name
 // a type and a list of social links
 type Frame struct {
-    Domainname   string `json:"domainname"`
-    HttpPort   string `json:"httpPort"`
-    HttpsPort    string    `json:"httpsPort"`
-	FullHTTPURL    string    `json:"fullHTTPURL"`
-    FullHTTPSURL    string    `json:"fullHTTPSURL"`
-    Description    string    `json:"Description"`	
+	FrameName    string `json:"frameName"`
+	DomainName   string `json:"domainName"`
+	HTTPPort     string `json:"httpPort"`
+	HTTPSPort    string `json:"httpsPort"`
+	FullHTTPURL  string `json:"fullHTTPURL"`
+	FullHTTPSURL string `json:"fullHTTPSURL"`
+	Description  string `json:"Description"`
 }
-var FrameConfigData map[string]Frame
+
+type IframesData struct {
+	Iframes []Frame `json:"Iframes"`
+}
+var FrameConfigData IframesData
 
 func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 	if AddOriginHeader {
