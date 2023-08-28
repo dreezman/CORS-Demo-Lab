@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="EN" xml:lang="en">
   <head>
-    <title>Really Important Bank</title>
+    <title>Cookies and CSRF attack</title>
   </head>
 
   <body>
     <!----------------------------------------------------------------------------------------
       Load Config information about iframes and their URLs and ports
     ------------------->
+    <script src="../getConfig.js" type="application/javascript"></script>
     <script>
+      getConfig("../config.json"); // data is stored in localstorage under "config"
       const jsonConfig = JSON.parse(localStorage.getItem("config"));
     </script>
     <!-- -------------------------------------------------------------------------------------------- -->
@@ -24,32 +26,21 @@
     excercise, we will load cookies and then steal them... if SSP allows it!
     <br />
 
-    First...lets load up some cookies into the browser as if we were logging
-    into your bank and getting session tokens<br /><br />
+    First...lets load up some cookies into the browser. <br /><br />
 
     1) F12 the debugger <br />
     2) Clear out network traffic <br />
     3) Clear out cookies <br />
-    4) In the debugger, monitor the network,cookie jar and see what cookies get
-    loaded <br />
-    5) Why are some loaded and others not? (hint:domain,secure,samesite)<br />
-    <img src="bakingcookies.jpg" alt="bakecookies" width="200" height="100" />
-    <img src="bank.jpg" alt="yourbank" width="200" />
+    4) Monitor network and cookie jar and see what happens <br /><br />
+    <img src="bakingcookies.jpg" alt="bakecookies" width="400" height="200" />
     <br />
     <script src="getCookies.js"></script>
-    <script>
-      function loadCookies() {
-        getCookies();
-        document.getElementById("getvariouscookiessameorigin").innerHTML =
-          "Cookies Uploaded";
-      }
-    </script>
     <button
       type="button"
       id="getvariouscookiessameorigin"
-      onclick="loadCookies()"
+      onclick="getCookies()"
     >
-      Click to Bake Some Cookies (Load bank session cookies into browser)
+      Click to Bake Some Cookies (Load cookies into browser)
     </button>
     <div id="sameorigincookieresponse"></div>
 
@@ -149,18 +140,18 @@
     steal some cookies!<br />
 
     <br />
-    <p>
-      Oh...look at the cute cat you got in your email. Click the picture to
-      steal a cookie
-    </p>
+    <p>Click the picture to steal a cookie</p>
     <a id="attacklink">
-      <img src="catcookie.jpg" alt="Cookie Monster" width="300" /></a
+      <img
+        src="cookiemonster.jpg"
+        alt="Cookie Monster"
+        width="400"
+        height="200" /></a
     ><br />
 
     <script>
       document.getElementById("attacklink").href =
-        "https://coresdemo2.z13.web.core.windows.net/evilHackerCSRFPage.html";
+        jsonConfig.Iframe1.fullHTTPURL + "/csrf/csrf-attack-form.html";
     </script>
-    <br /><br /><br /><br />
   </body>
 </html>
