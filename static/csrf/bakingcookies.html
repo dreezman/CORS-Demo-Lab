@@ -11,7 +11,7 @@
     <script src="../getConfig.js" type="application/javascript"></script>
     <script>
       getConfig("../config.json"); // data is stored in localstorage under "config"
-      const jsonConfig = JSON.parse(localStorage.getItem("config"));
+      const jsonConfig = JSON.parse(localStorage.getItem("iframeConfig"));
     </script>
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
@@ -121,7 +121,8 @@
       </li>
       <li>
         Lax - bank.com cookies will be sent if you are on FaceBook and click
-        link to your bank.com
+        link to your bank.com..but only on **GET** requests (and several other
+        restrictions)
       </li>
       <li>
         Strict - bank.com cookies will be sent only if your are on bank.com
@@ -151,7 +152,7 @@
 
     <script>
       document.getElementById("attacklink").href =
-        jsonConfig.Iframe1.fullHTTPURL + "/csrf/csrf-attack-form.html";
+        "https://coresdemo2.z13.web.core.windows.net/evilHackerCSRFPage.html";
     </script>
   </body>
 </html>
