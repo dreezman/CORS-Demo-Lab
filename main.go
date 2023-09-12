@@ -77,6 +77,7 @@ func main() {
        fmt.Println("Oh Oh..cannot read frame config file, do you have the right path??: ",err)
 	   return
 	}
+	// load JSON into GO object
 	common.LoadFrameConfig(jsonFile)
    	if (err != nil ){
        fmt.Println("Something went wrong when loading frame config file, is the data corrupt or not JSON??: ",err)
@@ -114,6 +115,7 @@ func main() {
 				log.Fatal("Error starting web server: ", err)
 			}
 		}(frameName,frameData)	
+		// HTTPS server
 		wg.Add(1)		
 		go func(frameName string,frameData common.Frame){
 			defer wg.Done()
