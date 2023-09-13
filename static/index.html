@@ -55,7 +55,7 @@
     <script src="getConfig.js"></script>
     <script>
       getConfig("config.json"); // data is stored in localstorage under "config"
-      const jsonConfig = JSON.parse(localStorage.getItem("config"));
+      const jsonConfig = JSON.parse(localStorage.getItem(iframeConfigName));
     </script>
     <!-- -------------------------------------------------------------------------------------------- -->
     <!--                  Parent Window Settings Page - Set some CORS parameters we will use on tests -->
@@ -743,6 +743,7 @@
             <iframe
               style="border: solid black; background-color: lightblue"
               id="iframe1"
+              title="iframe1"
             >
             </iframe>
             <script>
@@ -762,6 +763,7 @@
                 background-color: lightgoldenrodyellow;
               "
               id="iframe2"
+              title="iframe2"
             >
             </iframe>
             <script>
@@ -781,11 +783,12 @@
                 background-color: rgb(201, 172, 207);
               "
               id="sameoriginframe"
+              title="sameoriginasParentframe"
             >
             </iframe>
             <script>
               document.getElementById("sameoriginframe").src =
-                jsonConfig.Iframe3.fullHTTPURL + "/iframes.html"; // load the HTML for this frame;
+                jsonConfig.ParentIframe.fullHTTPURL + "/iframes.html"; // load the HTML for this frame;
               document.getElementById("sameoriginframeurl").innerHTML =
                 "Origin:" + document.getElementById("sameoriginframe").src;
             </script>

@@ -10,9 +10,16 @@
       "request": "launch",
       "mode": "auto",
       "args": ["static/config.json"],
-      "program": "C:\\git\\gostuff\\CORS-Demo-Lab\\main.go"
+      "program": "${file}"
     },
-        {
+    {
+      "name": "Debug Lab FrontEnd",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:9081/iframes.html",
+      "webRoot": "${workspaceFolder}"
+    }
+    {
       "name": "JS Debug",
       "type": "Node.js",
       "request": "launch",
@@ -20,6 +27,5 @@
       "args": ["static/config.json"],
       "program": ""
     }
-  ]
   ]
 }

@@ -1,3 +1,4 @@
+const iframeConfigName = "iframeConfig";
 async function getConfig(file) {
   const response = await fetch(file);
   const configTemp = await response.json();
@@ -11,5 +12,5 @@ async function getConfig(file) {
   const mapArray = Array.from(IFrameMap);
   const jsonObject = Object.fromEntries(mapArray);
   const jsonConfig = JSON.stringify(jsonObject);
-  localStorage.setItem("iframeConfig", jsonConfig);
+  localStorage.setItem(iframeConfigName, jsonConfig);
 }
