@@ -98,8 +98,13 @@
         /somename is in URL path or subdirectory
       </li>
       <li>
-        HTTP Only - Javascript HTTP requests cannot read Javascript HTTP
-        responses
+        HTTP Only - Only main browser has access to cookie, not JS code. Some
+        XSS protection.
+      </li>
+      <li>
+        Expire - "Session" cookies used for keeping state during a shopping
+        session. Session length is browser define. Dated expire times are when
+        backends want to control cookie expire times.
       </li>
       <li>Secure - Can only send over over HTTPS</li>
       <li>SameSite - See below</li>
