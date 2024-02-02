@@ -1,4 +1,5 @@
 _*.json
 _*.exe
 *.exe
-
+node_modules
+node_modules/**
