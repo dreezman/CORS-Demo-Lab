@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dreezman/browser-security/common"
+	"browser-security-lab/common"
 )
 
 ///////////////////////////////////////////////////////////////////////////

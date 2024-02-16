@@ -1,10 +1,10 @@
 package cors
 
 import (
+	"browser-security-lab/common"
 	"encoding/json"
+	"log"
 	"net/http"
-
-	"github.com/dreezman/browser-security/common"
 )
 
 // --------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ func CorsToggle(w http.ResponseWriter, r *http.Request) {
 	}
 	// What should the common.AllowOrigin be set to, default is Allow CORS
 	common.AddOriginHeader = true
-	param1 := r.URL.Query().Get("common.AllowOrigin")
+	param1 := r.URL.Query().Get("AllowOrigin")
 	switch param1 {
 	case "TurnCorsOff":
 		common.AddOriginHeader = false
@@ -61,6 +61,7 @@ func CorsToggle(w http.ResponseWriter, r *http.Request) {
 // --------------------------------------------------------------------------------------
 
 
+
 func Jsonhandler(w http.ResponseWriter, r *http.Request) {
 	// Create a sample message
 	message := common.Message{Text: "ThisPasswordIsSecretFor:" }
@@ -78,4 +79,17 @@ func Jsonhandler(w http.ResponseWriter, r *http.Request) {
 
 	// Write the JSON data to the response body
 	w.Write(jsonData)
+}
+
+// --------------------------------------------------------------------------------------
+// Add HTTP Request Handler to recieve GET /xss-attack request to return data to client
+// that is a XSS string
+// --------------------------------------------------------------------------------------
+func XssAttackHandler(w http.ResponseWriter, r *http.Request) {
+
+	xssVal := r.URL.Query().Get("xssvalue")
+	//fmt.Fprintf(w, "Received GET XSS request with XSS as value: = %v\n", xssVal)
+	// Write the XSS data to the response body
+	log.Print("XSS attack response: ", xssVal)	
+	w.Write([]byte(xssVal))
 }

@@ -1,7 +1,7 @@
 package main
 
 /*
-                               CORS Lab
+                               Browser Security Lab
 
 This program is a CORS security lab the allows users to explore both the client and server
 side of CORS. Users can manipulate both the Client JavaScript and Server GO HTTP header CORS
@@ -12,16 +12,16 @@ See README.md for details
 */
 
 import (
+	"browser-security-lab/common"
+	"browser-security-lab/cors"
+	"browser-security-lab/csrf"
+	"browser-security-lab/login"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
-	"github.com/dreezman/browser-security/common"
-	"github.com/dreezman/browser-security/cors"
-	"github.com/dreezman/browser-security/csrf"
-	"github.com/dreezman/browser-security/login"
 	"github.com/gorilla/handlers"
 )
 
@@ -48,7 +48,9 @@ func handleRequest(frameName string, port string, mux *http.ServeMux) {
 
 	// set cookies in response
 	mux.HandleFunc("/get-cookies", csrf.Cookiehandler)
+	// set cookies in response
 
+	mux.HandleFunc("/xss-attack", cors.XssAttackHandler)
 
 }
 

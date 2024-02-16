@@ -1,4 +1,4 @@
-module github.com/dreezman/browser-security
+module browser-security-lab
 
 go 1.13
 

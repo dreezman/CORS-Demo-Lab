@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "args": ["static/config.json"],
-      "program": "${file}"
+      "program": "${workspaceFolder}/main.go"
     },
     {
       "name": "Debug Lab FrontEnd",
