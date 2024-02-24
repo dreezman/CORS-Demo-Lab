@@ -29,6 +29,54 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 }
 
 
+
+
+/*
+connect-src
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src
+
+default-src
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/default-src
+
+script-src
+
+unsafe-inline	- allow inline scripts
+unsafe-eval - allow eval() function
+
+script-src-elem
+script-src-attr
+*/
+// Common variables for configuring headers
+var AddCSPHeader = true   // add Access-Control header to HTTP response
+
+
+// Write the Access Control CORS header into the HTTP response
+func WriteCSPHeader(w http.ResponseWriter, AllowOrigin string) {
+	if AddOriginHeader {
+		//w.Header().Add("X-Frame-Options", "GOFORIT")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Headers: X-PINGOTHER, Content-Type,Cache-Control, Content-Length,Content-Type,Expires,Last-Modified")
+	}
+	if AddCredsHeader {
+		w.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(AddCredsHeader))
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* -----------------------------------------------------------------------
 
 	Load iFrame config data from file into this structure as a map

