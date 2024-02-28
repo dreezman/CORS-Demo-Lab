@@ -12,10 +12,11 @@ See README.md for details
 */
 
 import (
-	"browser-security-lab/common"
-	"browser-security-lab/cors"
-	"browser-security-lab/csrf"
-	"browser-security-lab/login"
+	"browser-security-lab/src/common"
+	"browser-security-lab/src/cors"
+	"browser-security-lab/src/csp"
+	"browser-security-lab/src/csrf"
+	"browser-security-lab/src/login"
 	"fmt"
 	"log"
 	"net/http"
@@ -42,7 +43,7 @@ func handleRequest(frameName string, port string, mux *http.ServeMux) {
 	// handle login forms from classic Form Post Submit
 	mux.HandleFunc("/classic-form-submit", login.ClassicFormSubmit)
 	// fake setting new password
-	mux.HandleFunc("/change-password",csrf.FakeSetPassword)
+	mux.HandleFunc("/change-password", csrf.FakeSetPassword)
 	// test program: return secrets to client, see if they read it
 	mux.HandleFunc("/get-json", cors.Jsonhandler)
 
@@ -51,6 +52,8 @@ func handleRequest(frameName string, port string, mux *http.ServeMux) {
 	// set cookies in response
 
 	mux.HandleFunc("/xss-attack", cors.XssAttackHandler)
+
+	mux.HandleFunc("/set-csp-header", csp.SetCSPHeader)
 
 }
 
@@ -62,6 +65,7 @@ func addHeaders(fs http.Handler) http.HandlerFunc {
 	}
 
 }
+
 // --------------------------------------------------------------------------------------
 //
 //	MAIN: is just a web server handling requests
@@ -75,65 +79,63 @@ func main() {
 
 	// read iframe config file
 	jsonFile, err := os.Open(os.Args[1])
-    if (err != nil || jsonFile == nil ){
-       fmt.Println("Oh Oh..cannot read frame config file, do you have the right path??: ",err)
-	   return
+	if err != nil || jsonFile == nil {
+		fmt.Println("Oh Oh..cannot read frame config file, do you have the right path??: ", err)
+		return
 	}
 	// load JSON into GO object
 	common.LoadFrameConfig(jsonFile)
-   	if (err != nil ){
-       fmt.Println("Something went wrong when loading frame config file, is the data corrupt or not JSON??: ",err)
-	   return
+	if err != nil {
+		fmt.Println("Something went wrong when loading frame config file, is the data corrupt or not JSON??: ", err)
+		return
 	}
 
 	// Each Iframe will be served by a mini-backend web server.
 	// Each mini-webserver will be a background thread/goroutine dedicated
-	// to processing those iframe requests. 
+	// to processing those iframe requests.
 	//
 	// Loop thru all the iframes in the config file and
 	// setup a background goroutine with an HTTP server for each iframe
 	// and a HTTPS server for each iframe. So 3 iframes, 6 web servers
 	//
 	// NOTE: to setup HTTPS
-			// HTTPS server
-			// import to certmgr->trusted certs
-			// openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
-			//  -nodes -keyout privatekey.key -out publiccert.crt -subj "/CN=localhost" \
-			//  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
-			// firefox: add exception
-			//  https://unix.stackexchange.com/questions/644176/how-to-permanently-add-self-signed-certificate-in-firefox		
+	// HTTPS server
+	// import to certmgr->trusted certs
+	// openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
+	//  -nodes -keyout privatekey.key -out publiccert.crt -subj "/CN=localhost" \
+	//  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+	// firefox: add exception
+	//  https://unix.stackexchange.com/questions/644176/how-to-permanently-add-self-signed-certificate-in-firefox
 
 	var wg sync.WaitGroup
-	for frameName, frameData := range common.IFrameConfigMap{
+	for frameName, frameData := range common.IFrameConfigMap {
 		// HTTP server
 		wg.Add(1)
-		go func(frameName string,frameData common.Frame){
+		go func(frameName string, frameData common.Frame) {
 			defer wg.Done()
 			mux := http.NewServeMux()
-			handleRequest(frameName,frameData.HTTPPort,mux)
-			log.Print(frameName + " Listening on HTTP port:" + frameData.HTTPPort + "...")		
-			err := http.ListenAndServe(":" + frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, mux))
+			handleRequest(frameName, frameData.HTTPPort, mux)
+			log.Print(frameName + " Listening on HTTP port:" + frameData.HTTPPort + "...")
+			err := http.ListenAndServe(":"+frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, mux))
 			if err != nil {
 				log.Fatal("Error starting web server: ", err)
 			}
-		}(frameName,frameData)	
+		}(frameName, frameData)
 		// HTTPS server
-		wg.Add(1)		
-		go func(frameName string,frameData common.Frame){
+		wg.Add(1)
+		go func(frameName string, frameData common.Frame) {
 			defer wg.Done()
 			mux := http.NewServeMux()
-			handleRequest(frameName,frameData.HTTPSPort,mux)
+			handleRequest(frameName, frameData.HTTPSPort, mux)
 			log.Print(frameName + " Listening on HTTPS port:" + frameData.HTTPSPort + "...")
 			certFile := "./publiccert.crt"
 			keyFile := "./privatekey.key"
-			err = http.ListenAndServeTLS(":"+frameData.HTTPSPort, certFile, keyFile, handlers.LoggingHandler(os.Stdout, mux))					
+			err = http.ListenAndServeTLS(":"+frameData.HTTPSPort, certFile, keyFile, handlers.LoggingHandler(os.Stdout, mux))
 			if err != nil {
 				log.Fatal("Error starting web server: ", err)
 			}
-		}(frameName,frameData)				
-	}	
+		}(frameName, frameData)
+	}
 	wg.Wait()
 
 }
-
-
