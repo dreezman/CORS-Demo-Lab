@@ -12,7 +12,50 @@
     <title>CSP</title>
   </head>
   <body>
+    <script src="../getConfig.js" type="application/javascript"></script>
+    <script>
+      getConfig("../config.json"); // data is stored in localstorage under "config"
+      const jsonConfig = JSON.parse(localStorage.getItem("iframeConfig"));
+    </script>
     <h1>CSP</h1>
     <p>This is a basic CSP page.</p>
+    <script>
+    function createButtonAndSetCSP() {
+      // Create a new button
+      var button = document.createElement("button");
+      button.innerHTML = "Set CSP";
+  
+      // Append the button to the body
+      document.body.appendChild(button);
+  
+      // Set up the button click event
+      button.addEventListener("click", function() {
+          var xhr = new XMLHttpRequest();
+          parentURL = jsonConfig.ParentIframe.fullHTTPSURL + "/SetCSPHeader";
+          xhr.open("POST", ParentUrl, true);
+          xhr.setRequestHeader("Content-Type", "application/json");
+  
+          var data = {
+              "enabled": true,
+              "csp-mode": "Content-Security-Policy",
+              "csp-data": [
+                  {
+                      "csp-type": "default-src",
+                      "script-src": ["abc.com", "123.com"]
+                  },
+                  {
+                      "csp-type": "script-src",
+                      "script-src": ["abc.com", "123.com"]
+                  }
+              ]
+          };
+  
+          xhr.send(JSON.stringify(data));
+      });
+    }
+  
+    // Call the function to create the button and set up the event
+    createButtonAndSetCSP();
+  </script>
   </body>
 </html>

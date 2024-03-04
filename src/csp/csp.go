@@ -1,11 +1,12 @@
 package csp
 
 import (
-	"browser-security-lab/src/common"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 )
 
 /*
@@ -62,17 +63,26 @@ input looks like one of these
 }
 
 */
-type CSP struct {
-	DefaultSrc []string `json:"default-src"`
-	ScriptSrc  []string `json:"script-src"`
+
+// CSP Data structure
+// to create a CSP header that looks like this
+// Content-Security-Policy: default-src 'self' example.com *.example.com; object-src 'none'; base-uri 'self';
+type CSP_Data struct {
+	CSP_Type string   `json:"csp-type"` // default-src, script-src, etc
+	Domains  []string `json:"script-src"`
 }
 
-type CSPConfig struct {
-	EnableCSP     CSP `json:"enable-csp"`
-	ReportOnlyCSP CSP `json:"report-only-csp"`
-	DisableCSP    CSP `json:"disable-csp"`
+type CSP_Struct struct {
+	Enabled  bool       `json:"enabled"`  // if nothing is enabled, then CSP is disabled
+	CSP_Mode string     `json:"csp-mode"` // Content-Security-Policy, Content-Security-Policy-Report-Only
+	CSP_Data []CSP_Data `json:"csp-data"` // default-src, script-src, etc
 }
 
+var CSPConfig_Current CSP_Struct = CSP_Struct{Enabled: false} // default is to disable csp
+var CSPHeader string = ""                                     // Content-Security-Policy, Content-Security-Policy-Report-Only
+var CSPDomains string = ""                                    // default-src 'self'; img-src *; media-src example.org example.net; script-src userscripts.example.com
+
+// Set the CSP header based on the input, do not write the header to the response
 func SetCSPHeader(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -80,71 +90,89 @@ func SetCSPHeader(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	decoder := json.NewDecoder(r.Body)
-	var CSPConfig CSPConfig
-	err := decoder.Decode(&CSPConfig)
+	err := decoder.Decode(&CSPConfig_Current)
 	if err != nil {
 		panic(err)
 	}
-	log.Println(CSPConfig)
+	log.Println(CSPConfig_Current)
 
-	/*
-		// What should the common.AllowOrigin be set to, default is Allow csp
-		common.AddOriginHeader = true
-		param1 := r.URL.Query().Get("AllowOrigin")
-		switch param1 {
-		case "TurncspOff":
-			common.AddOriginHeader = false
-		case "TurncspWildOn":
-			common.AllowOrigin = "*"
-		case "TurncspRandomOrigOn": // random port and https
-			common.AllowOrigin = "https://xyz.com:123"
-		case "TurncspSelfOrigOn":
-			common.AllowOrigin = "http://" + r.Host
-		default:
-			common.AllowOrigin = "*"
-			common.AddOriginHeader = true
-		}
-		// What should the Send Credentials be set to, default is do not send
-		common.AddCredsHeader = false
-		param1 = r.URL.Query().Get("creds")
-		switch param1 {
-		case "Off":
-			common.AddCredsHeader = false
-		case "On":
-			common.AddCredsHeader = true
-		default:
-			common.AddOriginHeader = false
+	CSPHeader = ""
+	CSPDomains = ""
+	if CSPConfig_Current.Enabled {
+
+		if CSPConfig_Current.CSP_Mode == "Content-Security-Policy" {
+			CSPHeader = "Content-Security-Policy"
+		} else if CSPConfig_Current.CSP_Mode == "Content-Security-Policy-Report-Only" {
+			CSPHeader = "Content-Security-Policy-Report-Only"
+		} else {
+			http.Error(w, "Invalid CSP mode: "+CSPConfig_Current.CSP_Mode, http.StatusBadRequest)
+			CSPConfig_Current.Enabled = false
+			return
 		}
 
-		common.WriteACHeader(w, common.AllowOrigin)
-		http.Error(w, "Return to Main Page", http.StatusNoContent)
-	*/
+		if len(CSPConfig_Current.CSP_Data) == 0 {
+			CSPDomains = "default-src 'self'; "
+		}
+		// build the header to look like this
+		// Content-Security-Policy: default-src 'self' example.com *.example.com; object-src 'none'; base-uri 'self';
+		for _, cspData := range CSPConfig_Current.CSP_Data {
+			CSPDomains += cspData.CSP_Type + " " // default-src, script-src, etc
+			for _, domain := range cspData.Domains {
+				CSPDomains += domain + " " // abc.com 123.com;
+			}
+			CSPDomains += ";"
+		}
+	}
 }
 
 // Write the Access Control CORS header into the HTTP response
-func WriteCSPHeader(w http.ResponseWriter, AllowOrigin string) {
-	if common.AddOriginHeader {
-		//w.Header().Add("X-Frame-Options", "GOFORIT")
-		w.Header().Set("Cache-Control", "no-store")
-		w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Headers: X-PINGOTHER, Content-Type,Cache-Control, Content-Length,Content-Type,Expires,Last-Modified")
+func WriteCSPHeader(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
 	}
-	if common.AddCredsHeader {
-		w.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(common.AddCredsHeader))
+	if CSPConfig_Current.Enabled {
+		w.Header().Set(CSPHeader, CSPDomains)
 	}
 }
 
 // --------------------------------------------------------------------------------------
-// Add HTTP Request Handler to recieve GET /xss-attack request to return data to client
-// that is a XSS string
+// Handle all CSP violations and print them out
 // --------------------------------------------------------------------------------------
-func XssAttackHandler(w http.ResponseWriter, r *http.Request) {
+type CSPReport struct {
+	CSPReport CSP `json:"csp-report"`
+}
 
-	xssVal := r.URL.Query().Get("xssvalue")
-	//fmt.Fprintf(w, "Received GET XSS request with XSS as value: = %v\n", xssVal)
-	// Write the XSS data to the response body
-	log.Print("XSS attack response: ", xssVal)
-	w.Write([]byte(xssVal))
+type CSP struct {
+	DocumentURI string `json:"document-uri"`
+	Referrer    string `json:"referrer"`
+	BlockedURI  string `json:"blocked-uri"`
+}
+
+func CSPReportOnlyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		return
+	}
+
+	var report CSPReport
+	err = json.Unmarshal(body, &report)
+	if err != nil {
+		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+		return
+	}
+
+	reportJson, err := json.Marshal(report)
+	if err != nil {
+		http.Error(w, "Error marshalling report", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(os.Stderr, "Content-Security-Policy-Report-Only: %s\n", reportJson)
 }

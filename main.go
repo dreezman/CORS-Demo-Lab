@@ -52,8 +52,11 @@ func handleRequest(frameName string, port string, mux *http.ServeMux) {
 	// set cookies in response
 
 	mux.HandleFunc("/xss-attack", cors.XssAttackHandler)
-
+	// set CSP Header global vars
 	mux.HandleFunc("/set-csp-header", csp.SetCSPHeader)
+	mux.HandleFunc("/write-csp-header", csp.WriteCSPHeader)
+	// Handle and print all CSP violations
+	mux.HandleFunc("/csp-report-only", csp.CSPReportOnlyHandler)
 
 }
 
