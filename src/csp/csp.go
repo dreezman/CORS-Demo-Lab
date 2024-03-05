@@ -125,12 +125,8 @@ func SetCSPHeader(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Write the Access Control CORS header into the HTTP response
-func WriteCSPHeader(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
+// Write the CSP header into the HTTP response
+func InsertCSPHeader(w http.ResponseWriter, r *http.Request) {
 	if CSPConfig_Current.Enabled {
 		w.Header().Set(CSPHeader, CSPDomains)
 	}
