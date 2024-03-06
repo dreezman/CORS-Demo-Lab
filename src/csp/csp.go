@@ -69,7 +69,7 @@ input looks like one of these
 // Content-Security-Policy: default-src 'self' example.com *.example.com; object-src 'none'; base-uri 'self';
 type CSP_Data struct {
 	CSP_Type string   `json:"csp-type"` // default-src, script-src, etc
-	Domains  []string `json:"script-src"`
+	Domains  []string `json:"domains"`
 }
 
 type CSP_Struct struct {

@@ -41,11 +41,11 @@
               "csp-data": [
                   {
                       "csp-type": "default-src",
-                      "script-src": ["abc.com", "123.com"]
+                      "domains": ["abc.com", "123.com"]
                   },
                   {
                       "csp-type": "script-src",
-                      "script-src": ["abc.com", "123.com"]
+                      "domains": ["abc.com", "123.com"]
                   }
               ]
           };
@@ -76,6 +76,137 @@
 
 // Call the function to create the button and set up the event
 createButtonAndCallWriteCSPHeader();
+
+/*
+
+Convert
+
+"default-src abc.com 123.com ; script-src abc.com 123.com";
+
+TO:
+
+          "csp-data": [
+              {
+                  "csp-type": "default-src",
+                  "domains": ["abc.com", "123.com"]
+              },
+              {
+                  "csp-type": "script-src",
+                  "domains": ["abc.com", "123.com"]
+              }
+          ]
+
+
+*/
+function convertInputToJSON(input) {
+    var parts = input.split(" ; ");
+    var cspData = parts.map(function(part) {
+        var subParts = part.split(" ");
+        var cspType = subParts.shift();
+        var domains = subParts;
+        return {
+            "csp-type": cspType,
+            "domains": domains
+        };
+    });
+
+    return {
+        "csp-data": cspData
+    };
+}
+
+
+
+function createFormAndSendData() {
+    // Create dropdown
+    var select = document.createElement("select");
+    var option1 = new Option("CSP disabled", "1");
+    var option2 = new Option("CSP policy enforced", "2");
+    var option3 = new Option("CSP policy report-only", "3");
+    select.add(option1, undefined);
+    select.add(option2, undefined);
+    select.add(option3, undefined);
+
+    // Create text box
+    var textBox = document.createElement("Input Policy");
+    textBox.type = "text";
+
+    // Create submit button
+    var button = document.createElement("button");
+    button.innerHTML = "Submit";
+
+    // Append elements to the body
+    document.body.appendChild(select);
+    document.body.appendChild(textBox);
+    document.body.appendChild(button);
+
+    // Set up the button click event
+    button.addEventListener("click", function() {
+        /*
+        Using what the user typed in, create a JSON object for the CSP policy and
+        create something like this
+
+        {
+            "enabled": true,
+          "csp-mode": "Content-Security-Policy",
+            "csp-data": [
+                {
+                    "csp-type": "default-src",
+                    "script-src": ["abc.com", "123.com"]
+                },
+                {
+                    "csp-type": "script-src",
+                    "script-src": ["abc.com", "123.com"]
+                }
+            ]
+        }
+
+        */
+        switch(select.value) {
+          case 1:
+            var cspMode={enabled: false, cspMode:""}
+            break;
+          case 2:
+            var cspMode={enabled: true, cspMode:"Content-Security-Policy"}
+            break;
+          case 3:            
+            var cspMode={enabled: true, cspMode:"Content-Security-Policy-Report-Only"}
+            break;
+          default:
+            var cspMode={enabled: false, cspMode:""}
+        }
+        const cspModeJSON = JSON.stringify(cspMode);
+        try {
+          // var input = "default-src abc.com 123.com ; script-src abc.com 123.com";
+          var jsonCSP = convertInputToJSON(textBox.value);
+          console.log(JSON.stringify(json, null, 2));
+
+        }
+        catch (e) {
+          console.log("Could not convert to JSON:"+  + e);
+          return
+        }
+        var cspStructureJSON=Object.assign({},cspModeJSON, jsonCSP)
+        console.log("CSP Json to Set: "+ JSON.stringify(cspStructureJSON, null, 2));
+
+
+
+        var xhr = new XMLHttpRequest();
+        parentURL = jsonConfig.ParentIframe.fullHTTPSURL + "/set-csp-header";
+        xhr.open("POST", parentURL, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        var data = {
+            "selectedOption": select.value,
+            "textBoxContent": jsonCSP
+        };
+
+        xhr.send(JSON.stringify(data));
+    });
+}
+
+// Call the function to create the form and set up the event
+createFormAndSendData();
 </script>
 
 
