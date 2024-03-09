@@ -20,42 +20,6 @@
     <h1>CSP</h1>
     <p>This is a basic CSP page.</p>
     <script>
-    function createButtonAndSetCSP() {
-      // Create a new button
-      var button = document.createElement("button");
-      button.innerHTML = "Set CSP";
-  
-      // Append the button to the body
-      document.body.appendChild(button);
-  
-      // Set up the button click event
-      button.addEventListener("click", function() {
-          var xhr = new XMLHttpRequest();
-          parentURL = jsonConfig.ParentIframe.fullHTTPSURL + "/set-csp-header";
-          xhr.open("POST", parentURL, true);
-          xhr.setRequestHeader("Content-Type", "application/json");
-  
-          var data = {
-              "enabled": true,
-              "csp-mode": "Content-Security-Policy",
-              "csp-data": [
-                  {
-                      "csp-type": "default-src",
-                      "domains": ["abc.com", "123.com"]
-                  },
-                  {
-                      "csp-type": "script-src",
-                      "domains": ["abc.com", "123.com"]
-                  }
-              ]
-          };
-  
-          xhr.send(JSON.stringify(data));
-      });
-    }
-  
-    // Call the function to create the button and set up the event
-    createButtonAndSetCSP();
 
     function createButtonAndCallWriteCSPHeader() {
       // Create a new button
@@ -74,7 +38,7 @@
       });
     }
 
-// Call the function to create the button and set up the event
+// Call the function to create the Write button and set up the event
 createButtonAndCallWriteCSPHeader();
 
 /*
@@ -128,17 +92,20 @@ function createFormAndSendData() {
     select.add(option3, undefined);
 
     // Create text box
-    var textBox = document.createElement("Input Policy");
-    textBox.type = "text";
+    var textBox = document.createElement("INPUT");
+    textBox.type ="text"
+    textBox.value="Example:default-src abc.com 123.com ; script-src abc.com 123.com"
 
     // Create submit button
     var button = document.createElement("button");
     button.innerHTML = "Submit";
 
     // Append elements to the body
-    document.body.appendChild(select);
-    document.body.appendChild(textBox);
-    document.body.appendChild(button);
+    var br=document.createElement("BR");
+    document.body.appendChild(br);
+    document.body.appendChild(select);document.body.appendChild(br);
+    document.body.appendChild(textBox);document.body.appendChild(br);
+    document.body.appendChild(button);document.body.appendChild(br);
 
     // Set up the button click event
     button.addEventListener("click", function() {
@@ -163,45 +130,37 @@ function createFormAndSendData() {
 
         */
         switch(select.value) {
-          case 1:
+          case "1":
             var cspMode={enabled: false, cspMode:""}
             break;
-          case 2:
+          case "2":
             var cspMode={enabled: true, cspMode:"Content-Security-Policy"}
             break;
-          case 3:            
+          case "3":            
             var cspMode={enabled: true, cspMode:"Content-Security-Policy-Report-Only"}
             break;
           default:
             var cspMode={enabled: false, cspMode:""}
         }
-        const cspModeJSON = JSON.stringify(cspMode);
         try {
           // var input = "default-src abc.com 123.com ; script-src abc.com 123.com";
-          var jsonCSP = convertInputToJSON(textBox.value);
-          console.log(JSON.stringify(json, null, 2));
+          var cspData = convertInputToJSON(textBox.value);
+          console.log(JSON.stringify(cspData, null, 2));
 
         }
         catch (e) {
           console.log("Could not convert to JSON:"+  + e);
           return
         }
-        var cspStructureJSON=Object.assign({},cspModeJSON, jsonCSP)
-        console.log("CSP Json to Set: "+ JSON.stringify(cspStructureJSON, null, 2));
-
-
-
+        var cspStructureJSON=Object.assign({},cspMode, cspData)
+        var cspStructureString=JSON.stringify(cspStructureJSON, null, 2)
+        console.log("CSP Json to Set: "+ cspStructureString);
+        // send the request 
         var xhr = new XMLHttpRequest();
         parentURL = jsonConfig.ParentIframe.fullHTTPSURL + "/set-csp-header";
         xhr.open("POST", parentURL, true);
         xhr.setRequestHeader("Content-Type", "application/json");
-
-        var data = {
-            "selectedOption": select.value,
-            "textBoxContent": jsonCSP
-        };
-
-        xhr.send(JSON.stringify(data));
+        xhr.send(cspStructureString);
     });
 }
 

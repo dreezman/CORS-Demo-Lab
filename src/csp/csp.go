@@ -74,7 +74,7 @@ type CSP_Data struct {
 
 type CSP_Struct struct {
 	Enabled  bool       `json:"enabled"`  // if nothing is enabled, then CSP is disabled
-	CSP_Mode string     `json:"csp-mode"` // Content-Security-Policy, Content-Security-Policy-Report-Only
+	CSP_Mode string     `json:"cspMode"`  // Content-Security-Policy, Content-Security-Policy-Report-Only
 	CSP_Data []CSP_Data `json:"csp-data"` // default-src, script-src, etc
 }
 
