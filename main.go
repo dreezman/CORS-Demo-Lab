@@ -26,18 +26,68 @@ import (
 	"github.com/gorilla/handlers"
 )
 
+// CustomHandler is a struct for customizing the file server
+// CustomHandler is a struct for customizing the file server
+type CustomHandler struct {
+	// The base file server
+	FileServer http.Handler
+	// Function to generate custom headers dynamically
+	HeaderFunc func(r *http.Request) map[string]string
+}
+
+// ServeHTTP serves the static file and inserts headers
+func (h *CustomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Get custom headers from the provided function
+	headers := h.HeaderFunc(r)
+
+	// Add custom headers
+	for key, value := range headers {
+		w.Header().Set(key, value)
+	}
+
+	// Serve the static file
+	h.FileServer.ServeHTTP(w, r)
+}
+
+// Example function to generate headers dynamically
+func dynamicHeaders(r *http.Request) map[string]string {
+	headers := make(map[string]string)
+
+	// Add dynamic headers based on request properties
+	if csp.CSPConfig_Current.Enabled {
+		headers[csp.CSPHeader] = csp.CSPDomains // CSP Header
+	}
+	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
+
+	return headers
+}
+
 // Set HTTP request handlers
-func handleRequest(frameName string, port string, mux *http.ServeMux) {
+func handleRequest(mux *http.ServeMux) {
 
-	// Setup all the paths to handle HTTP requests
-	fs := http.FileServer(http.Dir("./static"))
+	// Create a file server handler to serve static files from the "static" directory
+	fs := http.FileServer(http.Dir("static/csp"))
 
-	// handle default web requests as front end server for html pages
-	mux.Handle("/", addHeaders(fs))
+	// Define a function to generate custom headers dynamically
+	headerFunc := dynamicHeaders
 
+	// Wrap the file server with the custom handler
+	customHandler := &CustomHandler{
+		FileServer: fs,
+		HeaderFunc: headerFunc,
+	}
+	print("customHandler: ", customHandler)
+	// Serve static files with the custom handler
+	mux.Handle("/", customHandler)
+
+	/* Specify the directory you want to serve files from
+	fs := http.FileServer(http.Dir("static"))
+	//--------------------------------------------
+	// Use the FileServer to serve files from the specified directory
+	mux.Handle("/", fs)
+	*/
 	// handle toggle CORS headers
 	mux.HandleFunc("/cors-toggle", cors.CorsToggle)
-
 	// handle login forms from JS Fetch requests
 	mux.HandleFunc("/login", login.LoginHandler)
 	// handle login forms from classic Form Post Submit
@@ -51,21 +101,12 @@ func handleRequest(frameName string, port string, mux *http.ServeMux) {
 	mux.HandleFunc("/get-cookies", csrf.Cookiehandler)
 	// set cookies in response
 
-	mux.HandleFunc("/xss-attack", cors.XssAttackHandler)
+	mux.HandleFunc("/xss-attack", csp.XssAttackHandler)
 	// set CSP Header global vars
 	mux.HandleFunc("/set-csp-header", csp.SetCSPHeader)
 	mux.HandleFunc("/insert-csp-header", csp.InsertCSPHeader)
 	// Handle and print all CSP violations
 	mux.HandleFunc("/csp-report-only", csp.CSPReportOnlyHandler)
-
-}
-
-// Add Cors headers to all responses
-func addHeaders(fs http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		common.WriteACHeader(w, common.AllowOrigin)
-		fs.ServeHTTP(w, r)
-	}
 
 }
 
@@ -117,7 +158,7 @@ func main() {
 		go func(frameName string, frameData common.Frame) {
 			defer wg.Done()
 			mux := http.NewServeMux()
-			handleRequest(frameName, frameData.HTTPPort, mux)
+			handleRequest(mux)
 			log.Print(frameName + " Listening on HTTP port:" + frameData.HTTPPort + "...")
 			err := http.ListenAndServe(":"+frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, mux))
 			if err != nil {
@@ -129,7 +170,7 @@ func main() {
 		go func(frameName string, frameData common.Frame) {
 			defer wg.Done()
 			mux := http.NewServeMux()
-			handleRequest(frameName, frameData.HTTPSPort, mux)
+			handleRequest(mux)
 			log.Print(frameName + " Listening on HTTPS port:" + frameData.HTTPSPort + "...")
 			certFile := "./publiccert.crt"
 			keyFile := "./privatekey.key"

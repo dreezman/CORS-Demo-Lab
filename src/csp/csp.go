@@ -172,3 +172,16 @@ func CSPReportOnlyHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(os.Stderr, "Content-Security-Policy-Report-Only: %s\n", reportJson)
 }
+
+// --------------------------------------------------------------------------------------
+// Add HTTP Request Handler to recieve GET /xss-attack request to return data to client
+// that is a XSS string
+// --------------------------------------------------------------------------------------
+func XssAttackHandler(w http.ResponseWriter, r *http.Request) {
+
+	xssVal := r.URL.Query().Get("xssvalue")
+	//fmt.Fprintf(w, "Received GET XSS request with XSS as value: = %v\n", xssVal)
+	// Write the XSS data to the response body
+	log.Print("XSS attack response: ", xssVal)
+	w.Write([]byte(xssVal))
+}

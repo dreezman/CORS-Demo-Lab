@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <style>
-      * {
+    span:after,
+    span:before{
+      content:"\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0";
+      text-decoration:line-through;
+    }  * {
         box-sizing: border-box;
       }
       body {
@@ -101,11 +106,14 @@ function createFormAndSendData() {
     button.innerHTML = "Submit";
 
     // Append elements to the body
-    var br=document.createElement("BR");
-    document.body.appendChild(br);
-    document.body.appendChild(select);document.body.appendChild(br);
-    document.body.appendChild(textBox);document.body.appendChild(br);
-    document.body.appendChild(button);document.body.appendChild(br);
+
+    document.body.appendChild(document.createElement("BR"));
+    document.body.appendChild(select);
+    document.body.appendChild(document.createElement("BR"));
+    document.body.appendChild(textBox);
+    document.body.appendChild(document.createElement("BR"));
+    document.body.appendChild(button);
+    document.body.appendChild(document.createElement("BR"));
 
     // Set up the button click event
     button.addEventListener("click", function() {
@@ -167,6 +175,18 @@ function createFormAndSendData() {
 // Call the function to create the form and set up the event
 createFormAndSendData();
 </script>
+
+<hr>
+<span> your text </span>
+<br /><br />
+<a href="https://localhost:9381/csp/xss-inline.html">XSS inline</a>
+
+
+<hr>
+
+<hr>
+
+<hr>
 
 
 
