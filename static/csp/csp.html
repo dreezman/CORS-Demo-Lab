@@ -99,7 +99,9 @@ function createFormAndSendData() {
     // Create text box
     var textBox = document.createElement("INPUT");
     textBox.type ="text"
-    textBox.value="Example:default-src abc.com 123.com ; script-src abc.com 123.com"
+    textBox.size ="100"
+    textBox.value="default-src 'none' https://localhost:3389"
+
 
     // Create submit button
     var button = document.createElement("button");
@@ -179,10 +181,13 @@ createFormAndSendData();
 <hr>
 <span> your text </span>
 <br /><br />
-<a href="https://localhost:9381/csp/xss-inline.html">XSS inline</a>
+<a href="https://localhost:9381/xss-inline.html">XSS inline</a>
 
 
 <hr>
+<span> your text </span>
+<br /><br />
+<a href="https://localhost:9381/xss-external-load.js">External Load</a>
 
 <hr>
 
