@@ -55,6 +55,9 @@ func dynamicHeaders(r *http.Request) map[string]string {
 
 	// Add dynamic headers based on request properties
 	if csp.CSPConfig_Current.Enabled {
+ 		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "https://localhost:9381/csp-report-only" }]}`
+		headers["Report-To"] = cspGroup
+		headers["Reporting-Endpoints"]= `csp-endpoint-uri="https://localhost:9381/csp-report-only"`
 		headers[csp.CSPHeader] = csp.CSPDomains // CSP Header
 	}
 	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
@@ -79,7 +82,8 @@ func handleRequest(mux *http.ServeMux) {
 	print("customHandler: ", customHandler)
 	// Serve static files with the custom handler
 	mux.Handle("/", customHandler)
-
+	//fs1 := http.FileServer(http.Dir("/"))
+	//mux.Handle("/", fs1)	
 	/* Specify the directory you want to serve files from
 	fs := http.FileServer(http.Dir("static"))
 	//--------------------------------------------

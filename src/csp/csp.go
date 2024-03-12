@@ -128,8 +128,30 @@ func SetCSPHeader(w http.ResponseWriter, r *http.Request) {
 // Write the CSP header into the HTTP response
 func InsertCSPHeader(w http.ResponseWriter, r *http.Request) {
 	if CSPConfig_Current.Enabled {
+		// cspGroup:= `{ "group": "csp-endpoint","max_age": 10886400,"endpoints": [{ "url": "https://example.com/csp-reports" }] }`
+ 		cspGroup := `{ 
+				"group": "csp-endpoint-group",
+				"max_age": 10886400,
+				"endpoints": [
+								{ "url": "https://localhost:9381/csp-report-only" }
+							] 
+				}`
+		w.Header().Set("Report-To",cspGroup)
+		w.Header().Set("Reporting-Endpoints-uri", `csp-endpoint="https://localhost:9381/csp-report-only"`)
 		w.Header().Set(CSPHeader, CSPDomains)
 	}
+
+
+	/*
+	if csp.CSPConfig_Current.Enabled {
+ 		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "https://localhost:9381/csp-report-only" }]}`
+		headers["Report-To"] = cspGroup
+		headers["Reporting-Endpoints"]= `csp-endpoint-uri="https://localhost:9381/csp-report-only"`
+		headers[csp.CSPHeader] = csp.CSPDomains // CSP Header
+	}
+	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
+	*/
+
 }
 
 // --------------------------------------------------------------------------------------
@@ -157,16 +179,22 @@ func CSPReportOnlyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var report CSPReport
-	err = json.Unmarshal(body, &report)
+
+//	var report CSPReport
+//	err = json.Unmarshal(body, &report)
+	var report interface{}
+	err = json.Unmarshal([]byte(body), &report)	
 	if err != nil {
-		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+		fmt.Fprintf(os.Stderr,"Error unmarshalling JSON csp report: %v\n", err)
+		fmt.Fprintf(os.Stderr,"CSP Body: %s\n",string(body))
 		return
 	}
 
-	reportJson, err := json.Marshal(report)
+	//reportJson, err := json.Marshal(report)
+	reportJson, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
-		http.Error(w, "Error marshalling report", http.StatusInternalServerError)
+		fmt.Fprintf(os.Stderr,"Error marshalling csp report: %v", err)
+		fmt.Fprintf(os.Stderr,"CSP Body: %s\n",string(body))
 		return
 	}
 
