@@ -1,6 +1,7 @@
 package csp
 
 import (
+	"browser-security-lab/src/common"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -125,35 +126,37 @@ func SetCSPHeader(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Write the CSP header into the HTTP response
 func InsertCSPHeader(w http.ResponseWriter, r *http.Request) {
+
+	// Add dynamic headers based on request properties
 	if CSPConfig_Current.Enabled {
-		// cspGroup:= `{ "group": "csp-endpoint","max_age": 10886400,"endpoints": [{ "url": "https://example.com/csp-reports" }] }`
- 		cspGroup := `{ 
-				"group": "csp-endpoint-group",
-				"max_age": 10886400,
-				"endpoints": [
-								{ "url": "https://localhost:9381/csp-report-only" }
-							] 
-				}`
-		w.Header().Set("Report-To",cspGroup)
-		w.Header().Set("Reporting-Endpoints-uri", `csp-endpoint="https://localhost:9381/csp-report-only"`)
-		w.Header().Set(CSPHeader, CSPDomains)
+		url := common.IFrameConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
+		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "` + url + `" }]}`
+		w.Header().Set("Report-To", cspGroup)
+		w.Header().Set("Reporting-Endpoints", `csp-endpoint-uri="`+url+`"`)
+		w.Header().Set(CSPHeader, CSPDomains) // CSP Header
 	}
-
-
-	/*
-	if csp.CSPConfig_Current.Enabled {
- 		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "https://localhost:9381/csp-report-only" }]}`
-		headers["Report-To"] = cspGroup
-		headers["Reporting-Endpoints"]= `csp-endpoint-uri="https://localhost:9381/csp-report-only"`
-		headers[csp.CSPHeader] = csp.CSPDomains // CSP Header
-	}
-	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
-	*/
 
 }
 
+/*
+// Write the CSP header into the HTTP response
+func InsertCSPHeader() map[string]string {
+
+	headers := make(map[string]string)
+	// Add dynamic headers based on request properties
+	if CSPConfig_Current.Enabled {
+		url := common.IFrameConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
+		print(fmt.Sprint("csp-endpoint-uri=\"", url, "\""))
+		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "` + url + `" }]}`
+		headers["Report-To"] = cspGroup
+		headers["Reporting-Endpoints"] = `csp-endpoint-uri="` + url + `"`
+		headers[CSPHeader] = CSPDomains // CSP Header
+	}
+
+	return headers
+}
+*/
 // --------------------------------------------------------------------------------------
 // Handle all CSP violations and print them out
 // --------------------------------------------------------------------------------------
@@ -179,22 +182,21 @@ func CSPReportOnlyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-//	var report CSPReport
-//	err = json.Unmarshal(body, &report)
+	//	var report CSPReport
+	//	err = json.Unmarshal(body, &report)
 	var report interface{}
-	err = json.Unmarshal([]byte(body), &report)	
+	err = json.Unmarshal([]byte(body), &report)
 	if err != nil {
-		fmt.Fprintf(os.Stderr,"Error unmarshalling JSON csp report: %v\n", err)
-		fmt.Fprintf(os.Stderr,"CSP Body: %s\n",string(body))
+		fmt.Fprintf(os.Stderr, "Error unmarshalling JSON csp report: %v\n", err)
+		fmt.Fprintf(os.Stderr, "CSP Body: %s\n", string(body))
 		return
 	}
 
 	//reportJson, err := json.Marshal(report)
 	reportJson, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
-		fmt.Fprintf(os.Stderr,"Error marshalling csp report: %v", err)
-		fmt.Fprintf(os.Stderr,"CSP Body: %s\n",string(body))
+		fmt.Fprintf(os.Stderr, "Error marshalling csp report: %v", err)
+		fmt.Fprintf(os.Stderr, "CSP Body: %s\n", string(body))
 		return
 	}
 

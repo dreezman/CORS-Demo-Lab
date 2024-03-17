@@ -55,14 +55,21 @@ func dynamicHeaders(r *http.Request) map[string]string {
 
 	// Add dynamic headers based on request properties
 	if csp.CSPConfig_Current.Enabled {
-		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "https://localhost:9381/csp-report-only" }]}`
-		headers["Report-To"] = cspGroup
-		headers["Reporting-Endpoints"] = `csp-endpoint-uri="https://localhost:9381/csp-report-only"`
-		headers[csp.CSPHeader] = csp.CSPDomains // CSP Header
+		//headers = csp.InsertCSPHeader()
 	}
 	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
 
 	return headers
+}
+
+func customHeaderMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set custom headers here
+		csp.InsertCSPHeader(w, r)
+		w.Header().Set("X-Custom-Header", "Custom Value")
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Set HTTP request handlers
@@ -79,7 +86,6 @@ func handleRequest(mux *http.ServeMux) {
 		FileServer: fs,
 		HeaderFunc: headerFunc,
 	}
-	print("customHandler: ", customHandler)
 	// Serve static files with the custom handler
 	mux.Handle("/", customHandler)
 	//fs1 := http.FileServer(http.Dir("/"))
@@ -108,7 +114,6 @@ func handleRequest(mux *http.ServeMux) {
 	mux.HandleFunc("/xss-attack", csp.XssAttackHandler)
 	// set CSP Header global vars
 	mux.HandleFunc("/set-csp-header", csp.SetCSPHeader)
-	mux.HandleFunc("/insert-csp-header", csp.InsertCSPHeader)
 	// Handle and print all CSP violations
 	mux.HandleFunc("/csp-report-only", csp.CSPReportOnlyHandler)
 
@@ -163,8 +168,9 @@ func main() {
 			defer wg.Done()
 			mux := http.NewServeMux()
 			handleRequest(mux)
+			wrappedMux := customHeaderMiddleware(mux)
 			log.Print(frameName + " Listening on HTTP port:" + frameData.HTTPPort + "...")
-			err := http.ListenAndServe(":"+frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, mux))
+			err := http.ListenAndServe(":"+frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, wrappedMux))
 			if err != nil {
 				log.Fatal("Error starting web server: ", err)
 			}
@@ -175,10 +181,11 @@ func main() {
 			defer wg.Done()
 			mux := http.NewServeMux()
 			handleRequest(mux)
+			wrappedMux := customHeaderMiddleware(mux)
 			log.Print(frameName + " Listening on HTTPS port:" + frameData.HTTPSPort + "...")
 			certFile := "./publiccert.crt"
 			keyFile := "./privatekey.key"
-			err = http.ListenAndServeTLS(":"+frameData.HTTPSPort, certFile, keyFile, handlers.LoggingHandler(os.Stdout, mux))
+			err = http.ListenAndServeTLS(":"+frameData.HTTPSPort, certFile, keyFile, handlers.LoggingHandler(os.Stdout, wrappedMux))
 			if err != nil {
 				log.Fatal("Error starting web server: ", err)
 			}
