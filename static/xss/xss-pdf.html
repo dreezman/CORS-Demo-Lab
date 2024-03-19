@@ -1,0 +1,24 @@
+
+
+<html>
+  <head>
+    <title>PDF Attack</title>
+  </head>
+  <body>
+<object
+type="application/pdf"
+data="/xss/DynamicEmail_AcroForm.pdf"
+width="500"
+height="800"
+></object>
+
+<textarea rows="10" cols="100">
+    <object
+type="application/pdf"
+data="/xss/DynamicEmail_AcroForm.pdf"
+width="250"
+height="200"
+></object>
+    </textarea>
+</body>
+</html>

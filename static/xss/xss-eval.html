@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Simple Calculator</title>
+    <title>XSS Eval</title>
   </head>
   <body>
 
@@ -11,8 +11,16 @@
         var op1 = decodeURI(getUrlParameter("op1")); 
         var op2 = decodeURI(getUrlParameter("op2")); 
         var sum =
+        //eval(`alert("hi")`); 
         eval(`${op1} + ${op2}`); 
         console.log(`The sum is: ${sum}`); //Inject XSS into the console
 </script>
+
+
+<textarea rows="10" cols="150">
+  https://localhost:9381/xss/xss-eval.html?op1=1&op2=2
+  https://localhost:9381/xss/xss-eval.html?op1=alert(%22hi%22)&op2=%22%22
+    </textarea>
+
   </body>
 </html>

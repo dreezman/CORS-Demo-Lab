@@ -215,3 +215,17 @@ func XssAttackHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("XSS attack response: ", xssVal)
 	w.Write([]byte(xssVal))
 }
+
+// --------------------------------------------------------------------------------------
+// Add HTTP Request Handler to recieve GET /xss-attack request to return data to client
+// that is a XSS string
+// --------------------------------------------------------------------------------------
+func XssFormHandler(w http.ResponseWriter, r *http.Request) {
+
+	fname := r.URL.Query().Get("fname")
+	//lname := r.URL.Query().Get("fname")
+	//fmt.Fprintf(w, "Received GET XSS request with XSS as value: = %v\n", xssVal)
+	// Write the XSS data to the response body
+	log.Print("XSS attack response: ", fname)
+	w.Write([]byte(fname))
+}

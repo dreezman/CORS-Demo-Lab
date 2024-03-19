@@ -1,0 +1,25 @@
+
+<script>    
+
+function stealCookies() {
+    document.body.innerHTML = "I see you cookie!!!!: " + document.cookie
+}
+</script>
+
+<button id="btn" onclick="stealCookies()" style="height:200px;width:200px">Push me for inline event handler</button>
+
+
+<br><br>
+I will execute this inline event handler...push the button
+<br>
+
+<textarea rows="3" cols="100">
+    <script>  
+    function stealCookies() {
+        document.body.innerHTML = "I see you cookie!!!!: " + document.cookie
+    }
+    </script>
+    
+    <button id="btn" onclick="stealCookies()" style="height:200px;width:200px">Push me for inline event handler</button>
+    
+</textarea>

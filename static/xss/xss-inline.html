@@ -1,15 +1,19 @@
-<!DOCTYPE html>
 <html>
-<body>
-<h1>I see your Cookeis!</h1>
+  <head>  </head>  
+  <body>
 
-<p id="demo" onclick="myFunction()">Click me to See my Cookies!!!.</p>
+<script> 
 
-<script>
-function myFunction() {
-  document.getElementById("demo").innerHTML = "Are these your cookies??"+document.cookie;
-}
-</script>
+document.cookie="TopSecretPassword=1234567890";
+alert("I see your cookies!!!:   " + document.cookie); </script>
+
+I just executed this inline script: <br>
+
+<textarea rows="3" cols="100">
+    document.cookie="TopSecretPassword=1234567890";
+    <script> alert("I see your cookies!!!:   " + document.cookie); </script>
+</textarea>
+
 
 </body>
-</html> 
+</html>

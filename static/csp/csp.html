@@ -23,7 +23,7 @@
             const jsonConfig = JSON.parse(localStorage.getItem('iframeConfig'))
         </script>
         <h1>CSP</h1>
-        <p>This is a basic CSP page.</p>
+        <p>This page sets and tests CSP Policy</p>
         <script>
             function createButtonAndCallWriteCSPHeader() {
                 // Create a new button
@@ -184,28 +184,67 @@ TO:
             // Call the function to create the form and set up the event
             createFormAndSendData()
         </script>
-
+<br>
+<textarea id="cspPolicy" rows="10" cols="80">
+    default-src 'none'  ;  report-uri /csp-report-only
+    default-src 'none'  ;  report-uri  https://localhost:9381/csp-report-only
+    default-src 'none'  ;  report-to /csp-report-only
+    default-src 'none'  ;  report-to   csp-endpoint-group
+    default-src 'none'  ;  report-to   csp-endpoint-uri
+    </textarea
+            >
         <hr />
-        <span> your text </span>
+        <span> inline </span>
         <br /><br />
-        <a href="https://localhost:9381/xss-inline.html">XSS inline</a>
-
-        <textarea id="cspPolicy" rows="10" cols="80">
-default-src 'none'  ;  report-uri /csp-report-only
-default-src 'none'  ;  report-uri  https://localhost:9381/csp-report-only
-default-src 'none'  ;  report-to /csp-report-only
-default-src 'none'  ;  report-to   csp-endpoint-group
-default-src 'none'  ;  report-to   csp-endpoint-uri
-</textarea
-        >
-
-        <hr />
-        <span> your text </span>
+        <a href="https://localhost:9381/xss/xss-inline.html" target=”_blank”>XSS inline</a>
         <br /><br />
-        <a href="https://localhost:9381/xss-external-load.js">External Load</a>
 
         <hr />
 
+
+
+
         <hr />
+        <span> inline event handler</span>
+        <br /><br />
+        <a href="https://localhost:9381/xss/xss-external-load.js" target=”_blank”>Inline event handler</a>
+
+
+
+        <hr />
+        <span> internal script loading</span>
+        <br />
+        <a href="xss/xss-internal-load.html" target=”_blank”>Internal script load</a>
+
+
+        <hr />
+        <span> remote script loading</span>
+        <br />
+        <a href="xss/xss-remote-foreign-load.html" target=”_blank”>Remote Script Load</a>
+
+
+        <hr />
+        <span> text to script with eval</span><br />
+
+        <a href="https://localhost:9381/xss/xss-eval.html?op1=alert(%22hi%22)&op2=%22%22" target=”_blank”>Script with Eval</a>
+
+        <hr />
+        <span> forms </span><br />
+
+
+        <a href="https://localhost:9381/xss/TBD.js" target=”_blank”>Script with Forms</a>
+
+
+        <hr />
+        <span> java in pdf </span><br />
+
+
+        <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in PDF</a>
+
+        <hr />
+        <span> Java in URL </span><br />
+
+        <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in URL</a>
+
     </body>
 </html>

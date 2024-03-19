@@ -26,42 +26,7 @@ import (
 	"github.com/gorilla/handlers"
 )
 
-// CustomHandler is a struct for customizing the file server
-// CustomHandler is a struct for customizing the file server
-type CustomHandler struct {
-	// The base file server
-	FileServer http.Handler
-	// Function to generate custom headers dynamically
-	HeaderFunc func(r *http.Request) map[string]string
-}
-
-// ServeHTTP serves the static file and inserts headers
-func (h *CustomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Get custom headers from the provided function
-	headers := h.HeaderFunc(r)
-
-	// Add custom headers
-	for key, value := range headers {
-		w.Header().Set(key, value)
-	}
-
-	// Serve the static file
-	h.FileServer.ServeHTTP(w, r)
-}
-
-// Example function to generate headers dynamically
-func dynamicHeaders(r *http.Request) map[string]string {
-	headers := make(map[string]string)
-
-	// Add dynamic headers based on request properties
-	if csp.CSPConfig_Current.Enabled {
-		//headers = csp.InsertCSPHeader()
-	}
-	headers["X-Custom-Header-mike"] = r.URL.Path // Example dynamic header
-
-	return headers
-}
-
+// Insert custom headers into the HTTP response. From CSP and CORS
 func customHeaderMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set custom headers here
@@ -77,25 +42,8 @@ func handleRequest(mux *http.ServeMux) {
 
 	// Create a file server handler to serve static files from the "static" directory
 	fs := http.FileServer(http.Dir("static/"))
-
-	// Define a function to generate custom headers dynamically
-	headerFunc := dynamicHeaders
-
-	// Wrap the file server with the custom handler
-	customHandler := &CustomHandler{
-		FileServer: fs,
-		HeaderFunc: headerFunc,
-	}
 	// Serve static files with the custom handler
-	mux.Handle("/", customHandler)
-	//fs1 := http.FileServer(http.Dir("/"))
-	//mux.Handle("/", fs1)
-	/* Specify the directory you want to serve files from
-	fs := http.FileServer(http.Dir("static"))
-	//--------------------------------------------
-	// Use the FileServer to serve files from the specified directory
 	mux.Handle("/", fs)
-	*/
 	// handle toggle CORS headers
 	mux.HandleFunc("/cors-toggle", cors.CorsToggle)
 	// handle login forms from JS Fetch requests
@@ -106,17 +54,15 @@ func handleRequest(mux *http.ServeMux) {
 	mux.HandleFunc("/change-password", csrf.FakeSetPassword)
 	// test program: return secrets to client, see if they read it
 	mux.HandleFunc("/get-json", cors.Jsonhandler)
-
 	// set cookies in response
 	mux.HandleFunc("/get-cookies", csrf.Cookiehandler)
 	// set cookies in response
-
 	mux.HandleFunc("/xss-attack", csp.XssAttackHandler)
 	// set CSP Header global vars
 	mux.HandleFunc("/set-csp-header", csp.SetCSPHeader)
 	// Handle and print all CSP violations
 	mux.HandleFunc("/csp-report-only", csp.CSPReportOnlyHandler)
-
+	mux.HandleFunc("/xss-form", csp.XssFormHandler)
 }
 
 // --------------------------------------------------------------------------------------
@@ -168,11 +114,12 @@ func main() {
 			defer wg.Done()
 			mux := http.NewServeMux()
 			handleRequest(mux)
+			// Each request will have custom headers added, from csp,cookies, cors
 			wrappedMux := customHeaderMiddleware(mux)
 			log.Print(frameName + " Listening on HTTP port:" + frameData.HTTPPort + "...")
 			err := http.ListenAndServe(":"+frameData.HTTPPort, handlers.LoggingHandler(os.Stdout, wrappedMux))
 			if err != nil {
-				log.Fatal("Error starting web server: ", err)
+				log.Fatal("Error starting HTTP web server: ", err)
 			}
 		}(frameName, frameData)
 		// HTTPS server
@@ -181,13 +128,14 @@ func main() {
 			defer wg.Done()
 			mux := http.NewServeMux()
 			handleRequest(mux)
+			// Each request will have custom headers added, from csp,cookies, cors
 			wrappedMux := customHeaderMiddleware(mux)
 			log.Print(frameName + " Listening on HTTPS port:" + frameData.HTTPSPort + "...")
 			certFile := "./publiccert.crt"
 			keyFile := "./privatekey.key"
 			err = http.ListenAndServeTLS(":"+frameData.HTTPSPort, certFile, keyFile, handlers.LoggingHandler(os.Stdout, wrappedMux))
 			if err != nil {
-				log.Fatal("Error starting web server: ", err)
+				log.Fatal("Error starting HTTPS web server: ", err)
 			}
 		}(frameName, frameData)
 	}
