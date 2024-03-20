@@ -10,6 +10,10 @@
 
 <textarea rows="3" cols="100">
 
+  function getCookie(){
+    alert('I see your cookies!!!:   ' + document.cookie)
+  }
+
   <script src="/xss-internal-load.js">  </script>
   <a href="javascript:void(0)" onclick="getCookie();">Run JavaScript Code</a>
 

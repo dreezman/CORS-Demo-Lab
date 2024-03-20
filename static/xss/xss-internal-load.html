@@ -1,17 +1,28 @@
 <html>
   <head>
-    <title>Simple Calculator</title>
+    <title>Load JS from internal site</title>
   </head>
   <body>
 
-    <script src="/xss-internal-load.js">  
+    <script src="/xss/xss-getcookie.js">  
+    <script src="/xss/xss-internal-load.js">  
+     
 </script>
 
 <br>
 
-<textarea rows="3" cols="100">
-  <script src="/xss-internal-load.js">  
-</textarea>
+<textarea rows="6" cols="100">
+
+
+  <script src="/xss/xss-getcookie.js">  
+    function getCookie(){
+      document.cookie="TopSecretPassword=1234567890";
+      alert('I see your cookies!!!:   ' + document.cookie)
+    }
+  <script src="/xss/xss-internal-load.js">  
+     getCookie()
+
+  </textarea>
 
 
   </body>
