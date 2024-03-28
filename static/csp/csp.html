@@ -191,6 +191,13 @@ TO:
             default-src 'none'  ;  report-to /csp-report-only
             default-src 'none'  ;  report-to   csp-endpoint-group
             default-src 'none'  ;  report-to   csp-endpoint-uri
+
+            default-src 'self'  ;  report-uri /csp-report-only
+            default-src *       ;  report-uri /csp-report-only
+            default-src localhost       ;  report-uri /csp-report-only    
+            default-src localhost:3389       ;  report-uri /csp-report-only  
+            default-src https://localhost:3389       ;  report-uri /csp-report-only                     
+            default-src https://localhost:3389  ; script-src 'self'     ;  report-uri /csp-report-only       
             </textarea
                     >
         <hr />

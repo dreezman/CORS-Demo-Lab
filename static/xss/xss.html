@@ -71,7 +71,13 @@ document.getElementsByTagName("*")[2].outerHTML
     <span> XSS inline </span>
 <br /><br />
     Javascript in its simplest form can exist as inline code. 
-    If an attacker manages to inject Javascript into a page, they can execute any code they want. This is the most common form of XSS attack.
+    If an attacker manages to inject Javascript into a HTML page/DOM, 
+    they can execute any code they want. 
+    This is the most common form of XSS attack.
+    NOTE: CSP forbids ALL inline code 
+    in all forms in HTML pages/DOMs, regardless of what is allowed in the policy. 
+    So in the examples below you will find inline code in many elements (i.e. button onclick=)
+    Look for the word "inline" in error messages and then hunt them down.
     <br /><br />
     <a href="/xss/xss-inline.html" target=”_blank”>XSS inline</a>
     <br /><br />
@@ -88,8 +94,15 @@ document.getElementsByTagName("*")[2].outerHTML
     <br /><br />
     Javascript execution can occur as an event handler. An event such as pushing a button will
     cause some function to be executed. 
-    If an attacker manages to inject this or corrupt a function, 
-    they can execute any code they want. This is the most common form of XSS attack.
+    If an attacker manages to inject ór corrupt this event handler in the DOM, 
+    they can execute any code they want. 
+<p></p>
+<ul>
+  <li>OhOh....First button didn't work? Why not? HINT: Has to do with modifying the DOM.</li>
+  <li>addEventListener is better? Why?</li>
+</ul>
+    
+    
  
 
 

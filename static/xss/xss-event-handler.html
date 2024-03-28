@@ -1,22 +1,41 @@
 
-<script>    
+<!DOCTYPE html>
+<html>
+<body>
 
-function stealCookies() {
-    document.body.innerHTML = "I see you cookie!!!!: " + document.cookie
-}
-</script>
+<script src="/xss/xss-getcookie.js">  
+    </script>
+<script src="/xss/xss-event-handler-getcookie-btn-addeventhandler.js">  
+</script>    
+    <button  onclick="getCookie()" style="height:50px">Push me for inline event handler</button> 
+    <button id="myBtn" >Push me for addEventListener event</button>
 
-<button id="btn" onclick="stealCookies()" style="height:200px;width:200px">Push me for inline event handler</button>
-
-
+    
 <br><br>
 I will execute this inline event handler...push the button
 <br>
 
-<textarea rows="3" cols="100">
+<textarea rows="15" cols="100">
+
+    function getCookie(){
+        document.cookie="TopSecretPassword=1234567890";
+        alert('I see your cookies!!!:   ' + document.cookie)
+    }
     <script src="/xss/xss-getcookie.js">  
     </script>
     
     <button id="btn" onclick="getCookie()" style="height:200px;width:200px">Push me for inline event handler</button>
     
+    Here is the inline script the button created. Paste into console:
+    -------------------------------------------------------------------
+    document.getElementsByTagName('script')[0].nextElementSibling
+
+
+    You can find event handler by going to Elements->Event Handlers in the developer tools
+    -------------------------------------------------------------------
+
 </textarea>
+
+
+</body>
+</html>
