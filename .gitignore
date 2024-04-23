@@ -3,3 +3,6 @@ _*.exe
 *.exe
 node_modules
 node_modules/**
+nginx/**
+!nginx/nginx.conf
+!nginx/nginx_build.sh
