@@ -6,3 +6,5 @@ node_modules/**
 nginx/**
 !nginx/nginx.conf
 !nginx/nginx_build.sh
+!nginx/default-ng*
+
