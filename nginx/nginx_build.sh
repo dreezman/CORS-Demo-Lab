@@ -1,4 +1,5 @@
-ngx_dir="/mnt/c/git/gostuff/Browser-Security-Lab/nginx"
+wd=`pwd`
+ngx_dir="${wd}/nginx"
 
 ngx_ver="1.25.5"
 ngx_tar_dir="nginx-${ngx_ver}"
