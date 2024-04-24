@@ -64,14 +64,8 @@ server {
 		# add CSP header to all responses so the browser enforces policy	
 		# add_header Content-Security-Policy "default-src *";
 		add_header Content-Security-Policy "default-src 'self'; script-src 'self' google.com 'nonce-$9186349167491' always"; image-src twitter.com; report-to "x.com"
-
-default=xxxx
-script-src=zzzz
-image-src=zzzz
-
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
-
 		try_files $uri $uri/ /index.html =404;
 	}
 
