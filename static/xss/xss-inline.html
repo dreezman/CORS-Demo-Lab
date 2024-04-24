@@ -5,14 +5,29 @@
 <script> 
 
 document.cookie="TopSecretPassword=1234567890";
-alert("I see your cookies!!!:   " + document.cookie); </script>
+alert("I see your cookies without a nonce !!!:   " + document.cookie); </script>
+
+<script nonce="**CSP_NONCE**"> 
+
+document.cookie="TopSecretPassword=1234567890";
+alert("I see your cookies with a Nonce!!!:   " + document.cookie); </script>
 
 I just executed this inline script: <br>
 
 <textarea rows="3" cols="100">
+
+    <script> 
+
     document.cookie="TopSecretPassword=1234567890";
-    <script> alert("I see your cookies!!!:   " + document.cookie); </script>
+    alert("I see your cookies without a nonce !!!:   " + document.cookie); </script>
+
+    <script nonce="**CSP_NONCE**"> 
+
+    document.cookie="TopSecretPassword=1234567890";
+    alert("I see your cookies with a Nonce!!!:   " + document.cookie); </script>
+
 </textarea>
+
 
 
 </body>
