@@ -18,6 +18,8 @@ fi
 
 echo "******** Install pre-req modules **************************"
 cd ${ngx_dir}
+service nginx stop
+sudo apt-mark hold nginx ## prevent any upgrades that wipe out our config
 sudo apt-get --yes   update && sudo apt-get --yes upgrade
 sudo apt-get --yes   install gcc
 sudo apt-get --yes   make
@@ -41,6 +43,12 @@ tar --strip-components 1 -C ${setnginx_tar_dir}    -xzvf ${setnginx_tar_dir}.tar
 
 echo "******** configure nginx with nonces **************************"
 echo  ${ngx_dir} "---------->" ${ngx_tar_dir} " :together: " ${ngx_dir}/${ngx_tar_dir} ${ngx_dir}/${ngx_dev_kit_tar_dir} ${ngx_dir}/${setnginx_tar_dir}
+
+#
+# Make sure these exist
+#
+sudo mkdir -vp /etc/nginx/sites-available /etc/nginx/modules-available
+sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
 
 cd ${ngx_dir}/${ngx_tar_dir}
 # https://www.photographerstechsupport.com/tutorials/hosting-wordpress-on-aws-tutorial-part-2-setting-up-aws-for-wordpress-with-rds-nginx-hhvm-php-ssmtp/#nginx-source
@@ -66,7 +74,7 @@ cd ${ngx_dir}/${ngx_tar_dir}
     --with-threads \
     --with-file-aio \
     --with-http_v2_module \
-    --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2-fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=native' \
+    --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=native' \
     # --add-module=../headers-more-nginx-module \
     --with-http_ssl_module \
     --add-module=${ngx_dir}/${ngx_dev_kit_tar_dir}/ \
