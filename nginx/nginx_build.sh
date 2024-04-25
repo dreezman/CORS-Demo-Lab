@@ -20,17 +20,17 @@ echo "******** Install pre-req modules **************************"
 cd ${ngx_dir}
 service nginx stop
 sudo apt-mark hold nginx ## prevent any upgrades that wipe out our config
-sudo apt-get --yes   update && sudo apt-get --yes upgrade
-sudo apt-get --yes   install gcc
-sudo apt-get --yes   make
-sudo apt install --yes   make-guile
-sudo apt install --yes   libnginx-mod-rtmp
-sudo apt-get install  --yes     zlib1g-dev zlib1g
-sudo apt-get install   --yes   libpcre3 libpcre3-dev
-sudo apt-get install   --yes   libssl-dev
-sudo apt-get install  --yes    libperl-dev
-sudo apt-get install  --yes    libgd-dev
-sudo apt-get install  --yes    net-tools
+sudo apt --yes   update && sudo apt --yes upgrade
+sudo apt-get install --yes   gcc
+sudo apt-get install --yes   make
+sudo apt-get install --yes   make-guile
+sudo apt-get install --yes   libnginx-mod-rtmp # installs in /usr/lib/nginx/modules
+sudo apt-get install --yes   zlib1g-dev zlib1g
+sudo apt-get install --yes   libpcre3 libpcre3-dev
+sudo apt-get install --yes   libssl-dev
+sudo apt-get install --yes   libperl-dev
+sudo apt-get install --yes   libgd-dev
+sudo apt-get install --yes   net-tools
 
 echo "******** Install nginx nonce modules **************************"
 cd ${ngx_dir}/ ; mkdir -pv ${ngx_tar_dir} ${ngx_dev_kit_tar_dir} ${setnginx_tar_dir}
@@ -52,10 +52,11 @@ sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
 
 cd ${ngx_dir}/${ngx_tar_dir}
 # https://www.photographerstechsupport.com/tutorials/hosting-wordpress-on-aws-tutorial-part-2-setting-up-aws-for-wordpress-with-rds-nginx-hhvm-php-ssmtp/#nginx-source
- ./configure --prefix=/opt/nginx \
+ ./configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --conf-path=/etc/nginx/nginx.conf \
+    --modules-path=/usr/lib/nginx/modules \
     --error-log-path=/var/log/nginx/error.log \
     --http-log-path=/var/log/nginx/access.log \
     --pid-path=/var/run/nginx.pid \
@@ -65,8 +66,9 @@ cd ${ngx_dir}/${ngx_tar_dir}
     --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
     --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
     --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-    --user=nginx \
-    --group=nginx \
+    --user=www-data \
+    --group=www-data \
+    --with-http_stub_status_module \
     --with-http_ssl_module \
     --with-http_realip_module \
     --with-http_gunzip_module \
@@ -75,8 +77,8 @@ cd ${ngx_dir}/${ngx_tar_dir}
     --with-file-aio \
     --with-http_v2_module \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=native' \
-    # --add-module=../headers-more-nginx-module \
     --with-http_ssl_module \
+    --with-http_sub_module \
     --add-module=${ngx_dir}/${ngx_dev_kit_tar_dir}/ \
     --add-module=${ngx_dir}/${setnginx_tar_dir}/
 
@@ -84,5 +86,13 @@ cd ${ngx_dir}/${ngx_tar_dir}
 echo "******** Build nginx **************************"
 sudo  make -j2
 sudo  make install
+
+### set file permissions
+echo "******** Set file permissions **************************"
+sudo chown www-data:www-data /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/run/nginx.lock /var/run/nginx.pid /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp
+sudo chmod 750 /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/run/nginx.lock /var/run/nginx.pid /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp
+
+
+
 ## use this to build docker image
 # https://stackoverflow.com/questions/28863126/creating-a-docker-image-with-nginx-compile-options-for-optional-http-modules
