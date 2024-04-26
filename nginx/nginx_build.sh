@@ -24,7 +24,7 @@ sudo apt --yes   update && sudo apt --yes upgrade
 sudo apt-get install --yes   gcc
 sudo apt-get install --yes   make
 sudo apt-get install --yes   make-guile
-sudo apt-get install --yes   libnginx-mod-rtmp # installs in /usr/lib/nginx/modules
+#sudo apt-get install --yes   libnginx-mod-rtmp # installs in /usr/lib/nginx/modules and conf in /etc/nginx
 sudo apt-get install --yes   zlib1g-dev zlib1g
 sudo apt-get install --yes   libpcre3 libpcre3-dev
 sudo apt-get install --yes   libssl-dev
@@ -45,7 +45,8 @@ echo "******** configure nginx with nonces **************************"
 echo  ${ngx_dir} "---------->" ${ngx_tar_dir} " :together: " ${ngx_dir}/${ngx_tar_dir} ${ngx_dir}/${ngx_dev_kit_tar_dir} ${ngx_dir}/${setnginx_tar_dir}
 
 #
-# Make sure these exist
+# Make sure these exist before running the configure
+# to install configs for various sites
 #
 sudo mkdir -vp /etc/nginx/sites-available /etc/nginx/modules-available
 sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
@@ -89,9 +90,18 @@ sudo  make install
 
 ### set file permissions
 echo "******** Set file permissions **************************"
-sudo chown www-data:www-data /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/run/nginx.lock /var/run/nginx.pid /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp
-sudo chmod 750 /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/run/nginx.lock /var/run/nginx.pid /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp
-
+sudo mkdir -pv \
+    /var/cache/nginx/client_temp \
+    /var/cache/nginx/proxy_temp \
+    /var/cache/nginx/fastcgi_temp \
+    /var/cache/nginx/uwsgi_temp \
+    /var/cache/nginx/scgi_temp 
+sudo chown www-data:www-data /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log  /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp /var/cache/nginx
+sudo chmod 750  /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp /var/cache/nginx
+sudo chown root:www-data /var/run/nginx.lock /var/run/nginx.pid
+sudo chmod 664          /var/run/nginx.lock /var/run/nginx.pid 
+sudo chown -R www-data:www-data /etc/nginx
+sudo chmod -R 660 /etc/nginx
 
 
 ## use this to build docker image
