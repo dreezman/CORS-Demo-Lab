@@ -7,14 +7,23 @@
 #
 
 if [ -f "./nginx/nginx_build_env.sh" ]; then
-    echo "Found config file exists."
+    echo "Found environmental config file for nginx exists."
     . ./nginx/nginx_build_env.sh 
 else
     echo "Config file ./nginx/nginx_build_env.sh not found, must invoke from repo root. Exiting."
     exit 1
 fi
 
-
+#
+# Make sure these exist before running the configure
+# to install configs for various sites. Remove any existing
+# files in these directories, they will be populated by the
+# subsequent steps.
+#
+sudo mkdir -vp /etc/nginx/sites-available /etc/nginx/modules-available
+sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
+rm -f /etc/nginx/sites-enabled/* /etc/nginx/modules-enabled/*
+rm -f /etc/nginx/sites-available/* /etc/nginx/modules-available/*
 
 echo "******** Install pre-req modules **************************"
 cd ${ngx_dir}
@@ -42,15 +51,6 @@ wget -O  ${setnginx_tar_dir}.tar.gz     https://github.com/openresty/set-misc-ng
 tar --strip-components 1 -C ${setnginx_tar_dir}    -xzvf ${setnginx_tar_dir}.tar.gz
 
 echo "******** configure nginx with nonces **************************"
-echo  ${ngx_dir} "---------->" ${ngx_tar_dir} " :together: " ${ngx_dir}/${ngx_tar_dir} ${ngx_dir}/${ngx_dev_kit_tar_dir} ${ngx_dir}/${setnginx_tar_dir}
-
-#
-# Make sure these exist before running the configure
-# to install configs for various sites
-#
-sudo mkdir -vp /etc/nginx/sites-available /etc/nginx/modules-available
-sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
-
 cd ${ngx_dir}/${ngx_tar_dir}
 # https://www.photographerstechsupport.com/tutorials/hosting-wordpress-on-aws-tutorial-part-2-setting-up-aws-for-wordpress-with-rds-nginx-hhvm-php-ssmtp/#nginx-source
  ./configure \
@@ -101,7 +101,7 @@ sudo chmod 750  /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /
 sudo chown root:www-data /var/run/nginx.lock /var/run/nginx.pid
 sudo chmod 664          /var/run/nginx.lock /var/run/nginx.pid 
 sudo chown -R www-data:www-data /etc/nginx
-sudo chmod -R 660 /etc/nginx
+sudo chmod -R 770 /etc/nginx
 
 
 ## use this to build docker image
