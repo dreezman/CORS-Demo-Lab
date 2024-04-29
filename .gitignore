@@ -8,4 +8,8 @@ nginx/**
 !nginx/nginx_build.sh
 !nginx/nginx_build_env.sh
 !nginx/default-ng*
+!spa/src/**
+!spa/.vscode/**
+!spa/*.html
+!spa/*.[html,ico,ts,css,js,json]
 
