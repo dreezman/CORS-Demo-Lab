@@ -14,6 +14,6 @@ export ngx_dev_kit_ver="v0.3.0"
 export ngx_dev_kit_tar_dir="ngx_dev_kit-${ngx_dev_kit_ver}"
 
 # rootdir for the root index.html
-export NGINX__ROOTDIR=/mnt/c/git/gostuff/Browser-Security-Lab/spa/dist/spa/browser
+export NGINX__ROOTDIR=/home/dreez/repos/Browser-Security-Lab
 
 
