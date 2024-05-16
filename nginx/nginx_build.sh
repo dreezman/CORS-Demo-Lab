@@ -1,6 +1,18 @@
 ##
 ## Build nginx from scratch and install it
 ##
+## What is special?
+## 1) Uses nginx/nginx_build_env.sh to set the environment variables for files and dirs
+## 2) Uses envsubst to replace the root directory in the default-nginx-config.conf with the environmental variable $NGINX__ROOTDIR
+## 3) Configured to use nonces for security
+## 4) Configured to use substitutions in the HTTP files it serves so the nonces are set
+## 5) Configured to make special mods for nonces in Angular SPAs
+## 6) Configured to use the latest version of nginx
+
+##
+## NOTE: take out debug, --with-debug for production, set root for production in nginx conf
+##       check the default config if in right place, make sure latest nginx, not sure about the
+##       geoip stuff rtmp modules???
 
 # get the environment variables from the nginx_build_env.sh
 # to config for this environment
@@ -24,6 +36,7 @@ sudo mkdir -vp /etc/nginx/sites-available /etc/nginx/modules-available
 sudo mkdir -vp /etc/nginx/sites-enabled   /etc/nginx/modules-available
 rm -f /etc/nginx/sites-enabled/* /etc/nginx/modules-enabled/*
 rm -f /etc/nginx/sites-available/* /etc/nginx/modules-available/*
+
 
 echo "******** Install pre-req modules **************************"
 cd ${ngx_dir}
@@ -49,11 +62,31 @@ wget -O  ${ngx_dev_kit_tar_dir}.tar.gz  https://github.com/simpl/ngx_devel_kit/a
 tar --strip-components 1 -C ${ngx_dev_kit_tar_dir} -xzvf ${ngx_dev_kit_tar_dir}.tar.gz
 wget -O  ${setnginx_tar_dir}.tar.gz     https://github.com/openresty/set-misc-nginx-module/archive/${setnginx_ver}.tar.gz
 tar --strip-components 1 -C ${setnginx_tar_dir}    -xzvf ${setnginx_tar_dir}.tar.gz
+mkdir -pv subsitute_module; cd subsitute_module;
+git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+# tool to replace variables in the default config with environmental variables
+curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+chmod +x envsubst
+sudo mv envsubst /usr/local/bin
+
+
+echo "******** Configure nginx.conf with environmental variables **************************"
+# the default-nginx-config.conf is a template for the nginx config, with nonces
+# 1) need to replace the root directory with the environmental variable $NGINX__ROOTDIR
+envsubst "\$NGINX__ROOTDIR \$NGINX__ROOTDIR" < ${ngx_dir}/default-nginx-config.conf > /etc/nginx/sites-available/default-nginx-config-withroot.conf
+# 2) sites-available is a directory with optional configurations for different sites
+#    sites-enabled is a directory with configs that used for running nginx processes
+#    nginx.conf is the main config file for nginx, it will include the sites-enabled configs and
+#             use the default file in sites-enabled as its default config
+sudo ln -s /etc/nginx/sites-available/default-nginx-config-withroot.conf  /etc/nginx/sites-enabled/default
+
 
 echo "******** configure nginx with nonces **************************"
 cd ${ngx_dir}/${ngx_tar_dir}
+##!!!NOTE:  Take out the --with-debug debug for production!!!
 # https://www.photographerstechsupport.com/tutorials/hosting-wordpress-on-aws-tutorial-part-2-setting-up-aws-for-wordpress-with-rds-nginx-hhvm-php-ssmtp/#nginx-source
  ./configure \
+    --with-debug \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --conf-path=/etc/nginx/nginx.conf \
@@ -81,8 +114,8 @@ cd ${ngx_dir}/${ngx_tar_dir}
     --with-http_ssl_module \
     --with-http_sub_module \
     --add-module=${ngx_dir}/${ngx_dev_kit_tar_dir}/ \
-    --add-module=${ngx_dir}/${setnginx_tar_dir}/
-
+    --add-module=${ngx_dir}/${setnginx_tar_dir}/ \
+    --add-module=${ngx_dir}/subsitute_module/ngx_http_substitutions_filter_module 
 
 echo "******** Build nginx **************************"
 sudo  make -j2
@@ -96,12 +129,26 @@ sudo mkdir -pv \
     /var/cache/nginx/fastcgi_temp \
     /var/cache/nginx/uwsgi_temp \
     /var/cache/nginx/scgi_temp 
-sudo chown www-data:www-data /etc/nginx /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log  /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp /var/cache/nginx
-sudo chmod 750  /usr/lib/nginx/modules /var/log/nginx /var/log/nginx/error.log /var/log/nginx/access.log /var/cache/nginx/scgi_temp /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp /var/cache/nginx/client_temp /var/cache/nginx
-sudo chown root:www-data /var/run/nginx.lock /var/run/nginx.pid
-sudo chmod 664          /var/run/nginx.lock /var/run/nginx.pid 
+
+#### Allow www-data (nginx) owner all access to these directories    
+
+# all under /etc/nginx reserved for nginx
 sudo chown -R www-data:www-data /etc/nginx
 sudo chmod -R 770 /etc/nginx
+
+# nginx will write to these too
+sudo chown www-data:www-data /usr/lib/nginx/modules /var/log/nginx \
+            /var/log/nginx/error.log /var/log/nginx/access.log  /var/cache/nginx/scgi_temp \
+            /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp \
+            /var/cache/nginx/client_temp /var/cache/nginx 
+sudo chmod 750 /usr/lib/nginx/modules /var/log/nginx \
+            /var/log/nginx/error.log /var/log/nginx/access.log  /var/cache/nginx/scgi_temp \
+            /var/cache/nginx/uwsgi_temp /var/cache/nginx/fastcgi_temp /var/cache/nginx/proxy_temp \
+            /var/cache/nginx/client_temp /var/cache/nginx 
+
+# nginx starts as root and needs to write to these files, then switches to www-data
+sudo chown root:www-data /var/run/nginx.lock /var/run/nginx.pid /var/log/nginx/debug.log
+sudo chmod 664          /var/run/nginx.lock /var/run/nginx.pid  /var/log/nginx/debug.log
 
 
 ## use this to build docker image
