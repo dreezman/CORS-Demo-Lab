@@ -71,11 +71,19 @@ sudo mv envsubst /usr/local/bin
 
 
 echo "******** Configure nginx.conf with environmental variables **************************"
-# the default-nginx-config.conf is a template for the nginx config, with nonces
-# 1) need to replace the root directory with the environmental variable $NGINX__ROOTDIR
-envsubst "\$NGINX__ROOTDIR \$NGINX__ROOTDIR" < ${ngx_dir}/default-nginx-config.conf > /etc/nginx/sites-available/default-nginx-config-withroot.conf
+# This next step inputs a template file and fills in the the correct values for the environmental variables $NGINX__ROOTDIR & $NGINX__PORT
+# from the shell script variables passed into this shell script...which is also $NGINX__ROOTDIR & $NGINX__PORT with a real value such as
+# /home/dreez/repos/usermgmt-frontend/dist/apps/customer-registry
+# 
+# 1) Update ROOTDIR
+# - the default-nginx-config.conf is a template for the nginx config, with nonces
+# -  need to replace the root directory in the template file which has an environmental variable $NGINX__ROOTDIR with the value shell script variable value
+# $NGINX__ROOTDIR passed into this script and create a new file nginx.conf file = /etc/nginx/sites-available/default-nginx-config-withroot.conf
+envsubst "\$NGINX__ROOTDIR \$NGINX__ROOTDIR"     < ${ngx_dir}/default-nginx-config.conf > /tmp/ngx_temp.conf
+envsubst "\$NGINX__PORT     \$NGINX__PORT"       < /tmp/ngx_temp.conf                   > /etc/nginx/sites-available/default-nginx-config-withroot.conf
 # 2) sites-available is a directory with optional configurations for different sites
-#    sites-enabled is a directory with configs that used for running nginx processes
+#    sites-enabled is a directory with configs that used for running nginx processes. ngx need to use 1 config file for the running ngx, so
+#                  point to a single file in sites-available to use as the default config                
 #    nginx.conf is the main config file for nginx, it will include the sites-enabled configs and
 #             use the default file in sites-enabled as its default config
 sudo ln -s /etc/nginx/sites-available/default-nginx-config-withroot.conf  /etc/nginx/sites-enabled/default

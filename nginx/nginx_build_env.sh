@@ -15,5 +15,5 @@ export ngx_dev_kit_tar_dir="ngx_dev_kit-${ngx_dev_kit_ver}"
 
 # rootdir for the root index.html
 export NGINX__ROOTDIR=/home/dreez/repos/Browser-Security-Lab
-
+export NGINX__PORT=4200
 
