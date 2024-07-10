@@ -4,7 +4,7 @@ _*.exe
 node_modules
 node_modules/**
 nginx/**
-!nginx/nginx.conf
+!nginx/nginx*.conf
 !nginx/nginx_build.sh
 !nginx/nginx_build_env.sh
 !nginx/default-ng*
@@ -12,4 +12,5 @@ nginx/**
 !spa/.vscode/**
 !spa/*.html
 !spa/*.[html,ico,ts,css,js,json]
+!Docker*
 

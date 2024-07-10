@@ -1,0 +1,27 @@
+# docker build --secret id=npm_auth,src=".npmrc"  --progress=plain --no-cache --build-arg TFS_TOKEN=${TFS_TOKEN}   --tag  dreezcustreg -f Dockerfile.customer-registry.local.csp .
+FROM docker-registry.services.sabio.de/base-images/node:20 AS build
+WORKDIR /application
+
+#RUN apt update -y
+#RUN apt install -y iputils-ping
+
+COPY package.json .
+COPY package-lock.json .
+
+ARG TFS_TOKEN ""
+RUN --mount=type=secret,id=npm_auth,dst=/application/.npmrc  echo "here is tfstoken: "${TFS_TOKEN} && cat /application/.npmrc
+RUN --mount=type=secret,id=npm_auth,dst=/application/.npmrc  npm ci
+
+COPY . .
+RUN --mount=type=cache,target=/application/.angular/cache/ npm run nx:reset && npm run build:customer-registry
+
+#FROM docker-registry.services.sabio.de/base-images/nginx-angular:1.23 AS production
+FROM nginx-angular:latest AS production
+EXPOSE 80
+
+COPY nginx-config/mime.types /etc/nginx/mime.types
+#COPY nginx-config/nginx.conf /etc/nginx/nginx.conf
+COPY nginx-config/nginx-csp-local.conf /etc/nginx/nginx.conf
+COPY --from=build application/dist/apps/customer-registry /usr/share/nginx/html
+
+#CMD ["nginx", "-g", "daemon off;"]

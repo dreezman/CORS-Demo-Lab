@@ -1,0 +1,124 @@
+#
+# Build a docker image with nginx and angular and support content security policy nonces
+# 
+
+# syntax=docker/dockerfile:1.4
+# Build stage/image
+
+ARG NGINX_VERSION=1.25.3-alpine
+# Based on: https://gist.github.com/hermanbanken/96f0ff298c162a522ddbba44cad31081
+# https://github.com/tofran/nginx-with-substitutions-filter-docker/blob/main/Dockerfile
+FROM nginx:${NGINX_VERSION} AS builder
+# This module version is required for content security policy nonce settings
+ENV SETNGINX_VER=v0.33
+
+RUN apk add --no-cache --virtual .build-deps \
+      alpine-sdk \
+      curl \
+      bash \
+      findutils \
+      gcc \
+      gd-dev \
+      geoip-dev \
+      libc-dev \
+      libedit-dev \
+      libxslt-dev \
+      linux-headers \
+      make \
+      cmake \
+      openssl-dev \
+      pcre2-dev \
+      perl-dev \
+      zlib-dev
+
+# envsubst tool uses ENV variables to replace variables in any file
+# Will be used to replace variables in the nginx.conf file
+RUN curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o /usr/local/bin/envsubst \
+    && chmod +x /usr/local/bin/envsubst 
+
+RUN mkdir -p /usr/src
+
+# NGINX source code
+RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz -O nginx.tar.gz \
+    && tar -zxC /usr/src -f nginx.tar.gz \
+    && rm nginx.tar.gz
+
+# ngx_http_substitutions_filter_module can replace text in the response body
+RUN wget https://github.com/yaoweibin/ngx_http_substitutions_filter_module/archive/refs/heads/master.tar.gz -O nginx_substitutions_filter.tar.gz \
+    && tar -zxC /usr/src -f nginx_substitutions_filter.tar.gz  \
+    && rm nginx_substitutions_filter.tar.gz
+
+# ngx_dev_kit: used to support csp nonces
+# ngx_dev_kit_ver: Find the latest version based on Release tag....and download it. ngx_dev_kit used by csp nonces
+RUN ngx_dev_kit_ver=`wget -q -O - https://github.com/vision5/ngx_devel_kit/releases/latest | fgrep " Release " | sed -n 's/.*Release v\([^·]*\)\s.*/\1/p'` \
+    && wget https://github.com/vision5/ngx_devel_kit/archive/v${ngx_dev_kit_ver}.tar.gz  -O  ngx-dev-kit.tar.gz  \
+    && mkdir -p /usr/src/ngx-dev-kit \
+    && tar --strip-components 1 -C /usr/src/ngx-dev-kit -xzvf  ngx-dev-kit.tar.gz \
+    && rm ngx-dev-kit.tar.gz
+
+
+# set-misc-nginx: used by csp nonce module, needs ngx_dev_kit to execute
+RUN wget https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/${SETNGINX_VER}.tar.gz -O  set-misc-nginx-module.tar.gz \
+    && mkdir -p /usr/src/set-misc-nginx-module \
+    && tar --strip-components 1 -C /usr/src/set-misc-nginx-module -xzvf  set-misc-nginx-module.tar.gz \
+    && rm set-misc-nginx-module.tar.gz
+
+# download brotli compression module and compile all
+# we removed the flags: "-march=native -mtune=native -flto"
+RUN git clone --recurse-submodules -j8 https://github.com/google/ngx_brotli /usr/src/ngx_brotli-master \
+    && cd /usr/src/ngx_brotli-master/deps/brotli \
+    && mkdir out && cd out \
+    && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_C_FLAGS="-Ofast -m64 -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+    -DCMAKE_CXX_FLAGS="-Ofast -m64 -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+    -DCMAKE_INSTALL_PREFIX=./installed .. \
+    && cmake --build . --config Release --target brotlienc
+
+# RUN wget https://github.com/google/ngx_brotli/archive/refs/heads/master.tar.gz -O ngx_brotli.tar.gz \
+#     && tar -zxC /usr/src -f ngx_brotli.tar.gz  \
+#     && rm ngx_brotli.tar.gz
+
+# add to the nginx configuration the modules we want to compile by appending arguments to the configure script
+# 1) Print out existing configure arguments into a file, stripping out the first info lines
+# 2) Append new modules to the configure arguments
+# 3) Run the configure script with the new arguments
+# 4) Compile the nginx binary
+RUN cd /usr/src/nginx-$NGINX_VERSION \
+    && nginx -V 2>&1 | tr '\n'  ' '  | sed -n -e "s/^.*configure arguments: //p" > /tmp/current_options \
+    && echo \
+        --modules-path=/usr/lib/nginx/modules \
+        --user=www-data \
+        --group=www-data \
+        --with-http_v2_module \
+        --with-compat \
+        --with-http_gunzip_module \
+        --with-http_gzip_static_module \
+        --add-dynamic-module=/usr/src/ngx_http_substitutions_filter_module-master \
+        --add-dynamic-module=/usr/src/ngx_brotli-master     \
+        --add-dynamic-module=/usr/src/ngx-dev-kit \
+        --add-dynamic-module=/usr/src/set-misc-nginx-module \
+        >> /tmp/new_options \
+    && ./configure `cat  /tmp/new_options`    \
+    && make \
+    && make install
+
+
+FROM nginx:${NGINX_VERSION}
+
+# move the dynamic modules into the nginx module directory
+COPY --from=builder /usr/lib/nginx/modules/ngx_http_subs_filter_module.so /usr/lib/nginx/modules/ngx_http_subs_filter_module.so
+COPY --from=builder /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so
+COPY --from=builder /usr/lib/nginx/modules/ngx_http_brotli_static_module.so /usr/lib/nginx/modules/ngx_http_brotli_static_module.so
+COPY --from=builder /usr/lib/nginx/modules/ndk_http_module.so /usr/lib/nginx/modules/ndk_http_module.so
+COPY --from=builder /usr/lib/nginx/modules/ngx_http_set_misc_module.so /usr/lib/nginx/modules/ngx_http_set_misc_module.so
+
+# sample nginx.conf file
+COPY nginx/angular-csp/nginx.conf /etc/nginx/nginx.conf
+
+# Create a file that will be included in the main nginx.conf file to load the dynamic modules
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;"  >  /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;"  >> /etc/nginx/nginx-dynamic-module-load.conf
+# NOTE: ngx_dev_kit and set-misc-nginx-module are required for csp nonces and ndk has to be loaded first
+RUN echo "load_module /usr/lib/nginx/modules/ndk_http_module.so;"  >>               /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_set_misc_module.so;"  >>      /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_subs_filter_module.so;" >>    /etc/nginx/nginx-dynamic-module-load.conf
