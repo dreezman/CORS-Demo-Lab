@@ -3,11 +3,6 @@ _*.exe
 *.exe
 node_modules
 node_modules/**
-nginx/**
-!nginx/nginx*.conf
-!nginx/nginx_build.sh
-!nginx/nginx_build_env.sh
-!nginx/default-ng*
 !spa/src/**
 !spa/.vscode/**
 !spa/*.html

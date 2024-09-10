@@ -24,182 +24,66 @@
         </script>
         <h1>Content Security Policy Lab </h1>
         <p>This page sets and tests CSP Policy</p>
-        <script>
-            function createButtonAndCallWriteCSPHeader() {
-                // Create a new button
-                var button = document.createElement('button')
-                button.innerHTML = 'Write CSP Header'
-
-                // Append the button to the body
-                document.body.appendChild(button)
-
-                // Set up the button click event
-                button.addEventListener('click', function () {
-                    var xhr = new XMLHttpRequest()
-                    parentURL =
-                        jsonConfig.ParentIframe.fullHTTPSURL +
-                        '/insert-csp-header'
-                    xhr.open('POST', parentURL, true)
-                    xhr.send()
-                })
-            }
-
-            // Call the function to create the Write button and set up the event
-            createButtonAndCallWriteCSPHeader()
-
-            /*
-
-Convert
-
-"default-src abc.com 123.com ; script-src abc.com 123.com";
-
-TO:
-
-          "csp-data": [
-              {
-                  "csp-type": "default-src",
-                  "domains": ["abc.com", "123.com"]
-              },
-              {
-                  "csp-type": "script-src",
-                  "domains": ["abc.com", "123.com"]
-              }
-          ]
-
-
-*/
-            function convertInputToJSON(input) {
-                var parts = input.split(' ; ')
-                var cspData = parts.map(function (part) {
-                    var subParts = part.split(' ')
-                    var cspType = subParts.shift()
-                    var domains = subParts
-                    return {
-                        'csp-type': cspType,
-                        domains: domains,
-                    }
-                })
-
-                return {
-                    'csp-data': cspData,
-                }
-            }
-
-            function createFormAndSendData() {
-                // Create dropdown
-                var select = document.createElement('select')
-                var option1 = new Option('CSP disabled', '1')
-                var option2 = new Option('CSP policy enforced', '2')
-                var option3 = new Option('CSP policy report-only', '3')
-                select.add(option1, undefined)
-                select.add(option2, undefined)
-                select.add(option3, undefined)
-
-                // Create text box
-                var textBox = document.createElement('INPUT')
-                textBox.type = 'text'
-                textBox.size = '100'
-                textBox.value = "default-src 'none' https://localhost:3389"
-
-                // Create submit button
-                var button = document.createElement('button')
-                button.innerHTML = 'Submit'
-
-                // Append elements to the body
-
-                document.body.appendChild(document.createElement('BR'))
-                document.body.appendChild(select)
-                document.body.appendChild(document.createElement('BR'))
-                document.body.appendChild(textBox)
-                document.body.appendChild(document.createElement('BR'))
-                document.body.appendChild(button)
-                document.body.appendChild(document.createElement('BR'))
-
-                // Set up the button click event
-                button.addEventListener('click', function () {
-                    /*
-        Using what the user typed in, create a JSON object for the CSP policy and
-        create something like this
-
-        {
-            "enabled": true,
-          "csp-mode": "Content-Security-Policy",
-            "csp-data": [
-                {
-                    "csp-type": "default-src",
-                    "script-src": ["abc.com", "123.com"]
-                },
-                {
-                    "csp-type": "script-src",
-                    "script-src": ["abc.com", "123.com"]
-                }
-            ]
-        }
-
-        */
-                    switch (select.value) {
-                        case '1':
-                            var cspMode = { enabled: false, cspMode: '' }
-                            break
-                        case '2':
-                            var cspMode = {
-                                enabled: true,
-                                cspMode: 'Content-Security-Policy',
-                            }
-                            break
-                        case '3':
-                            var cspMode = {
-                                enabled: true,
-                                cspMode: 'Content-Security-Policy-Report-Only',
-                            }
-                            break
-                        default:
-                            var cspMode = { enabled: false, cspMode: '' }
-                    }
-                    try {
-                        // var input = "default-src abc.com 123.com ; script-src abc.com 123.com";
-                        var cspData = convertInputToJSON(textBox.value)
-                        console.log(JSON.stringify(cspData, null, 2))
-                    } catch (e) {
-                        console.log('Could not convert to JSON:' + +e)
-                        return
-                    }
-                    var cspStructureJSON = Object.assign({}, cspMode, cspData)
-                    var cspStructureString = JSON.stringify(
-                        cspStructureJSON,
-                        null,
-                        2
-                    )
-                    console.log('CSP Json to Set: ' + cspStructureString)
-                    // send the request
-                    var xhr = new XMLHttpRequest()
-                    parentURL =
-                        jsonConfig.ParentIframe.fullHTTPSURL + '/set-csp-header'
-                    xhr.open('POST', parentURL, true)
-                    xhr.setRequestHeader('Content-Type', 'application/json')
-                    xhr.send(cspStructureString)
-                })
-            }
-
-            // Call the function to create the form and set up the event
-            createFormAndSendData()
-        </script>
         <br>
-        <textarea id="cspPolicy" rows="10" cols="80">
-            default-src 'none'  ;  report-uri /csp-report-only
-            default-src 'none'  ;  report-uri  https://localhost:9381/csp-report-only
-            default-src 'none'  ;  report-to /csp-report-only
-            default-src 'none'  ;  report-to   csp-endpoint-group
-            default-src 'none'  ;  report-to   csp-endpoint-uri
 
-            default-src 'self'  ;  report-uri /csp-report-only
-            default-src *       ;  report-uri /csp-report-only
-            default-src localhost       ;  report-uri /csp-report-only    
-            default-src localhost:3389       ;  report-uri /csp-report-only  
-            default-src https://localhost:3389       ;  report-uri /csp-report-only                     
-            default-src https://localhost:3389  ; script-src 'self'     ;  report-uri /csp-report-only       
-            </textarea
-                    >
+        <form id="configForm">
+            <label for="configInput">Enter Config:</label>
+            <textarea id="configInput" name="config" rows="10" cols="50"></textarea>
+            <button type="button" onclick="submitConfig()">Submit</button>
+        </form>
+
+        <script>
+            function submitConfig() {
+                const configInput = document.getElementById('configInput').value;
+    
+                fetch(jsonConfig.ParentIframe.fullHTTPSURL + '/push-ngx-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ config: configInput })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Config submitted successfully');
+                    } else {
+                        alert('Failed to submit config');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting the config');
+                });
+            }
+        </script>
+
+        <br>
+        <textarea id="cspPolicy" rows="40" cols="100">
+
+
+
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self' *.google.com; 
+    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; 
+    style-src 'self' 'nonce-$cspNonce'; style-src-elem 'self' 'nonce-$cspNonce';
+    style-src-attr 'self' 'unsafe-inline'; font-src 'self' data:  ;
+    report-to csp-endpoint;" 
+    always;	 	
+
+
+default-src 'none'  ;  report-uri /csp-report-only
+default-src 'none'  ;  report-uri  https://localhost:9381/csp-report-only
+default-src 'none'  ;  report-to /csp-report-only
+default-src 'none'  ;  report-to   csp-endpoint-group
+default-src 'none'  ;  report-to   csp-endpoint-uri
+
+default-src 'self'  ;  report-uri /csp-report-only
+default-src *       ;  report-uri /csp-report-only
+default-src localhost       ;  report-uri /csp-report-only    
+default-src localhost:3389       ;  report-uri /csp-report-only  
+default-src https://localhost:3389       ;  report-uri /csp-report-only                     
+default-src https://localhost:3389  ; script-src 'self'     ;  report-uri /csp-report-only       
+            </textarea>
         <hr />
         <br><br>
         <a href="https://localhost:9381/xss/xss.html" target=”_blank”>Go To XSS Lab</a>

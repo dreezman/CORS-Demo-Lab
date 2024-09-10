@@ -40,10 +40,6 @@ func customHeaderMiddleware(next http.Handler) http.Handler {
 // Set HTTP request handlers
 func handleRequest(mux *http.ServeMux) {
 
-	// Create a file server handler to serve static files from the "static" directory
-	fs := http.FileServer(http.Dir("static/"))
-	// Serve static files with the custom handler
-	mux.Handle("/", fs)
 	// handle toggle CORS headers
 	mux.HandleFunc("/cors-toggle", cors.CorsToggle)
 	// handle login forms from JS Fetch requests
@@ -63,6 +59,8 @@ func handleRequest(mux *http.ServeMux) {
 	// Handle and print all CSP violations
 	mux.HandleFunc("/csp-report-only", csp.CSPReportOnlyHandler)
 	mux.HandleFunc("/xss-form", csp.XssFormHandler)
+	// Push ngx config to nginx.conf
+	mux.HandleFunc("/push-ngx-config", common.PushNgxConfig)
 }
 
 // --------------------------------------------------------------------------------------

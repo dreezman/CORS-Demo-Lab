@@ -1,0 +1,71 @@
+services:
+  bsl-backend:
+    build:
+      dockerfile: src/Dockerfile
+      context: .
+      tags:
+        - "bsl-backend:latest"
+        - "docker.io/dreezman/bsl:latest"
+    volumes:
+      - nginx-config:/usr/share/nginx-config
+    ports:
+      - "9081:9081"
+      - "9381:9381"
+      - "3000:3000"
+      - "3300:3300"
+      - "3100:3100"
+      - "3400:3400"
+
+
+  # build/compile the nginx with csp support
+  bsl-builder-cspngx:
+    build:
+      dockerfile: nginx/Dockerfile.Builder-CspNgx
+      context: .
+      tags:
+        - "bsl-csp-ngx-builder:latest"
+        - "docker.io/dreezman/bsl-csp-ngx-builder:latest"
+
+  # build the final nginx image with csp configured
+  bsl-final-cspngx:
+    build:
+      dockerfile: nginx/Dockerfile.Final-CspNgx
+      context: .
+      tags:
+        - "bsl-nginx-csp-frontend:latest"
+        - "docker.io/dreezman/bsl-nginx-csp:latest"
+    #depends_on:
+    #  - bsl-backend
+    volumes:
+      - nginx-config:/usr/share/nginx-config
+    environment: # environment variables for the container
+      NGX_BACKEND: "https://localhost:9381"
+      # ngx debug level
+      NGX_LOG_LEVEL: "warn"
+      # tell ngx to pass all API calls to backend
+      NGX_CSP_REPORTING_SERVER: "https://localhost:9999"
+    image: "bsl-nginx-csp-frontend:latest"
+    container_name: bsl-nginx-csp-frontend
+    ports:
+      - "7777:80"
+
+
+  # where to send the csp reports
+  nginx-csp-reporter:
+    image: ghcr.io/ix-ai/csp:latest
+    environment:
+      PORT: '80'
+      MAX_CONTENT_LENGTH: '512'
+    ports:
+      - '9999:80'
+
+# volumes shared between frontend and backend to store the nginx config
+# for customizing the csp policy
+volumes:
+  nginx-config:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: rw
+

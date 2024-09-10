@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -80,4 +81,61 @@ func LoadFrameConfig(configFile *os.File) error {
 
 type Message struct {
 	Text string `json:"text"`
+}
+
+// Push the CSP config into the Nginx config file
+func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		// Write the Access Control header to allow all requests from all origins
+		AllowOrigin = "*"
+		fmt.Println("in options")
+		WriteACHeader(w, AllowOrigin)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Anyone allowed to POST"))
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	// Write the Access Control header to allow all requests from all origins
+	AllowOrigin = "*"
+	WriteACHeader(w, AllowOrigin)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		return
+	}
+	// Check if the file exists
+	filePath := "/usr/share/nginx-config/csp-policy.conf"
+	var ngxConfigFile *os.File // Declare ngxConfigFile before the conditional statements
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		w.WriteHeader(http.StatusAccepted) // 202 Accepted
+		w.Write([]byte(fmt.Sprintf("Warning! NGX ConfigFile %s does not exist yet, nothing POSTed\n", filePath)))
+		return
+	} else if err != nil { // error checking if file exists
+		http.Error(w, fmt.Sprintf("Error checking if file %s exists", filePath), http.StatusInternalServerError)
+		return
+	} else {
+		// Open the file
+		ngxConfigFile, err := os.OpenFile(filePath, os.O_RDWR, 0666)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error opening Nginx config file %s for writing", filePath), http.StatusInternalServerError)
+			return
+		}
+		defer ngxConfigFile.Close()
+	}
+
+	// Write the body into the file
+	_, err = ngxConfigFile.Write(body)
+	if err != nil {
+		http.Error(w, "Error writing to Nginx config file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	AllowOrigin = "*"
+	WriteACHeader(w, AllowOrigin)
+	w.Write([]byte("Nginx config updated successfully"))
+	ngxConfigFile.Close()
 }
