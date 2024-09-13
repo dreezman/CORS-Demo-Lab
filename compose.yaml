@@ -1,4 +1,5 @@
 services:
+
   bsl-backend:
     build:
       dockerfile: src/Dockerfile
@@ -7,7 +8,7 @@ services:
         - "bsl-backend:latest"
         - "docker.io/dreezman/bsl:latest"
     volumes:
-      - nginx-config:/usr/share/nginx-config
+      - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
     ports:
       - "9081:9081"
       - "9381:9381"
@@ -37,7 +38,7 @@ services:
     #depends_on:
     #  - bsl-backend
     volumes:
-      - nginx-config:/usr/share/nginx-config
+      - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
     environment: # environment variables for the container
       NGX_BACKEND: "https://localhost:9381"
       # ngx debug level
@@ -59,13 +60,5 @@ services:
     ports:
       - '9999:80'
 
-# volumes shared between frontend and backend to store the nginx config
-# for customizing the csp policy
-volumes:
-  nginx-config:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-      o: rw
+
 

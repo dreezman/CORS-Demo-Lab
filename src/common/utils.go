@@ -106,6 +106,8 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
+	bodyStr := string(body)
+	fmt.Print("Before file exists check, here is body:\n", bodyStr)
 	// Check if the file exists
 	filePath := "/usr/share/nginx-config/csp-policy.conf"
 	var ngxConfigFile *os.File // Declare ngxConfigFile before the conditional statements
@@ -118,6 +120,7 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		// Open the file
+		fmt.Print("Before file open\n")
 		ngxConfigFile, err := os.OpenFile(filePath, os.O_RDWR, 0666)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error opening Nginx config file %s for writing", filePath), http.StatusInternalServerError)
@@ -127,12 +130,25 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Write the body into the file
-	_, err = ngxConfigFile.Write(body)
+	// Convert the string to ASCII
+	asciiBody := ""
+	for _, char := range bodyStr {
+		if char > 127 {
+			asciiBody += "?" // Replace non-ASCII characters with a placeholder
+		} else {
+			asciiBody += string(char)
+		}
+	}
+
+	// Write the body into the file
+	fmt.Print("Before write, here is body: \n", asciiBody)
+	_, err = ngxConfigFile.Write([]byte(asciiBody))
 	if err != nil {
+		fmt.Print("Write error: \n", err)
 		http.Error(w, "Error writing to Nginx config file", http.StatusInternalServerError)
 		return
 	}
-
+	fmt.Print("Before write cors\n")
 	w.WriteHeader(http.StatusOK)
 	AllowOrigin = "*"
 	WriteACHeader(w, AllowOrigin)
