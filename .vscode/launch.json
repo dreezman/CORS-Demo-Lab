@@ -13,6 +13,21 @@
       "program": "${workspaceFolder}/main.go"
     },
     {
+
+      "name": "Go Debug in Docker",
+  
+      "type": "go",
+  
+      "request": "attach",
+  
+      "mode": "remote",
+  
+      "port": 40000, // Port where Delve is listening
+  
+      "address": "127.0.0.1"
+  
+  },    
+    {
       "name": "Debug Lab FrontEnd",
       "type": "chrome",
       "request": "launch",

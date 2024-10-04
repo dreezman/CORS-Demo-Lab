@@ -85,6 +85,7 @@ type Message struct {
 
 // Push the CSP config into the Nginx config file
 func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
+	// Check if the request method is OPTIONS
 	if r.Method == http.MethodOptions {
 		// Write the Access Control header to allow all requests from all origins
 		AllowOrigin = "*"
@@ -121,7 +122,7 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Open the file
 		fmt.Print("Before file open\n")
-		ngxConfigFile, err := os.OpenFile(filePath, os.O_RDWR, 0666)
+		ngxConfigFile, err = os.OpenFile(filePath, os.O_RDWR, 0666)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error opening Nginx config file %s for writing", filePath), http.StatusInternalServerError)
 			return
