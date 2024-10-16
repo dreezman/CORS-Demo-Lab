@@ -1,236 +1,27 @@
 <!DOCTYPE html>
-<html lang="EN" xml:lang="en">
-  <head>
-    <title>CORs Security Lab</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        background-color: lightgreen;
-      }
-      iframe {
-        height: 300px;
-        width: 400px;
-      }
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Security Lab</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
 
-      .left {
-        width: 25%;
-        overflow: scroll;
-        height: 1200px;
-      }
+<h2>Browser Security Lab</h2>
 
-      .right {
-        width: 75%;
-        overflow: scroll;
-        height: 1200px;
-      }
-      /* Create two equal columns that floats next to each other */
-      .column {
-        float: left;
-        width: 50%;
-        padding: 33px;
-      }
+<img src=/Logo-smaller.gif width="15%">
+<p>Click on the tabs to switch between different security topics.</p>
 
-      /* Clear floats after the columns */
-      .row:after {
-        content: "";
-        display: table;
-        clear: both;
-      }
+<div class="tab">
+  <a href="/settings/index.html" class="tablinks" target="content-frame">Settings</a>
+  <a href="/xss/index.html" class="tablinks" target="content-frame">XSS</a>
+  <a href="/csp/index.html" class="tablinks" target="content-frame">CSP</a>
+  <a href="/cors/index.html" class="tablinks" target="content-frame">CORS</a>
+  <a href="/csrf/index.html" class="tablinks" target="content-frame">CSRF</a>
+</div>
+<hr>
+<iframe name="content-frame" src="/settings/index.html"></iframe>
 
-      /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
-      @media screen and (max-width: 600px) {
-        .column {
-          width: 100%;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!----------------------------------------------------------------------------------------
-      Load Config information about iframes and their URLs and ports
-    ------------------->
-    <script src="getConfig.js"></script>
-    <script>
-      getConfig("config.json"); // data is stored in localstorage under "config"
-      const jsonConfig = JSON.parse(localStorage.getItem(iframeConfigName));
-    </script>
-    <!-- -------------------------------------------------------------------------------------------- -->
-    <!--                  Parent Window Settings Page - Set some CORS parameters we will use on tests -->
-    <!-- -------------------------------------------------------------------------------------------- -->
-    <h1>Browser Securit Lab</h1>
-    <div class="row">
-      <div class="column left" style="background-color: lightgreen">
-        <h1>Parent Window</h1>
-        <h3 id="ParOrigin"></h3>
-        <script>
-          document.getElementById("ParOrigin").innerHTML =
-            "Origin:" + document.location.origin;
-        </script>
-        <br />
-        Within this parent frame are several internal frames on the right that
-        it will use to test cross-origin and same origin restrictions. Each one
-        comes from a different origin and web server.
-        <br />
-        <br />
-        This lab will use these frames to run various Cross Origin and Site
-        Requests and try to violate those policies.
-
-        <br />
-        <hr />
-        <h2>Cooking with Cookies</h2>
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      Cookies and SSP - Playing with cookies and CSRF attacks -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        Normally HTTP responses tell the browser to load cookies into the
-        browser. It would be too easy if there were just 1 way to do this!!!<br />
-
-        <a href="csrf/bakingcookies.html"></a>
-        <p>Click to starting eat some cookies</p>
-        <a href="csrf/bakingcookies.html">
-          <img
-            src="csrf/cookiemonster.jpg"
-            alt="Cookie Monster"
-            width="400"
-            height="200"
-        /></a>
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      XSS attack                                          -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-
-        <h2>XSS Attack</h2>
-        <a href="xss/xss.html">Click to starting XSS</a>
-
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      CSP Lab
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-        <h2>CSP Lab</h2>
-        <a href="csp/csp.html">Click to starting CSP lab</a>
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      CORS Header Setting
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-        <h2>CORS Header Settings</h2>
-        <a href="cors/cors-header-settings.htlm">Click to set CORS headers</a>
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!--      CORS Lab
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <!-- -------------------------------------------------------------------------------------------- -->
-        <hr />
-        <h2>CORS lab</h2>
-        <a href="cors/cors.html">Click to starting CORS</a>
-      </div>
-
-      <!------------------------------------------------------------------------------------------------------
-      ------------------------------------------------------------------------------------------------------
-      ------------------------------------------------------------------------------------------------------
-      
-      iframe setup -- create all the iframes of the parent
-
-      ------------------------------------------------------------------------------------------------------  
-      ------------------------------------------------------------------------------------------------------
-      ----------------------------------------------------------------------------------------------------------->
-      <div class="column right" style="background-color: #bbb">
-        <div class="row">
-          <div class="column">
-            <!-- Iframe 1 -->
-            <h3>Non-Origin Iframe 1:</h3>
-            <div id="iframe1urlparm"></div>
-            <br />
-            <iframe
-              style="border: solid black; background-color: lightblue"
-              id="iframe1"
-              title="iframe1"
-            >
-            </iframe>
-            <script>
-              document.getElementById("iframe1").src =
-                jsonConfig.Iframe1.fullHTTPURL + "/iframes.html"; // load the HTML for this frame
-              document.getElementById("iframe1urlparm").innerHTML =
-                "Origin:" + document.getElementById("iframe1").src;
-            </script>
-          </div>
-          <!-- Iframe 2 -->
-          <div class="column">
-            <h3>Non-Origin Iframe 2:</h3>
-            <div id="iframe2urlparm"></div>
-            <iframe
-              style="
-                border: solid black;
-                background-color: lightgoldenrodyellow;
-              "
-              id="iframe2"
-              title="iframe2"
-            >
-            </iframe>
-            <script>
-              document.getElementById("iframe2").src =
-                jsonConfig.Iframe2.fullHTTPURL + "/iframes.html"; // load the HTML for this frame; // load the HTML for this frame
-              document.getElementById("iframe2urlparm").innerHTML =
-                "Origin:" + document.getElementById("iframe2").src;
-            </script>
-          </div>
-          <!-- Iframe 3 -->
-          <div class="column">
-            <h3>Same-Origin Iframe :</h3>
-            <div id="sameoriginframeurl"></div>
-            <iframe
-              style="
-                border: 10 solid black;
-                background-color: rgb(201, 172, 207);
-              "
-              id="sameoriginframe"
-              title="sameoriginasParentframe"
-            >
-            </iframe>
-            <script>
-              document.getElementById("sameoriginframe").src =
-                jsonConfig.ParentIframe.fullHTTPURL + "/iframes.html"; // load the HTML for this frame;
-              document.getElementById("sameoriginframeurl").innerHTML =
-                "Origin:" + document.getElementById("sameoriginframe").src;
-            </script>
-          </div>
-
-          <div class="column">
-            <h3>Simple Non Origin Frame:</h3>
-            <div id="simplenonoriginframeurl"></div>
-            <iframe
-              src="https://www.example.com"
-              id="simplenonoriginframe"
-            ></iframe>
-            <script>
-              document.getElementById("simplenonoriginframeurl").innerHTML =
-                "Origin:" + document.getElementById("simplenonoriginframe").src;
-            </script>
-          </div>
-          <div class="column">
-            <h3>Complex Non Origin Frame</h3>
-            <div id="complexnonoriginframeurl"></div>
-            <iframe
-              src="https://www.google.com"
-              id="complexnonoriginframe"
-            ></iframe>
-            <script>
-              document.getElementById("complexnonoriginframeurl").innerHTML =
-                "Origin:" +
-                document.getElementById("complexnonoriginframe").src;
-            </script>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+</body>
 </html>

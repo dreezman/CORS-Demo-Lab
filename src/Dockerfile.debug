@@ -25,12 +25,12 @@ ENV GOPATH=/browser-security-lab/src
 ENV GO111MODULE=off
 RUN CGO_ENABLED=0 go build -gcflags="all=-N -l" -o main .
 
-# Copy the Pre-built binary file from the previous stage
+# copy the config file used during launch
 COPY  static/config.json ./
 # shared volume to exchange nginx configs
 RUN  mkdir -p /root/nginx
 # Expose port 8080 to the outside world, 40000 is debugger
 EXPOSE 8080 40000
 
-# Command to run the executable
+# Command to run the executable with config file
 CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/browser-security-lab/main", "/browser-security-lab/config.json" ]

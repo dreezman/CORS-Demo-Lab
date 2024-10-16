@@ -9,3 +9,4 @@ node_modules/**
 !spa/*.[html,ico,ts,css,js,json]
 !Docker*
 
+static/cors/index copy.html

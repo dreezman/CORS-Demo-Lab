@@ -1,5 +1,7 @@
 services:
 
+############## BackEnd ################
+# dockerized backend, no debug
   bsl-backend:
     build:
       dockerfile: src/Dockerfile
@@ -7,6 +9,28 @@ services:
       tags:
         - "bsl-backend:latest"
         - "docker.io/dreezman/bsl:latest"
+    volumes:
+      - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
+    container_name: bsl-backend
+    ports:
+      - "9081:9081"
+      - "9381:9381"
+      - "3000:3000"
+      - "3300:3300"
+      - "3100:3100"
+      - "3400:3400"
+
+
+# dockerized backend with docker debug enabled for vscode
+  bsl-backend-debug:
+    build:
+      dockerfile: src/Dockerfile.Debug
+      context: .
+      tags:
+        - "bsl-backend-debug-image:latest"
+        - "docker.io/dreezman/bsl-debug-image:latest"
+    image: bsl-backend-debug-image
+    container_name: bsl-backend-debug
     volumes:
       - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
     ports:
@@ -19,7 +43,10 @@ services:
       - "3400:3400"
 
 
-  # build/compile the nginx with csp support
+############## FrontEnd NGX with CSP ################
+
+
+  # 1. build/compile the alpine nginx with csp support
   bsl-builder-cspngx:
     build:
       dockerfile: nginx/Dockerfile.Builder-CspNgx
@@ -28,7 +55,7 @@ services:
         - "bsl-csp-ngx-builder:latest"
         - "docker.io/dreezman/bsl-csp-ngx-builder:latest"
 
-  # build the final nginx image with csp configured
+  # 2. build the final nginx image with csp configured
   bsl-final-cspngx:
     build:
       dockerfile: nginx/Dockerfile.Final-CspNgx
@@ -41,17 +68,18 @@ services:
     volumes:
       - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
     environment: # environment variables for the container
+      # tell ngx to pass all API calls to backend
       NGX_BACKEND: "https://localhost:9381"
       # ngx debug level
       NGX_LOG_LEVEL: "warn"
-      # tell ngx to pass all API calls to backend
+      # log all csp errors to the logger
       NGX_CSP_REPORTING_SERVER: "https://localhost:9999"
     image: "bsl-nginx-csp-frontend:latest"
     container_name: bsl-nginx-csp-frontend
     ports:
       - "7777:80"
 
-
+################# CSP REPORTER ####################
   # where to send the csp reports
   nginx-csp-reporter:
     image: ghcr.io/ix-ai/csp:latest
