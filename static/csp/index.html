@@ -18,7 +18,7 @@
         <p>This page sets and tests CSP Policy</p>
         <br>
 
-        <form id="configForm">
+        <form id="configForm" enctype="text/plain">
             <label for="configInput">Enter Config:</label>
             <textarea id="configInput" name="config" rows="10" cols="50"></textarea>
             <button type="button" onclick="submitConfig()">Submit</button>
@@ -31,9 +31,9 @@
                 fetch(jsonConfig.ParentIframe.fullHTTPSURL + '/push-ngx-config', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain'
                     },
-                    body: JSON.stringify({ config: configInput })
+                    body: configInput 
                 })
                 .then(response => {
                     if (response.ok) {

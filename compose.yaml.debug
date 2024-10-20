@@ -21,7 +21,41 @@ services:
       - "3100:3100"
       - "3400:3400"
 
+
+# dockerized backend with docker debug enabled for vscode
+  bsl-backend-debug:
+    build:
+      dockerfile: src/Dockerfile.Debug
+      context: .
+      tags:
+        - "bsl-backend-debug-image:latest"
+        - "docker.io/dreezman/bsl-debug-image:latest"
+    image: docker.io/dreezman/bsl-debug-image:latest
+    container_name: bsl-backend-debug
+    volumes:
+      - /home/dreez/repos/Browser-Security-Lab/nginx/local:/usr/share/nginx-config
+    ports:
+      - "40000:40000"
+      - "9081:9081"
+      - "9381:9381"
+      - "3000:3000"
+      - "3300:3300"
+      - "3100:3100"
+      - "3400:3400"
+
+
 ############## FrontEnd NGX with CSP ################
+
+
+  # 1. build/compile the alpine nginx with csp support
+  bsl-builder-cspngx:
+    build:
+      dockerfile: nginx/Dockerfile.Builder-CspNgx
+      context: .
+      tags:
+        - "bsl-csp-ngx-builder:latest"
+        - "docker.io/dreezman/bsl-csp-ngx-builder:latest"
+
   # 2. build the final nginx image with csp configured
   bsl-final-cspngx:
     build:
