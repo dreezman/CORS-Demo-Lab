@@ -120,6 +120,13 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Error checking if file %s exists", filePath), http.StatusInternalServerError)
 		return
 	} else {
+		// kill file contents
+		err := os.Truncate(filePath, 0)
+		if err != nil {
+			fmt.Print("Truncating ngx.conf file error: \n", err)
+			http.Error(w, "Truncating ngx.conf file error:", http.StatusInternalServerError)
+			return;
+		}
 		// Open the file
 		fmt.Print("Before file open\n")
 		ngxConfigFile, err = os.OpenFile(filePath, os.O_RDWR, 0666)
@@ -142,11 +149,19 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Write the body into the file
-	fmt.Print("Before write, here is body: \n", asciiBody)
+	fmt.Print("Before write, here is body: \n", asciiBody,"\n")
 	_, err = ngxConfigFile.Write([]byte(asciiBody))
 	if err != nil {
 		fmt.Print("Write error: \n", err)
 		http.Error(w, "Error writing to Nginx config file", http.StatusInternalServerError)
+		return
+	}
+	// Write the body into the file
+	fmt.Print("\nSnyc file to write: \n")
+	err = ngxConfigFile.Sync()
+	if err != nil {
+		fmt.Print("Snyc error: \n", err)
+		http.Error(w, "Error syncing to Nginx config file", http.StatusInternalServerError)
 		return
 	}
 	fmt.Print("Before write cors\n")

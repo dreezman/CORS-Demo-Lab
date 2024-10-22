@@ -53,28 +53,38 @@
         <textarea id="cspPolicy" rows="40" cols="100">
 
 
-
+# allow inline scripts to run with nonces or hierarchy includes
 add_header Content-Security-Policy-Report-Only
     "default-src 'self' *.google.com; 
-    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; 
-    style-src 'self' 'nonce-$cspNonce'; style-src-elem 'self' 'nonce-$cspNonce';
-    style-src-attr 'self' 'unsafe-inline'; font-src 'self' data:  ;
-    report-to csp-endpoint;" 
-    always;	 	
+    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
+
+# block all
+add_header Content-Security-Policy-Report-Only
+    "default-src 'none'  ; ";
+
+# self vs localhost no port???
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self'; script-src https://localhost; style-src  'self'     ;";
+
+# allow all????
+add_header Content-Security-Policy-Report-Only
+    "default-src *       ;";
+
+# allow all
+add_header Content-Security-Policy-Report-Only
+    "default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline'; 
+    script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; 
+    script-src-elem * data: blob: 'unsafe-inline' 'unsafe-eval';
+    connect-src * data: blob: 'unsafe-inline'; 
+    img-src * data: blob: 'unsafe-inline'; 
+    media-src * data: blob: 'unsafe-inline'; 
+    frame-src * data: blob: ; 
+    style-src * data: blob: 'unsafe-inline';
+    font-src * data: blob: 'unsafe-inline';
+    frame-ancestors * data: blob:;";
 
 
-default-src 'none'  ;  report-uri /csp-report-only
-default-src 'none'  ;  report-uri  https://localhost:9381/csp-report-only
-default-src 'none'  ;  report-to /csp-report-only
-default-src 'none'  ;  report-to   csp-endpoint-group
-default-src 'none'  ;  report-to   csp-endpoint-uri
 
-default-src 'self'  ;  report-uri /csp-report-only
-default-src *       ;  report-uri /csp-report-only
-default-src localhost       ;  report-uri /csp-report-only    
-default-src localhost:3389       ;  report-uri /csp-report-only  
-default-src https://localhost:3389       ;  report-uri /csp-report-only                     
-default-src https://localhost:3389  ; script-src 'self'     ;  report-uri /csp-report-only       
             </textarea>
         <hr />
         <br><br>
