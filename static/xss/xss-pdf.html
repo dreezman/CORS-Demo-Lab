@@ -7,18 +7,26 @@
   <body>
 <object
 type="application/pdf"
-data="/xss/DynamicEmail_AcroForm.pdf"
+data="/xss/hackingpdf.pdf"
 width="500"
 height="800"
 ></object>
-
-<textarea rows="10" cols="100">
+<br><br>
+<textarea rows="20" cols="100">
     <object
 type="application/pdf"
-data="/xss/DynamicEmail_AcroForm.pdf"
+data="/xss/hackingpdf.pdf"
 width="250"
 height="200"
 ></object>
+
+
+#### To find the JS code in the PDF, use the following JS code:
+==================================================
+  document.location.origin
+  **TBD cannot find origin in DOM right now, probably internal JS function?**
+  document.getElementsByTagName('object')[0]
+  PDF's can be inspected for JS code with: https://pdfcrowd.com/inspect-pdf/
     </textarea>
 </body>
 </html>

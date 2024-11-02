@@ -8,7 +8,7 @@
 
 <br>
 
-<textarea rows="10" cols="100">
+<textarea rows="20" cols="100">
 
   function getCookie(){
     alert('I see your cookies!!!:   ' + document.cookie)
@@ -17,7 +17,11 @@
   <script src="/xss/xss-getcookie.js">  </script>
   <a href="javascript:void(0)" onclick="getCookie();">Run JavaScript Code</a>
 
-
+  #### Inspect the JS code in the URL with the following JS code:
+  ==================================================
+    document.location.origin
+    # Internal JS function, no origin
+    document.getElementsByTagName('a')[0].onclick
 
 </textarea>
 

@@ -11,7 +11,7 @@
 
 <br>
 
-<textarea rows="10" cols="100">
+<textarea rows="20" cols="100">
 
 
   <script src="/xss/xss-getcookie.js">  </script>
@@ -21,6 +21,16 @@
     }
   <script src="/xss/xss-internal-load.js">  </script>
      getCookie()
+
+
+     Here is the event handler script the button created. Paste into console:
+     -------------------------------------------------------------------
+     document.getElementsByTagName('script')[0].src
+     document.getElementsByTagName('script')[1].src
+     document.location.origin
+
+
+
 
   </textarea>
 

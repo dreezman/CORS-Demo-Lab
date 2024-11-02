@@ -53,10 +53,6 @@
         <textarea id="cspPolicy" rows="40" cols="100">
 
 
-# allow inline scripts to run with nonces or hierarchy includes
-add_header Content-Security-Policy-Report-Only
-    "default-src 'self' *.google.com; 
-    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
 
 # block all
 add_header Content-Security-Policy-Report-Only
@@ -83,6 +79,19 @@ add_header Content-Security-Policy-Report-Only
     font-src * data: blob: 'unsafe-inline';
     frame-ancestors * data: blob:;";
 
+# allow inline scripts to run with nonces or hierarchy includes
+set_secure_random_alphanum $cspNonce 32;
+sub_filter_once off;
+sub_filter_types *;
+sub_filter '<style>'  '<style nonce="$cspNonce">'  ;
+sub_filter '<script>'  '<script nonce="$cspNonce">'  ;
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self' *.google.com; 
+    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self' *.google.com; 
+    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
+    
 
 
             </textarea>

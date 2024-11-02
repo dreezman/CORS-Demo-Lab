@@ -2,12 +2,12 @@
   <head>  </head>  
   <body>
 
-<script> 
+<script nonce="***FAKE NONCE**"> 
 
 document.cookie="TopSecretPassword=1234567890";
 alert("I see your cookies without a nonce !!!:   " + document.cookie); </script>
 
-<script nonce="**CSP_NONCE**"> 
+<script> 
 
 document.cookie="TopSecretPassword=1234567890";
 alert("I see your cookies with a Nonce!!!:   " + document.cookie); </script>
@@ -16,15 +16,22 @@ I just executed this inline script: <br>
 
 <textarea rows="40" cols="100">
 
-    <script> 
+    <script nonce="***FAKE NONCE**"> 
 
     document.cookie="TopSecretPassword=1234567890";
     alert("I see your cookies without a nonce !!!:   " + document.cookie); </script>
 
-    <script nonce="**CSP_NONCE**"> 
+    <script> 
 
     document.cookie="TopSecretPassword=1234567890";
     alert("I see your cookies with a Nonce!!!:   " + document.cookie); </script>
+
+      Compare Origins of the two scripts above. 
+      ==================================================
+      document.getElementsByTagName('script')[0].src
+      document.getElementsByTagName('script')[1].src
+      document.location.origin
+
 
 </textarea>
 

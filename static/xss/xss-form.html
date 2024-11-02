@@ -4,7 +4,7 @@
 
 <h2>HTML Forms</h2>
 
-<form action="/xss-form">
+<form action="http://localhost:9081/xss-form">
   <label for="fname">First name:</label><br>
   <input type="text" id="fname" name="fname" value="John"><br>
   <label for="lname">Last name:</label><br>
@@ -15,7 +15,7 @@
 <p>If you click the "Submit" button, the form-data will be sent to a page called "/action_page.php".</p>
 
 <textarea rows="20" cols="150">
-    <form action="/action_page.php">
+    <form action="http://localhost:9081/xss-form">
         <label for="fname">First name:</label><br>
         <input type="text" id="fname" name="fname" value="John"><br>
         <label for="lname">Last name:</label><br>
@@ -24,8 +24,14 @@
       </form> 
 
       use this in first name:
-      <script>alert("I have your cookies" + document.cookie)</script>      
+      <script> document.cookie = "Password=Abc123!!!";alert("I have your cookies" + document.cookie)</script>         
 
+
+      Compare Origins before and after the submit 
+      ==================================================
+      Before: document.getElementsByTagName('script') 
+      After: document.getElementsByTagName('script')[0].src
+      document.location.origin
 
 </textarea>
 
