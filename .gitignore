@@ -3,3 +3,10 @@ _*.exe
 *.exe
 node_modules
 node_modules/**
+!spa/src/**
+!spa/.vscode/**
+!spa/*.html
+!spa/*.[html,ico,ts,css,js,json]
+!Docker*
+
+static/cors/index copy.html

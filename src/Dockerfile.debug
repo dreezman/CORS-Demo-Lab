@@ -1,0 +1,36 @@
+# Stage 1: Build the Go binary
+FROM golang:1.23-alpine
+
+# Set the Current Working Directory inside the container
+WORKDIR /browser-security-lab
+
+# add gcc
+RUN apk add --no-cache gcc musl-dev
+RUN apk add git
+RUN CGO_ENABLED=0 go install  -ldflags "-s -w -extldflags '-static'" github.com/go-delve/delve/cmd/dlv@latest
+
+# Copy the source from the current directory to the Working Directory inside the container
+COPY main.go ./
+COPY privatekey.key ./
+COPY publiccert.crt ./
+COPY src/      /usr/local/go/src/browser-security-lab/src/
+# load external dependencies
+RUN  mkdir -p  /usr/local/go/src/github.com/gorilla/
+RUN  git -C    /usr/local/go/src/github.com/gorilla/ clone https://github.com/gorilla/handlers 
+RUN mkdir -p   /usr/local/go/src/github.com/felixge/
+RUN git -C     /usr/local/go/src/github.com/felixge/ clone https://github.com/felixge/httpsnoop
+
+# Build the Go app
+ENV GOPATH=/browser-security-lab/src
+ENV GO111MODULE=off
+RUN CGO_ENABLED=0 go build -gcflags="all=-N -l" -o main .
+
+# copy the config file used during launch
+COPY  static/config.json ./
+# shared volume to exchange nginx configs
+RUN  mkdir -p /root/nginx
+# Expose port 8080 to the outside world, 40000 is debugger
+EXPOSE 8080 40000
+
+# Command to run the executable with config file
+CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/browser-security-lab/main", "/browser-security-lab/config.json" ]

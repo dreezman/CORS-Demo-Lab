@@ -1,0 +1,32 @@
+
+<html>
+  <head> 
+    
+    <title>Remote External Loadk</title>
+  </head>  
+  <body>
+<script src="https://coresdemo2.z13.web.core.windows.net/xss/xss.js"></script>
+
+<br>
+
+<textarea rows="10" cols="100">
+  <script src="https://coresdemo2.z13.web.core.windows.net/xss/xss.js"></script>
+
+  File: https://coresdemo2.z13.web.core.windows.net/xss/xss.js
+  ----------------------------------------------------------------
+  alert("I see your cookies!!!:   " + document.cookie);
+
+
+  
+  Here is the event handler script the button created. Paste into console:
+  -------------------------------------------------------------------
+  document.getElementsByTagName('script')[0].src
+  document.location.origin
+
+
+</textarea>
+
+
+
+</body>
+</html>

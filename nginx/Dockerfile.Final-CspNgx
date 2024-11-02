@@ -1,0 +1,49 @@
+
+FROM docker.io/dreezman/bsl-nginx-csp:latest
+
+LABEL "org.opencontainers.image.vendor"="Layer8"
+LABEL "org.opencontainers.image.title"="Browser Security Training"
+LABEL "org.opencontainers.image.authors"="info@layer8.cloud"
+LABEL "org.opencontainers.image.source"="TBD"
+
+# Port NGX will listen on, but you can override this with -e PORT=8080:80 for host
+EXPOSE 80
+
+###### Builder created several dynmaic modules for csp policy and brotli compression
+# Create a file that will be included in the main nginx.conf file to load the dynamic modules
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;"  >  /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;"  >> /etc/nginx/nginx-dynamic-module-load.conf
+# NOTE: ngx_dev_kit and set-misc-nginx-module are required for csp nonces and ndk has to be loaded first
+RUN echo "load_module /usr/lib/nginx/modules/ndk_http_module.so;"  >>               /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_set_misc_module.so;"  >>      /etc/nginx/nginx-dynamic-module-load.conf
+RUN echo "load_module /usr/lib/nginx/modules/ngx_http_subs_filter_module.so;" >>    /etc/nginx/nginx-dynamic-module-load.conf
+
+
+########## Copy the application and the nginx configuration ##########
+# copy application from first stage
+ARG NGX_APP
+COPY static/ /usr/share/nginx/html
+
+########## Build the nginx.conf with CSP controls ##########
+# copy and modify the nginx template config file with the CSP settings 
+# /etc/nginx is a shared volume between the backend and frontend and
+# backend will write to the csp-policy.conf file to update the csp
+RUN mkdir -p /etc/nginx/templates && chmod -R a+rwx /etc/nginx/
+# top level nginx.conf file, pulls in the template file
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+# template file that is included by nginx.conf.
+# nginx will fill in variables and put into /etc/nginx/conf.d/
+COPY nginx/default.conf.template /etc/nginx/templates/
+#  template file will pull in the csp policy which is shared
+# between the containers so that the front-end can push to 
+# backend and update the csp-policy.conf file
+COPY nginx/local/csp-policy.conf    /usr/share/nginx-config/csp-policy.conf
+# clear it out in case it was left over from a previous run
+RUN  echo 'echo "" > /usr/share/nginx-config/csp-policy.conf' > /docker-entrypoint.d/10-clear-csp-policy.sh && \
+    chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh
+RUN chmod -R a+rwx  /usr/share/nginx-config/csp-policy.conf
+# tell crontab to reload nginx every 10 seconds in case we push a new csp policy
+COPY nginx/crontab.conf /var/spool/cron/crontabs/root
+RUN echo "crond" > /docker-entrypoint.d/50-start-cron.sh && \
+    chmod a+x /docker-entrypoint.d/50-start-cron.sh
+

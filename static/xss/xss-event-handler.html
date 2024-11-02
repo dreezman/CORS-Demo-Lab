@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<body>
+
+
+<!-- Inline Event -->
+<br>
+<a id="author" href="https://google.com?&apos;-alert(1111111)-&apos;" onclick="var tracker={track(){}};tracker.track('https://google.com?&apos;-alert(111111)-&apos;');">Click on This to Win $1 Million</a>
+<br><br>
+<textarea rows="15" cols="100">
+
+    # This is what was executed by the inline event button, find it in the console
+
+    <a id="author" href="https://google.com?&apos;-alert(1)-&apos;" onclick="var tracker={track(){}};tracker.track('https://google.com?&apos;-alert(1)-&apos;');">Click on This to Win $1 Million</a>
+
+    
+    Here is the inline script the button created. Paste into console:
+    -------------------------------------------------------------------
+    document.getElementsByTagName('a')[0].onclick
+    document.getElementsByTagName('a')[0].origin
+</textarea>
+
+
+<!--Event Handler -->
+
+<hr>
+<br><br>
+<script src="/xss/xss-event-handler-getcookie-btn-addeventhandler.js">  </script>    
+<button id="myBtn" >Push me for addEventListener event</button>
+<br><br>
+<textarea  rows="40" cols="100">
+
+AddEvent Handlers are considered more secure than inline <onclick> event handlers because they AddEventListeners
+have to be <script src="somefile"> loaded from a JS file when proper CSP is enforced, which is difficult for a hacker to create a JS file on
+a server they do not control. Additionally, inline event handlers my allow input from external sources that can be
+modified by an attacker to insert malicious code.
+
+    <script src="/xss/xss-event-handler-getcookie-btn-addeventhandler.js">  </script>    
+    <button id="myBtn" >Push me for addEventListener event</button>
+    File xss-event-handler-getcookie-btn-addeventhandler.js contents
+    #############################################
+    function getCookie(){
+        document.cookie="TopSecretPassword=1234567890";
+        alert('I see your cookies!!!:   ' + document.cookie)
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("myBtn").addEventListener("click", getCookie);
+    });
+    ##############################################
+
+    Here is the event handler script the button created. Paste into console:
+    -------------------------------------------------------------------
+    document.getElementsByTagName('script')[0].src
+    document.location.origin
+    ---AND---
+    You can find event handler by going to Elements->Event Handlers in the developer tools
+
+</textarea>
+
+</body>
+</html>

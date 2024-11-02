@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>XSS thru Eval function</title>
+    </head>
+    <body>
+      <script src="/xss/xss-eval.js"> </script>
+
+
+      <textarea rows="20" cols="150">
+
+      Paste these into the URL window and see what happens:
+
+      http://localhost:7777/xss/xss-eval-load.html?op1=1&op2=2
+      http://localhost:7777/xss/xss-eval-load.html?op1=alert(%22hi%22)&op2=%22%22
+      http://localhost:7777/xss/xss-eval-load.html?op1=alert(%22I%20see%20you%20cookie!!!!:%20%22+%20document.cookie%20)&op2=%22%22
+      
+        "I see you cookie!!!!: " + document.cookie
+
+
+        Compare Origins of the two scripts above. 
+        ==================================================
+        eval() is an internal JS function, thus with no origin.
+        document.location.origin
+        
+      </textarea>
+
+    </body>
+</html>
