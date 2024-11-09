@@ -56,17 +56,31 @@
 
 # block all
 add_header Content-Security-Policy-Report-Only
-    "default-src 'none'  ; ";
-
-# self vs localhost no port???
-add_header Content-Security-Policy-Report-Only
-    "default-src 'self'; script-src https://localhost; style-src  'self'     ;";
+    "default-src 'none'  ; report-uri http://localhost:9999/csp; " ;
 
 # allow all????
 add_header Content-Security-Policy-Report-Only
-    "default-src *       ;";
+    "default-src *       ; report-uri http://localhost:9999/csp;";
 
-# allow all
+# allow all with from self
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self'; report-uri http://localhost:9999/csp;";
+
+
+# allow inline scripts to run with nonces or hierarchy includes
+set_secure_random_alphanum $cspNonce 32;
+sub_filter_once off;
+sub_filter_types *;
+sub_filter '<style>'  '<style nonce="$cspNonce">'  ;
+sub_filter '<script>'  '<script nonce="$cspNonce">'  ;
+add_header Content-Security-Policy-Report-Only
+    "default-src 'self' *.google.com; 
+    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; 
+    script-src 'self' 'nonce-$cspNonce' ; report-uri http://localhost:9999/csp; " ;
+
+
+
+# allow all the various options
 add_header Content-Security-Policy-Report-Only
     "default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline'; 
     script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; 
@@ -79,18 +93,7 @@ add_header Content-Security-Policy-Report-Only
     font-src * data: blob: 'unsafe-inline';
     frame-ancestors * data: blob:;";
 
-# allow inline scripts to run with nonces or hierarchy includes
-set_secure_random_alphanum $cspNonce 32;
-sub_filter_once off;
-sub_filter_types *;
-sub_filter '<style>'  '<style nonce="$cspNonce">'  ;
-sub_filter '<script>'  '<script nonce="$cspNonce">'  ;
-add_header Content-Security-Policy-Report-Only
-    "default-src 'self' *.google.com; 
-    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
-add_header Content-Security-Policy-Report-Only
-    "default-src 'self' *.google.com; 
-    script-src 'self' 'strict-dynamic' 'nonce-$cspNonce' ; ";
+
     
 
 
