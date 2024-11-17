@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <title>XSS thru Dynamic Function function</title>
+    </head>
+    <body>
+
+      <br>
+      <p>
+      JS anonymous (no name) functions can be dynamically created, so it 
+      almost list creating a script dynamically. But scripts are HTML 
+      elements, JS functions are internal JS components, thus no origin
+      is assigned to them.
+      </p>
+      <p>
+      FYI JS function with a name looks like this:<br>
+      <textarea rows="5" cols="50">
+       function functionWithName(parameter1) {
+          return (parameter1)
+       }
+       </textarea>
+ 
+      </p>
+      <script src=/xss/xss-dynamic-function.js> </script> 
+        
+    <textarea rows="20" cols="150">
+
+      I just executed this:
+
+      <script src="/xss/xss-dynamic-function.js"> </script>
+
+      which had this function in it:
+
+      var fs = [];
+      fs['f1'] = new Function('name', 'return alert("hello, " + name + "!");');
+      fs['f1']('HACKED!!!!!');
+
+      which should work if the CSP had script-src: 'self'
+
+      BUT!!!!!
+
+      Paste these into the console and see what happens:
+      -----------------------------------------------------
+
+      var fs = [];
+      fs['f2'] = new Function('name', 'return alert("hello, " + name + "!");');
+      fs['f2']('HACKED!!!!!');
+
+      ==================================================
+      fs['f2'] is an dynamically created JS function, thus with no origin.
+
+      Did it work with CSP????
+
+
+    </textarea>
+
+
+    </body>
+</html>
