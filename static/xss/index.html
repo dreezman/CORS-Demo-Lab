@@ -26,38 +26,73 @@
             <br />
             <textarea rows="25%" cols="100%">
 
-
+========================================
 Javascript as Executable Code: 
----------------------
-Paste this into your browser's address bar:
-http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+========================================
 
-In the console, see how the code above is stored as executable code in the DOM:
-document.getElementsByTagName('*')
-document.getElementsByTagName("*")[2].innerHTML
-document.getElementsByTagName("*")[2].outerHTML
+1. Create new tab in browser and open developers console F12
+2. Paste this into your browser's debug console:
+   document.location.origin
+   document.getElementsByTagName('*')
+
+3. Paste this into your browser's address bar:
+   http://localhost:9081/xss-attack?xssvalue=HelloWorld
 
 
+4. Paste this into your browser's debug console:
+   document.getElementsByTagName('*')
+   document.body
+   document.getElementsByTagName('pre')[0].innerHTML
+   document.getElementsByTagName('pre')[0].outerHTML
 
+5. Has anything changed?
+
+
+6. Paste this into your browser's address bar:
+   http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+
+7. Paste this into your browser's debug console:
+    document.getElementsByTagName('*')
+
+
+8. What has changed?
+9. Check out the script
+
+    document.getElementsByTagName('script')
+    document.getElementsByTagName('script')[0]
+
+10. Most importantly, check out the scripts origin. Does that
+    seem strange to you? Why?
+
+    document.location.origin
+    document.getElementsByTagName('script')[0].src
+
+11. See how the script is stored internally in the DOM:
+
+    document.getElementsByTagName('script')[0].innerHTML
+    document.getElementsByTagName('script')[0].outerHTML
+
+
+========================================
 Javascript as Text
------------------------------------
-Paste this into your browser's address bar:
+========================================
+
+12. Paste this into your browser's address bar:
+
 http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
 
-In the console, see how the code above is stored as text in the DOM:
-document.getElementsByTagName('*')
-document.getElementsByTagName("*")[4].innerHTML
-document.getElementsByTagName("*")[4].outerHTML
+13. In the console, see how the code above is stored as text in the DOM:
+
+    document.getElementsByTagName('*')
+    document.getElementsByTagName('pre')[0].innerHTML
+    document.getElementsByTagName('pre')[0].outerHTML
 
 
-XSS attack 3: script in JS file
------------------------------------
-http://localhost:9081/xss-attack?xssvalue=<script src=http://localhost:3000/xss/xss.js> </script>
-document.getElementsByTagName('*')
-document.getElementsByTagName("*")[2].innerHTML
-document.getElementsByTagName("*")[2].outerHTML
+14. Why is this script different than the one above?    
+
 </textarea
             >
+
             <hr />
             <br /><br />
             <hr />
