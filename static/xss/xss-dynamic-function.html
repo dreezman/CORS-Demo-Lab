@@ -41,12 +41,19 @@
       Paste these into the console and see what happens:
       -----------------------------------------------------
 
-      var fs = [];
       fs['f2'] = new Function('name', 'return alert("hello, " + name + "!");');
       fs['f2']('HACKED!!!!!');
 
       ==================================================
       fs['f2'] is an dynamically created JS function, thus with no origin.
+
+      Paste these into the console and look inside:
+      -----------------------------------------------------
+      fs
+      fs['f1']
+      fs['f2']
+
+
 
       Did it work with CSP????
 
