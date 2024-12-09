@@ -10,12 +10,14 @@
 <br><br>
 <textarea rows="15" cols="100">
 
-    # This is what was executed by the inline event button, find it in the console
+    # This is what will be executed by the inline event button
+    # BEFORE you click on the button, find it in the console
 
     <a id="author" href="https://example.com?&apos;-alert(1)-&apos;" onclick="var tracker={track(){}};tracker.track('https://example.com?&apos;-alert(1)-&apos;');">Click on This to Win $1 Million</a>
 
     
-    Here is the inline script the button created. Paste into console:
+    BEFORE you click: Here is the dynamic function that the onclick converted
+    to a dynamic function that will be executed.
     -------------------------------------------------------------------
     document.getElementsByTagName('a')[0].onclick
     document.getElementsByTagName('a')[0].origin
