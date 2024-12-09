@@ -51,12 +51,18 @@
 
 		## send logs to here
 		add_header Reporting-Endpoints  "$NGX_CSP_REPORTING_SERVER";
+    # no caching
+    add_header Last-Modified $date_gmt;
+    add_header Cache-Control 'no-store, no-cache';
 		## pull in policy from shared volume
 		include /usr/share/nginx-config/csp-policy.conf;
 		try_files $uri $uri/ /index.html;
     }
 	# Part of class training, no csp policy
 	location /csp/ {
+    # no caching
+    add_header Last-Modified $date_gmt;
+    add_header Cache-Control 'no-store, no-cache';
 		try_files $uri $uri/ /index.html;
 	}
 

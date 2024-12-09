@@ -10,7 +10,7 @@
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-# CORS Demo Lab
+# Browser Security Lab
 
 TBD-
 
@@ -28,15 +28,17 @@ basis. This is the only way to fully understand how a technology works.
 
 Browser Security is a super-complex topic because there never was no top-down structure to it. As browser attacks occurred, new countermeasures were created adhoc. Different browsers may or may not implement those countermeasures depending on the version one is using. One countermeasure may or maynot work with a different countermeasure. Lots of "always true EXCEPT in the case of..."
 
-This lab was created so that one can view step-by-step how browsers and backends implement browser security countermeasures. With this lab one can breakpoint debug step-by-step the interactions between browsers and backends as they attempt to implement a countermeasure.
+This lab provides both the front and backend components to test browser security. This lab was created so that one can view step-by-step how browsers and backends implement browser security countermeasures. With this lab one can breakpoint debug step-by-step the interactions between browsers and backends as they attempt to implement a countermeasure.
 
-What are the countermeasures?
+What are the topics you can explore with this lab?
 
+0. Browser Security Basics
 0. SSP - Same Site Policy
 1. SOP - Same Origin Policy
+2. CSRF - Cookie Attack
 2. CORS - Cross Origin Requests
 3. XSS - Cross Site Scripting
-4. Content Security Policies
+3. CSP - XSS prevention policies
 5. SEC- Headers
 6. OpenID and OAuth
 7. Cookies vs JWT and Browser Storage
