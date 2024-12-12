@@ -5,4 +5,4 @@ document.cookie="TopSecretPassword=1234567890";
 var op1 = decodeURI(getUrlParameter('op1'))
 var op2 = decodeURI(getUrlParameter('op2'))
 var sum = eval(op1 + ' + ' + op2)
-console.log(`The sum is: ${sum}`) //Inject XSS into the console
+console.log('The sum is: ${sum}') //Inject XSS into the console
