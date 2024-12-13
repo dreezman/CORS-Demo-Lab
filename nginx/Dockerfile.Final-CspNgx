@@ -44,6 +44,6 @@ RUN  echo 'echo "" > /usr/share/nginx-config/csp-policy.conf' > /docker-entrypoi
 RUN chmod -R a+rwx  /usr/share/nginx-config/csp-policy.conf
 # tell crontab to reload nginx every 10 seconds in case we push a new csp policy
 COPY nginx/crontab.conf /var/spool/cron/crontabs/root
-RUN echo "crond" > /docker-entrypoint.d/50-start-cron.sh && \
+RUN echo "while  sleep 5; do nginx -s reload; done &" > /docker-entrypoint.d/50-start-cron.sh && \
     chmod a+x /docker-entrypoint.d/50-start-cron.sh
 
