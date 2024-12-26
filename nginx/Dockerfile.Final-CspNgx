@@ -42,8 +42,7 @@ COPY nginx/local/csp-policy.conf    /usr/share/nginx-config/csp-policy.conf
 RUN  echo 'echo "" > /usr/share/nginx-config/csp-policy.conf' > /docker-entrypoint.d/10-clear-csp-policy.sh && \
     chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh
 RUN chmod -R a+rwx  /usr/share/nginx-config/csp-policy.conf
-# tell crontab to reload nginx every 10 seconds in case we push a new csp policy
-COPY nginx/crontab.conf /var/spool/cron/crontabs/root
-RUN echo "while  sleep 5; do nginx -s reload; done &" > /docker-entrypoint.d/50-start-cron.sh && \
+# reload ngx every 5 seconds to pick up changes to the csp policy
+RUN echo "while  sleep 5; do nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh && \
     chmod a+x /docker-entrypoint.d/50-start-cron.sh
 
