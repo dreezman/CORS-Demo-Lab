@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="EN" xml:lang="en">
+<head>
+    <title>Cross Origin sub Iframe</title>
+</head>
+
+<body>
+
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--                       Setup login form to store passwords in local storage                                                   -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+
+
+
+ <span style="font-size: 20px">Login Form </span> 
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" value="admin" required><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" value="password"  required><br>
+      <input type="submit" value="Login">
+    </form>
+
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+      
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+      
+        try {
+          const response = await fetch(document.location.origin + '/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          });
+      
+          const data = await response.json();
+          console.log(data);
+          window.localStorage.setItem("AccessToken"+ document.location.port,data.token)
+          window.document.cookie="AccessToken"+ document.location.port + "=" + data.token
+        } catch (error) {
+        console.error('An error occurred:', error.message);
+        }
+      });
+    </script>
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--            Setup Button to send message to parent via postMessage -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+    <hr>
+
+
+    <button type="button" id="button1" > Send Message to Parent <button>
+
+    <script>
+
+        function clickHandler () {
+            console.log("iframeWeb Posting Message");
+            window.parent.postMessage('Iframe sending password data to parent to parent: "MySecretPassword:" ',
+            '*');//could be generic too like '*'
+            }
+        document.getElementById("button1").addEventListener('click',clickHandler,false);
+
+    </script>
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--     Setup message listener, to alert when receive message iframes or parent-->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+    <script>
+    let count = 1
+        // ------------  Receive Message
+        var messageEventHandler = function(event){
+           // check that the origin is one we want.// this is to prevent XSS!!!
+            //if(event.origin == 'https://www.tutorialspoint.com') {
+            if(true) {                
+                //alert(event.data);
+                console.log('Iframe host '+ window.location.host + ' receives data:  '+ event.data + " from origin " + event.origin);
+                document.getElementById("response").innerHTML = event.data  + count;
+                count += 1
+                // respond to sender
+              window.parent.postMessage('Iframe host '+ window.location.host + ' received data:  '+ event.data + " from origin " + event.origin +
+               ' and is returning response--Got Your Message','*')
+            }            
+            }           
+        window.addEventListener('message', messageEventHandler,false);
+
+
+    </script>
+        <div Parent Response Counter: id="response"></div>
+</body>
+</html>

