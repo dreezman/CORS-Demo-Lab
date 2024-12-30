@@ -1,8 +1,9 @@
-
+# backend api server written in LUA that simulates backend API endpoints
 
         location / {
             default_type text/html;
             content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = '*'
                 ngx.say("<p>hello, world to default location</p>")
             }
         }
@@ -11,6 +12,7 @@
             charset_types application/json;
             default_type  application/json;
             content_by_lua '
+                ngx.header["Access-Control-Allow-Origin"] = "*"
                 local cjson = require "cjson"
                 ngx.status  = ngx.HTTP_OK
                 ngx.say(cjson.encode({ status = true, foobar = "string" }))
@@ -20,8 +22,10 @@
 
 
         location /params {
+
             default_type text/html;
             content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = "*"
                 local args = ngx.req.get_uri_args()
                 local response = "<html><body><h1>Request Parameters</h1><ul>"
                 for key, val in pairs(args) do
@@ -38,6 +42,7 @@
         #http://localhost:1234/attack?attack=%22%3Cscript%3Ealert(1)%3C/script%3E%22
         location /xss-attack {
             content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = "*"
                 local args = ngx.req.get_uri_args()
                 ngx.header.content_type = 'text/html'
                 local response = "<html><body>"
@@ -52,8 +57,9 @@
                 ngx.say(response)
             }
         }
-        location /set-csp-header {
+        location /push-ngx-config {
             content_by_lua '
+                ngx.header["Access-Control-Allow-Origin"] = "*"
                 ngx.req.read_body()
                 local request_body = ngx.req.get_body_data()  
                 local file = io.open("${NGINX_CONFIG_FILE}", "w+b")

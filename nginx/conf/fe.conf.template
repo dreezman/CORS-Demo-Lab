@@ -1,10 +1,10 @@
 ##
-
+# Frontend server that serves up html, js, css, etc
+# and embedded CSP controls
 ##
 
     root   /usr/local/openresty/nginx/html/;
     index  index.html index.htm;
-    include /etc/nginx/mime.types;
 
 
     # create random nonce value for CSP that is used by all the pages
@@ -21,14 +21,15 @@
     location / {
 
 
-		## send logs to here
-		add_header Reporting-Endpoints  "$NGX_CSP_REPORTING_SERVER";
-    # no caching
-    add_header Last-Modified $date_gmt;
-    add_header Cache-Control 'no-store, no-cache';
-		## pull in policy from shared volume
-		include /usr/share/nginx-config/csp-policy.conf;
-		try_files $uri $uri/ /index.html;
+        ## send logs to here
+        add_header Reporting-Endpoints  "$NGX_CSP_REPORTING_SERVER";
+        # no caching
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache';
+        add_header Access-Control-Allow-Origin "*";
+        ## pull in policy from shared volume
+        include /usr/share/nginx-config/csp-policy.conf;
+        try_files $uri $uri/ /index.html;
     }
 
 
@@ -38,6 +39,7 @@
     # no caching
     add_header Last-Modified $date_gmt;
     add_header Cache-Control 'no-store, no-cache';
+    add_header Access-Control-Allow-Origin "*";
 		try_files $uri $uri/ /index.html;
 	}
 

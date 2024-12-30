@@ -32,7 +32,7 @@ RUN  echo 'echo "" > /usr/share/nginx-config/csp-policy.conf' > /docker-entrypoi
     chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh
 RUN chmod -R a+rwx  /usr/share/nginx-config/csp-policy.conf
 # reload ngx every 5 seconds to pick up changes to the csp policy
-RUN echo "while  sleep 5; do nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh && \
+RUN echo "while  sleep 5; do /usr/local/openresty/nginx/sbin/nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh && \
     chmod a+x /docker-entrypoint.d/50-start-cron.sh
 
 # copy front end static files to the web root
