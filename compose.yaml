@@ -7,15 +7,16 @@ services:
       context: .
       tags:
         - "browser-security-lab"
+      args:
+        NGINX_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-update-file.conf
+
     volumes:
       - ./nginx/local:/usr/share/nginx-config:rw
       - ./nginx/conf:/etc/nginx/templates
     environment:
       - NGINX_ERR_OUTPUT=/dev/stdout
       - NGINX_ERR_MODE=info
-      - NGINX_CONFIG_FILE=/usr/share/nginx-config/csp-policy.conf
-      # log all csp errors to the logger
-      - NGX_CSP_REPORTING_SERVER='https://localhost:9999'
+      - NGX_CSP_REPORTING_SERVER="https://localhost:9800"
     image: "browser-security-lab-image"
     container_name: "browser-security-lab"
     ports:
@@ -29,7 +30,7 @@ services:
     image: ghcr.io/ix-ai/csp:latest
     container_name: csp-reporter
     environment:
-      PORT: "9999"
+      PORT: "9800"
       MAX_CONTENT_LENGTH: "40000"
     ports:
-      - "9999:9999"
+      - "9800:9800"

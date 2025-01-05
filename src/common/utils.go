@@ -110,7 +110,7 @@ func PushNgxConfig(w http.ResponseWriter, r *http.Request) {
 	bodyStr := string(body)
 	fmt.Print("Before file exists check, here is body:\n", bodyStr)
 	// Check if the file exists
-	filePath := "/usr/share/nginx-config/csp-policy.conf"
+	filePath := "/usr/share/nginx-config/ngx-dynamic-update-file.conf"
 	var ngxConfigFile *os.File // Declare ngxConfigFile before the conditional statements
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		w.WriteHeader(http.StatusAccepted) // 202 Accepted

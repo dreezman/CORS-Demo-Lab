@@ -61,21 +61,21 @@
 
 # block all
 add_header Content-Security-Policy-Report-Only
-    "default-src 'none'  ; report-uri http://localhost:9999/csp; " ;
+    "default-src 'none'  ; report-uri http://localhost:9800/csp; " ;
 
 # allow all????
 add_header Content-Security-Policy-Report-Only
-    "default-src *       ; report-uri http://localhost:9999/csp;";
+    "default-src *       ; report-uri http://localhost:9800/csp;";
 
 # allow all with from self
 add_header Content-Security-Policy-Report-Only
-    "default-src 'self'; report-uri http://localhost:9999/csp;";
+    "default-src 'self'; report-uri http://localhost:9800/csp;";
 
 # allow a hierarchy of JS included sources to run
 add_header Content-Security-Policy-Report-Only
     "default-src 'self' *.google.com; 
     script-src 'self' 'strict-dynamic'  ; 
-    report-uri http://localhost:9999/csp; " ;
+    report-uri http://localhost:9800/csp; " ;
 
 # allow inline scripts to run with nonces 
 set_secure_random_alphanum $cspNonce 32;
@@ -86,7 +86,7 @@ sub_filter '<script>'  '<script nonce="$cspNonce">'  ;
 add_header Content-Security-Policy-Report-Only
     "default-src 'self' *.example.com; 
     script-src 'self' 'nonce-$cspNonce' ; 
-    report-uri http://localhost:9999/csp; " ;
+    report-uri http://localhost:9800/csp; " ;
 
 
 # allow all the various options
