@@ -36,7 +36,7 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 		So that at the end we can loop thru the map and refer to each
 		frame property like
 
-		FrameConfigMap[frameName].DomainName
+		FrameConfigMap[apiName].DomainName
 
 		Bit weird, first read JSON config data, the put into map where we
 		can refer to each member by name.
@@ -44,7 +44,7 @@ func WriteACHeader(w http.ResponseWriter, AllowOrigin string) {
 	   -----------------------------------------------------------------------
 */
 type Frame struct {
-	FrameName    string `json:"frameName"`
+	apiName    string `json:"apiName"`
 	DomainName   string `json:"domainName"`
 	HTTPPort     string `json:"httpPort"`
 	HTTPSPort    string `json:"httpsPort"`
@@ -53,7 +53,7 @@ type Frame struct {
 	Description  string `json:"Description"`
 }
 
-var IFrameConfigMap map[string]Frame
+var apiConfigMap map[string]Frame
 
 /* First load temp JSON data into this array */
 type IframesData struct {
@@ -70,11 +70,11 @@ func LoadFrameConfig(configFile *os.File) error {
 	if err != nil {
 		return err
 	}
-	// Build map with framename as index so that can refer to
-	// as FrameConfigMap[frameName].DomainName
-	IFrameConfigMap = make(map[string]Frame)
+	// Build map with apiName as index so that can refer to
+	// as FrameConfigMap[apiName].DomainName
+	apiConfigMap = make(map[string]Frame)
 	for _, iframe := range frameConfigData.Iframes {
-		IFrameConfigMap[iframe.FrameName] = iframe
+		apiConfigMap[iframe.apiName] = iframe
 	}
 	return nil
 }

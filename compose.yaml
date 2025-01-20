@@ -9,7 +9,6 @@ services:
         - "browser-security-lab"
       args:
         NGINX_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-update-file.conf
-
     volumes:
       - ./nginx/local:/usr/share/nginx-config:rw
       - ./nginx/conf:/etc/nginx/templates
@@ -17,20 +16,26 @@ services:
       - NGINX_ERR_OUTPUT=/dev/stdout
       - NGINX_ERR_MODE=info
       - NGX_CSP_REPORTING_SERVER="https://localhost:9800"
+      - NGINX_HTML_ROOT=/usr/local/openresty/nginx/html/
     image: "browser-security-lab-image"
     container_name: "browser-security-lab"
     ports:
-      - "7777:80"
-      - "9081:8080"
-      - "9381:8443"
+      - "7777:80"    # bsl front end
+      - "9081:8080"  # csp backend
+      - "9381:8443"  # csp ssl backend
+      - "9090:9090" #  cors backend
+      - "9443:9443" #  cors ssl backend
+      - "7070:7070" #  config update backend
+      - "7443:7443" #  cconfig update ssl backend
+
 
   ################# CSP REPORTER ####################
   # where to send the csp reports
-  nginx-csp-reporter:
-    image: ghcr.io/ix-ai/csp:latest
-    container_name: csp-reporter
-    environment:
-      PORT: "9800"
-      MAX_CONTENT_LENGTH: "40000"
-    ports:
-      - "9800:9800"
+  #nginx-csp-reporter:
+  #  image: ghcr.io/ix-ai/csp:latest
+  #  container_name: csp-reporter
+  #  environment:
+  #    PORT: "9800"
+  #    MAX_CONTENT_LENGTH: "40000"
+  #  ports:
+  #    - "9800:9800"

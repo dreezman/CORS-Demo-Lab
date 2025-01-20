@@ -36,15 +36,9 @@ RUN  echo "echo \"\" > ${NGINX_CONFIG_FILE}; chmod a+rw ${NGINX_CONFIG_FILE}" > 
 RUN echo "while  sleep 5; do /usr/local/openresty/nginx/sbin/nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh && \
     chmod a+x /docker-entrypoint.d/50-start-cron.sh
 
-    
-
-
-
-
-
-    
-
 # copy front end static files to the web root
 COPY fe/ /usr/local/openresty/nginx/html/
-
+# install luafilesystem which allow LUA to make file
+# system calls like chdir, mode, default dir
+RUN  luarocks install luafilesystem
 CMD ["/docker-entrypoint.sh", "nginx"]

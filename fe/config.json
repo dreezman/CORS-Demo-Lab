@@ -1,31 +1,31 @@
 {
   "Iframes": [
     {
-      "frameName": "ParentIframe",
+      "apiName": "CSPbackend",
       "domainName": "localhost",
       "httpPort": "9081",
       "httpsPort": "9381",
       "fullHTTPURL": "http://localhost:9081",
       "fullHTTPSURL": "https://localhost:9381",
-      "Description": "ParentFrame has port 9081 and TLS 9381"
+      "Description": "Backend endpoints for CSP lab"
     },
     {
-      "frameName": "Iframe1",
+      "apiName": "CORSbackend",
       "domainName": "localhost",
-      "httpPort": "3000",
-      "httpsPort": "3300",
-      "fullHTTPURL": "http://localhost:3000",
-      "fullHTTPSURL": "https://localhost:3300",
-      "Description": "Iframe1 has different origin as parent, port 3000 and TLS 3300"
+      "httpPort": "9090",
+      "httpsPort": "9443",
+      "fullHTTPURL": "http://localhost:9090",
+      "fullHTTPSURL": "https://localhost:9443",
+      "Description": "Backend endpoints for CORS lab"
     },
     {
-      "frameName": "Iframe2",
+      "apiName": "ConfigUpdate",
       "domainName": "localhost",
-      "httpPort": "3100",
-      "httpsPort": "3400",
-      "fullHTTPURL": "http://localhost:3100",
-      "fullHTTPSURL": "https://localhost:3400",
-      "Description": "Iframe2 has different origin as parent, port 3100 and TLS 3400"
+      "httpPort": "7070",
+      "httpsPort": "7443",
+      "fullHTTPURL": "http://localhost:7070",
+      "fullHTTPSURL": "https://localhost:7443",
+      "Description": "Backend endpoints for CORS lab"
     }
   ]
 }

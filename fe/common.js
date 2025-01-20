@@ -11,5 +11,5 @@ function getUrlParameter(name) {
 
 
 getConfig("../config.json"); // data is stored in localstorage under "config"
-const jsonConfig = JSON.parse(localStorage.getItem("iframeConfig"));
+const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
 

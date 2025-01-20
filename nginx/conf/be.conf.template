@@ -1,5 +1,6 @@
 # backend api server written in LUA that simulates backend API endpoints
 
+        # default is hello world
         location / {
             default_type text/html;
             content_by_lua_block {
@@ -7,6 +8,7 @@
                 ngx.say("<p>hello, world to default location</p>")
             }
         }
+        # default return a json string
         location /json {
             charset       utf-8;
             charset_types application/json;
@@ -20,7 +22,7 @@
             ';
         }
 
-
+        # return HTML using content from request params...XSS vulnerable
         location /params {
 
             default_type text/html;
@@ -39,6 +41,7 @@
                 ngx.say(response)
             }
         }
+        # return HTML using content from request params...also XSS vulnerable
         #http://localhost:1234/attack?attack=%22%3Cscript%3Ealert(1)%3C/script%3E%22
         location /xss-attack {
             content_by_lua_block {
@@ -57,15 +60,6 @@
                 ngx.say(response)
             }
         }
-        location /push-ngx-config {
-            content_by_lua '
-                ngx.header["Access-Control-Allow-Origin"] = "*"
-                ngx.req.read_body()
-                local request_body = ngx.req.get_body_data()  
-                local file = io.open("${NGINX_CONFIG_FILE}", "w+b")
-                file:write(request_body)
-                file:close()
-            ';
-        }
+
 
     
