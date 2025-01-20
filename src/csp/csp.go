@@ -130,7 +130,7 @@ func InsertCSPHeader(w http.ResponseWriter, r *http.Request) {
 
 	// Add dynamic headers based on request properties
 	if CSPConfig_Current.Enabled {
-		url := common.IFrameConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
+		url := common.apiConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
 		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "` + url + `" }]}`
 		w.Header().Set("Report-To", cspGroup)
 		w.Header().Set("Reporting-Endpoints", `csp-endpoint-uri="`+url+`"`)
@@ -146,7 +146,7 @@ func InsertCSPHeader() map[string]string {
 	headers := make(map[string]string)
 	// Add dynamic headers based on request properties
 	if CSPConfig_Current.Enabled {
-		url := common.IFrameConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
+		url := common.apiConfigMap["ParentIframe"].FullHTTPSURL + "/csp-report-only"
 		print(fmt.Sprint("csp-endpoint-uri=\"", url, "\""))
 		cspGroup := `{"group": "csp-endpoint-group","max_age": 10886400,"endpoints": [{"url": "` + url + `" }]}`
 		headers["Report-To"] = cspGroup

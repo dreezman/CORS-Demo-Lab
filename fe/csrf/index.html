@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="EN" xml:lang="en">
+  <head>
+    <title>Cookies and CSRF attack</title>
+  </head>
+
+  <body>
+    <!----------------------------------------------------------------------------------------
+      Load Config information about iframes and their URLs and ports
+    ------------------->
+    <script src="../getConfig.js" type="application/javascript"></script>
+    <script>
+      getConfig("../config.json"); // data is stored in localstorage under "config"
+      const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
+    </script>
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--      Cookie Testing-   Load up on Cookies                                          -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <hr />
+    <h2>Cooking with Cookies</h2>
+
+    So, before we complicate things with Same Origin Policy, let us start simple
+    with Same Site Policy (SSP). SSP applies to how cookies are handled. In this
+    excercise, we will load cookies and then steal them... if SSP allows it!
+    <br />
+
+    First...lets load up some cookies into the browser. <br /><br />
+
+    1) F12 the debugger <br />
+    2) Clear out network traffic <br />
+    3) Clear out cookies <br />
+    4) Monitor network and cookie jar and see what happens <br /><br />
+    <img src="bakingcookies.jpg" alt="bakecookies" width="400" height="200" />
+    <br />
+    <script src="getCookies.js"></script>
+    <button
+      type="button"
+      id="getvariouscookiessameorigin"
+      onclick="getCookies()"
+    >
+      Click to Bake Some Cookies (Load cookies into browser like when you log
+      into you bank account)
+    </button>
+    <div id="sameorigincookieresponse"></div>
+
+    <p>
+      Now, let's look into the Cookie Jar and see what cookies we have. Look at
+      the error console and see if some did not load.<br />
+    </p>
+    <div
+      class="tenor-gif-embed"
+      data-postid="14260609"
+      data-share-method="host"
+      data-aspect-ratio="1.78571"
+      data-width="33%"
+    >
+      <a href="https://tenor.com/view/cookie-jar-cookie-smile-gif-14260609"
+        >Cookie Jar Cookie GIF</a
+      >from
+      <a href="https://tenor.com/search/cookie+jar-gifs">Cookie Jar GIFs</a>
+    </div>
+    <script
+      type="text/javascript"
+      async
+      src="https://tenor.com/embed.js"
+    ></script>
+    <button
+      type="button"
+      id="getvariouscookiessameorigin"
+      onclick="openCookieJar('cookieTemplate')"
+    >
+      Open the Cookie Jar please</button
+    ><br />
+
+    <label for="cookieTemplate"></label>
+    <textarea
+      id="cookieTemplate"
+      name="freeform"
+      rows="10"
+      cols="150"
+    ></textarea>
+    <h2>What is all this Cookie Security Stuff??</h2>
+    Both HTML Forms and JS can make HTTP requests. Cookies are sent
+    automatically by the main browser on HTTP requests. Let' look into the
+    cookie storage and describe the security fields which tell them main browser
+    when to send the cookie<br />
+    <img src="cookiestorage.jpg" alt="Cookie Jar" width="800" height="200" />
+    <ul>
+      <li>
+        Domain - Which site (ignore port,subdomains) should I send this to. If
+        cookie domain is bank.com, then only send to http://bank.com or
+        http://example.bank.com
+      </li>
+      <li>
+        Path - / sends cookies regardless of URL path. /somename only sends if
+        /somename is in URL path or subdirectory
+      </li>
+      <li>
+        HTTP Only - Only main browser has access to cookie, not JS code. Some
+        XSS protection.
+      </li>
+      <li>
+        Expire - "Session" cookies used for keeping state during a shopping
+        session. Session length is browser define. Dated expire times are when
+        backends want to control cookie expire times.
+      </li>
+      <li>Secure - Can only send over over HTTPS</li>
+      <li>SameSite - See below</li>
+    </ul>
+
+    <p>
+      What is all this sameSite stuff about?
+      <a
+        href="https://andrewlock.net/understanding-samesite-cookies/"
+        target="_blank"
+      >
+        SameSite Details and examples</a
+      >
+    </p>
+
+    <ul>
+      <li>
+        None - Send all SameSite(domain)"none" cookies on all requests. "secure"
+        means only over HTTPS
+      </li>
+      <li>
+        Lax - bank.com cookies will be sent if you are on FaceBook and click
+        link to your bank.com..but only on **GET** requests (and several other
+        restrictions)
+      </li>
+      <li>
+        Strict - bank.com cookies will be sent only if your are on bank.com
+        going to bank.com
+      </li>
+    </ul>
+
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!--         Steal Cookies                                         -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------------------------------- -->
+
+    <h2>Stealing Cookies</h2>
+    OK, you are probably pretty bored and hungry by now. Here is an easy way to
+    steal some cookies!<br />
+
+    <br />
+    <p>Click the picture to steal a cookie</p>
+    <a id="attacklink">
+      <img
+        src="cookiemonster.jpg"
+        alt="Cookie Monster"
+        width="400"
+        height="200" /></a
+    ><br />
+
+    <script>
+      document.getElementById("attacklink").href =
+        "https://coresdemo2.z13.web.core.windows.net/csrf-attack-form.html";
+    </script>
+  </body>
+</html>

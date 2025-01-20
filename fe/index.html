@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Browser Security Lab</title>
+        <link rel="stylesheet" href="/styles.css" />
+    </head>
+    <body>
+        <h2>Browser Security Lab</h2>
+
+        <img src=/Logo-smaller.gif width="15%">
+        <p>Click on the tabs to switch between different security topics.</p>
+
+        <div class="tab">
+            <a href="/xss/index.html" class="tablinks" target="content-frame"
+                >XSS-CSP</a
+            >
+            <a href="/cors/index.html" class="tablinks" target="content-frame"
+                >CORS</a
+            >
+            <a href="/csrf/index.html" class="tablinks" target="content-frame"
+                >CSRF</a
+            >
+        </div>
+        <hr />
+        <iframe name="content-frame" src="/xss/index.html"></iframe>
+    </body>
+</html>

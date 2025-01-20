@@ -1,0 +1,46 @@
+##
+# Frontend server that serves up html, js, css, etc
+# and embedded CSP controls
+##
+
+    root   /usr/local/openresty/nginx/html/;
+    index  index.html index.htm;
+
+
+    # create random nonce value for CSP that is used by all the pages
+    set_secure_random_alphanum $cspNonce 32;
+
+    # nginx error logging to debug.log if needed, otherwise comment out
+    error_log ${NGINX_ERR_OUTPUT} ${NGINX_ERR_MODE};    
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    location / {
+
+
+        ## send logs to here
+        add_header Reporting-Endpoints  $NGX_CSP_REPORTING_SERVER;
+        # no caching
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache';
+        add_header Access-Control-Allow-Origin "*";
+        ## pull in policy from shared volume with new config submitted
+        ## by user and updated every 5 seconds
+        include ${NGINX_CONFIG_FILE};
+        try_files $uri $uri/ /index.html;
+    }
+
+
+
+	# Part of class training, no csp policy
+	location /csp/ {
+    # no caching
+    add_header Last-Modified $date_gmt;
+    add_header Cache-Control 'no-store, no-cache';
+    add_header Access-Control-Allow-Origin "*";
+		try_files $uri $uri/ /index.html;
+	}
+

@@ -1,0 +1,90 @@
+# backend api server written in LUA that simulates backend API endpoints
+
+        # default is hello world
+        location / {
+            default_type text/html;
+            content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = '*'
+                ngx.say("<p>hello, world to default location</p>")
+            }
+        }
+
+        # default return a json string
+        location /json {
+            charset       utf-8;
+            charset_types application/json;
+            default_type  application/json;
+            content_by_lua '
+                -- include headers from the config file that the User
+                -- has dynamically updated
+                dofile("${NGINX_CONFIG_FILE}")
+                local cjson = require "cjson"
+                ngx.status  = ngx.HTTP_OK
+                ngx.say(cjson.encode({ status = true, foobar = "string" }))
+                return ngx.exit(ngx.HTTP_OK)
+            ';
+        }
+
+        # GET method returns an image
+        # https://localhost/get-img?file=<filename>
+        location /get-img {
+            content_by_lua_block {
+                ngx.header["Content-Type"] = "image/png"
+                local args = ngx.req.get_uri_args()
+                local file = args["file"]
+                if file then
+                    local image_url = "/get-img-file/" .. file
+                    ngx.header["Content-Type"] = "text/html"
+                    ngx.say("<html><body><img src='" .. image_url .. "' alt='Image'></body></html>")
+        
+                else
+                    ngx.status = ngx.HTTP_BAD_REQUEST
+                    ngx.say("File parameter is missing")
+                    return ngx.exit(ngx.HTTP_BAD_REQUEST)
+                end
+            }
+
+        }
+
+        location /get-img-file {
+
+            alias "${NGINX_HTML_ROOT}";
+
+        }
+        # GET to return parms
+        # return HTML using content from request params...XSS vulnerable
+        location /echo-params {
+
+            default_type text/html;
+            content_by_lua_block {
+
+                local args = ngx.req.get_uri_args()
+                local response = "<html><body><h1>Request Parameters</h1><ul>"
+                for key, val in pairs(args) do
+                    if type(val) == "table" then
+                        response = response .. "<li>" .. key .. " : " .. table.concat(val, ", ") .. "</li>"
+                    else
+                        response = response .. "<li>" .. key .. " : " .. val .. "</li>"
+                    end
+                end
+                response = response .. "</ul></body></html>"
+                ngx.say(response)
+            }
+        }
+
+
+        # POST login
+        # TBD probably return JSON in future??
+        location /login {
+            if ($request_method = OPTIONS) {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }
+        }
+
+    

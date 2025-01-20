@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="EN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings Lab</title>
+    <link rel="stylesheet" href="/styles.css" type="text/css" />
+    <style>
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+    }
+</style>
+    </head>
+  <body>
+    <!-- Get URLs of all the front end back ends </script> -->
+    <script src="../getConfig.js" type="application/javascript"></script>
+    <script>
+      getConfig("../config.json"); // data is stored in localstorage under "config"
+      const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
+    </script>
+    <div class="column-split">
+        <h2>Cross Origin Request Lab</h2>
+
+
+
+
+        <hr />
+        <br /><br />
+        <hr />
+        <h3>CORS image</h3>
+        <hr />
+        <br /><br />
+          Let us import an image from cross origin.
+
+        <br /><br />
+        <a href="http://localhost:9090/get-img?file=/cors/hackerimg.png">Image Import</a>
+        <br /><br />
+        <hr />
+        <h3>JSON import</h3>
+        <hr />
+        <br /><br />
+          Get some JSON data with html
+
+        <br /><br />
+        <a href="http://localhost:9090/json">Read JSON</a>
+        <br /><br />
+
+        
+        <hr />
+        <h3>JSON import from Javascript</h3>
+        <hr />
+        <br /><br />
+          Get some JSON data
+
+        <br /><br />
+        <a href="http://localhost:9090/json" id="fetch-json">Read JSON</a>
+        <br /><br />
+        <div id="json-output"></div>
+
+        <div id="json-output"></div>
+
+        <script>
+            document.getElementById('fetch-json').addEventListener('click', function(event) {
+                event.preventDefault();
+                fetch('http://localhost:9090/json')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('json-output').innerText = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => console.error('Error fetching JSON:', error));
+            });
+        </script>
+
+
+
+      </div>
+
+    <div class="form-container-split">
+        <h2>Submit Form</h2>
+        <form id="configForm" enctype="text/plain">
+          <label for="configInput">Enter Config:</label>
+          <textarea
+            id="configInput"
+            name="config"
+            rows="10"
+            cols="50"
+          ></textarea>
+          <button type="button" onclick="submitConfig()">Submit</button>
+        </form>
+
+        <script>
+          function submitConfig() {
+            const configInput = document.getElementById("configInput").value;
+
+            fetch(jsonConfig.ConfigUpdate.fullHTTPSURL + "/push-ngx-config", {
+              method: "POST",
+              headers: {
+                "Content-Type": "text/plain",
+              },
+              body: configInput,
+            })
+              .then((response) => {
+                if (response.ok) {
+                  alert("Config submitted successfully");
+                } else {
+                  alert("Failed to submit config");
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while submitting the config");
+              });
+          }
+        </script>
+
+        <br />
+        <textarea id="cspPolicy" rows="40" cols="100">
+
+
+
+# block all
+add_header Content-Security-Policy-Report-Only
+    "default-src 'none'  ; report-uri http://localhost:9800/csp; " ;
+
+
+
+            </textarea
+        >
+    </div>
+</body>
+</html>
