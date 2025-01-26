@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Image</title>
+</head>
+<body>
+
+
+
+    <script>
+        document.getElementById('post-login').addEventListener('click', function(event) {
+            event.preventDefault();
+            fetch(jsonConfig.CORSbackend.fullHTTPSURL + "/login",{
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                User: 'Joe Schmoe',
+                Password: 'SuperSecretPassword'
+              })
+            .then(response => response.json())
+                .then(data => {
+                    document.getElementById('login-output').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error fetching JSON:', error))
+        })
+      });
+    </script>      
+
+      </div>
+ <!--       /* Form for submitting nginx config, either CORSpreflight or the default
+           // common (common to CORS, CSP, CSRF) config
+      */   -->
+      <div class="form-container-split">
+
+</body>
+</html>

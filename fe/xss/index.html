@@ -331,7 +331,7 @@
                 function submitConfig() {
                     const configInput = document.getElementById("configInput").value;
 
-                    fetch(jsonConfig.ConfigUpdate.fullHTTPSURL + "/push-ngx-config", {
+                    fetch(jsonConfig.CSPbackend.fullHTTPSURL + "/push-ngx-config", {
                     method: "POST",
                     headers: {
                         "Content-Type": "text/plain",

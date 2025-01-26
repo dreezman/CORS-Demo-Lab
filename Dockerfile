@@ -1,9 +1,11 @@
 
 FROM openresty/openresty:1.25.3.1-2-alpine-fat
-ARG NGINX_CONFIG_FILE
-ENV NGINX_CONFIG_FILE=${NGINX_CONFIG_FILE}
-EXPOSE 80
-EXPOSE 443
+ARG NGINX_CSP_CONFIG_FILE
+ARG NGINX_PF_CORS_CONFIG_FILE
+ARG NGINX_CORS_CONFIG_FILE
+ENV NGINX_CSP_CONFIG_FILE=${NGINX_CSP_CONFIG_FILE} \
+    NGINX_PF_CORS_CONFIG_FILE=${NGINX_PF_CORS_CONFIG_FILE} \
+    NGINX_CORS_CONFIG_FILE=${NGINX_CORS_CONFIG_FILE} 
 RUN apk update && apk add --no-cache \
     openrc \
     curl \
@@ -30,11 +32,23 @@ RUN  rm -f entrypoint/docker-entrypoint.sh && \
 # copy the nginx config file
 COPY nginx/conf/nginx.conf /usr/local/openresty/nginx/conf/
 COPY nginx/pubkey/* /usr/local/openresty/nginx/
-# clear it dynamic config file out in case it was left over from a previous run
-RUN  echo "echo \"\" > ${NGINX_CONFIG_FILE}; chmod a+rw ${NGINX_CONFIG_FILE}" > /docker-entrypoint.d/10-clear-csp-policy.sh && \
-     chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh
-RUN echo "while  sleep 5; do /usr/local/openresty/nginx/sbin/nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh && \
-    chmod a+x /docker-entrypoint.d/50-start-cron.sh
+# clear the dynamic config file out in case it was left over from a previous run
+RUN bash -c ' \
+    CONFIG_FILES=( \
+        "${NGINX_CSP_CONFIG_FILE}" \
+        "${NGINX_PF_CORS_CONFIG_FILE}" \
+        "${NGINX_CORS_CONFIG_FILE}" \
+    ); \
+    echo "#!/bin/sh" > /docker-entrypoint.d/10-clear-csp-policy.sh; \
+    for CONFIG_FILE in "${CONFIG_FILES[@]}"; do \
+        echo "echo \"\" > ${CONFIG_FILE}; chmod a+rw ${CONFIG_FILE}" >> /docker-entrypoint.d/10-clear-csp-policy.sh; \
+    done; \
+    chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh \
+'
+
+     
+
+
 
 # copy front end static files to the web root
 COPY fe/ /usr/local/openresty/nginx/html/

@@ -18,14 +18,14 @@ http {
 
 
     include       mime.types;
-    #### Front End HTTP Server Configuration ####
+
+        ############  COMMON front end  configurations  ############
+        #### Front End Serves up HTML pages and Updates NGINX configurations ####
+
     server {
         listen       80;
         server_name  localhost;
-
-
-        ############  front end  configurations  ############
-        include /etc/nginx/conf.d/fe.conf;
+        include /etc/nginx/conf.d/fe-html.conf;
 
         # redirect server error pages to the static page /50x.html
         #
@@ -34,8 +34,8 @@ http {
             root   html;
         }
     }
-        ############   back end CSP configurations  ############
 
+        ############   back end CSP configurations HTTP Server  ############
     server {
         listen              8080; # listen both http and https
         listen              8443 ssl;
@@ -45,8 +45,7 @@ http {
         ssl_certificate     /usr/local/openresty/nginx/publiccert.crt;
         ssl_certificate_key /usr/local/openresty/nginx/privatekey.key;
 
-        ############  back end configurations  ############
-        include /etc/nginx/conf.d/be.conf;
+        include /etc/nginx/conf.d/csp-be.conf;
 
         # redirect server error pages to the static page /50x.html
         #
@@ -56,7 +55,7 @@ http {
         }
     }   
 
-        ############   back end CORS configurations  ############
+        ############   back end CORS configurations HTTP server ############
     server {
         listen              9090; # listen both http and https
         listen              9443 ssl;
@@ -67,7 +66,7 @@ http {
         ssl_certificate     /usr/local/openresty/nginx/publiccert.crt;
         ssl_certificate_key /usr/local/openresty/nginx/privatekey.key;
 
-        ############  back end configurations  ############
+
         include /etc/nginx/conf.d/cors-be.conf;
 
         # redirect server error pages to the static page /50x.html
@@ -77,36 +76,5 @@ http {
             root   html;
         }
     }   
-    ## ############   Common server to update nginx config  ############
-    server {
-        listen              7070; # listen both http and https
-        listen              7443 ssl;
-        server_name         localhost;
-        include             mime.types;
-        root                /usr/local/openresty/nginx/html/;
 
-        ssl_certificate     /usr/local/openresty/nginx/publiccert.crt;
-        ssl_certificate_key /usr/local/openresty/nginx/privatekey.key;
-
-        ############  back end configurations  ############
-        # allow browser client to update nginx config dynamically
-        # cron has reload every 5 seconds to reload nginx config
-        location /push-ngx-config {
-            content_by_lua '
-                ngx.header["Access-Control-Allow-Origin"] = "*"
-                ngx.req.read_body()
-                local request_body = ngx.req.get_body_data()  
-                local file = io.open("${NGINX_CONFIG_FILE}", "w+b")
-                file:write(request_body)
-                file:close()
-            ';
-        }
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-    }
 }

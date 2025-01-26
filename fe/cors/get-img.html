@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Image</title>
+</head>
+<body>
+    <h3>Import Image</h3>
+    <a id="image-link" href="#">Image Import</a>
+
+    <script src="../getConfig.js" type="application/javascript"></script>
+    <script>
+        // Assuming getConfig function sets the jsonConfig object
+        getConfig("../config.json"); // data is stored in localstorage under "config"
+        const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
+
+        // Set the href attribute for the image link
+        document.getElementById('image-link').href = jsonConfig.CORSbackend.fullHTTPSURL + "/get-img?file=/cors/hackerimg.png";
+    </script>
+</body>
+</html>

@@ -8,7 +8,12 @@ services:
       tags:
         - "browser-security-lab"
       args:
-        NGINX_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-update-file.conf
+        # two nginx config files that the user can dynamically change
+        # this is for most nginx cors and csp headers
+        NGINX_CSP_CONFIG_FILE: /usr/share/nginx-config/ngx-csp-update-file.conf
+        # this is for cors preflight requests
+        NGINX_CORS_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-cors-update-file.conf
+        NGINX_PF_CORS_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-preflight-cors-update-file.conf
     volumes:
       - ./nginx/local:/usr/share/nginx-config:rw
       - ./nginx/conf:/etc/nginx/templates
@@ -20,13 +25,11 @@ services:
     image: "browser-security-lab-image"
     container_name: "browser-security-lab"
     ports:
-      - "7777:80"    # bsl front end
+      - "7777:80"    # bsl front end HTML and JS server
       - "9081:8080"  # csp backend
       - "9381:8443"  # csp ssl backend
       - "9090:9090" #  cors backend
       - "9443:9443" #  cors ssl backend
-      - "7070:7070" #  config update backend
-      - "7443:7443" #  cconfig update ssl backend
 
 
   ################# CSP REPORTER ####################

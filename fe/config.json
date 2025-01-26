@@ -17,15 +17,6 @@
       "fullHTTPURL": "http://localhost:9090",
       "fullHTTPSURL": "https://localhost:9443",
       "Description": "Backend endpoints for CORS lab"
-    },
-    {
-      "apiName": "ConfigUpdate",
-      "domainName": "localhost",
-      "httpPort": "7070",
-      "httpsPort": "7443",
-      "fullHTTPURL": "http://localhost:7070",
-      "fullHTTPSURL": "https://localhost:7443",
-      "Description": "Backend endpoints for CORS lab"
     }
   ]
 }

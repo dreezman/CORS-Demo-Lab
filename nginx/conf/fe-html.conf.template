@@ -29,18 +29,17 @@
         add_header Access-Control-Allow-Origin "*";
         ## pull in policy from shared volume with new config submitted
         ## by user and updated every 5 seconds
-        include ${NGINX_CONFIG_FILE};
         try_files $uri $uri/ /index.html;
     }
 
 
 
 	# Part of class training, no csp policy
-	location /csp/ {
-    # no caching
-    add_header Last-Modified $date_gmt;
-    add_header Cache-Control 'no-store, no-cache';
-    add_header Access-Control-Allow-Origin "*";
-		try_files $uri $uri/ /index.html;
+	location ~ ^/(xss|csp|cors|csrf)/ {
+        # no caching
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache';
+        add_header Access-Control-Allow-Origin "*";
+            try_files $uri $uri/ /index.html;
 	}
 

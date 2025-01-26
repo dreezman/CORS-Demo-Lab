@@ -61,5 +61,18 @@
             }
         }
 
-
+        ############  Update CSP ngixn configuration dynamically  ############
+        # allow browser client to update nginx config dynamically
+        # cron has reload every 5 seconds to reload nginx config
+        # dynmically update the CSP config file
+        location /push-ngx-config {
+            content_by_lua '
+                local file = io.open("${NGINX_CSP_CONFIG_FILE}", "w+b")
+                ngx.header["Access-Control-Allow-Origin"] = "*"
+                ngx.req.read_body()
+                local request_body = ngx.req.get_body_data()  
+                file:write(request_body)
+                file:close()
+            ';
+        }
     
