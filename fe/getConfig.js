@@ -5,7 +5,7 @@ async function getConfig(file) {
   const IFrameMap = new Map();
   let i = 0;
   while (i < configTemp.Iframes.length) {
-    console.log(configTemp.Iframes[i]);
+    // console.log(configTemp.Iframes[i]);
     IFrameMap.set(configTemp.Iframes[i].apiName, configTemp.Iframes[i]);
     i++;
   }

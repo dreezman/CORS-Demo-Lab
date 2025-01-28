@@ -10,6 +10,7 @@ events {
 
 
 http {
+    error_log /dev/stdout info;
     init_by_lua_block {
         local lfs = require "lfs"
         local default_dir = "/usr/local/openresty/nginx/html/"

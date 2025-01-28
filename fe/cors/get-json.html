@@ -14,11 +14,12 @@
 
 
         <script src="../getConfig.js" type="application/javascript"></script>
+
         <script>
             getConfig("../config.json"); // data is stored in localstorage under "config"
             const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
             document.getElementById('fetch-json').addEventListener('click', function(event) {
-            event.preventDefault();
+                event.preventDefault();
             fetch(jsonConfig.CORSbackend.fullHTTPSURL + "/json")
                 .then(response => response.json())
                 .then(data => {

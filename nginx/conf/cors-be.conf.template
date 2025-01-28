@@ -110,6 +110,7 @@
                     end
 
                     -- Return HTML with the name and password (e.g., authenticate the user)
+                    ngx.log(ngx.STDERR, 'Login Successfull, adding header')
                     dofile("${NGINX_CORS_CONFIG_FILE}")
                     ngx.say("Login succesfull with Name: " .. name .. ", Password: " .. password)
                 else
